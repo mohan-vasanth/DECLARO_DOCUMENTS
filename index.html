@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tradenix Documentation Portal</title>
+<title>Declaro Portal</title>
 <style>
   /* ============================================================
      THEME TOKENS
@@ -323,6 +323,53 @@
     border-radius:50%;
     background:var(--active-text);
   }
+
+  /* Clickable mid-level dropdown heading (e.g. "IPT Declaration") that
+     independently expands/collapses a set of nav-items one level deeper,
+     for sections whose sidebar hierarchy mirrors a nested Table of
+     Contents branch (e.g. Amendment Declaration's IPT/INP/TNP/OUT
+     groups). Mirrors the top-level .nav-section-btn/.nav-items pattern
+     at a smaller, deeper-indented scale. */
+  .nav-subgroup-btn{
+    width:100%;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:none;
+    border:none;
+    text-align:left;
+    padding:7px 10px 7px 30px;
+    margin:2px 0 0;
+    cursor:pointer;
+    border-radius:6px;
+    color:var(--text-faint);
+    font-size:11.5px;
+    font-weight:700;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+  }
+  .nav-subgroup-btn:hover{background:var(--hover-bg);color:var(--text);}
+  .nav-subgroup-btn .chev{
+    width:11px;height:11px;
+    display:flex;
+    transition:transform .15s ease;
+    color:var(--text-faint);
+    flex-shrink:0;
+  }
+  .nav-subgroup-wrap.expanded .nav-subgroup-btn .chev{transform:rotate(90deg);}
+
+  .nav-items-sub{
+    list-style:none;
+    margin:0;
+    padding:0;
+    overflow:hidden;
+    max-height:0;
+    transition:max-height .18s ease;
+  }
+  .nav-subgroup-wrap.expanded .nav-items-sub{max-height:600px;}
+
+  .nav-item-sub{padding-left:44px;}
+  .nav-item-sub.active::before{left:28px;}
 
   /* ============================================================
      MAIN CONTENT
@@ -781,8 +828,7 @@
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
     </button>
     <div class="brand" id="brandHome">
-      <div class="brand-mark">TX</div>
-      <span class="brand-name">Tradenix Documentation</span>
+      <span class="brand-name">Declaro</span>
       <span class="brand-chevron">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
       </span>
@@ -821,9 +867,9 @@
     <!-- Landing / welcome page -->
     <section class="landing" id="landingView">
       <div class="landing-inner">
-        <div class="landing-eyebrow">Tradenix Documentation</div>
+        <div class="landing-eyebrow">Declaro</div>
         <h1>Documentation Portal</h1>
-        <p class="lead">Welcome to the Tradenix Documentation Portal. Select a document from the left navigation, or select a section from the Table of Contents, to view its documentation.</p>
+        <p class="lead">Welcome to the Declaro Portal. Select a document from the left navigation, or select a section from the Table of Contents, to view its documentation.</p>
         <div style="margin-bottom:28px;">
           <a href="#/toc" class="btn btn-primary">View Table of Contents</a>
         </div>
@@ -835,7 +881,7 @@
     <section class="toc-view" id="tocView">
       <div class="toc-inner">
         <h1>Table of Contents</h1>
-        <p class="toc-sub">Structure of the Tradenix documentation set. Items linked to an available document open directly; unlinked items are structural headings only.</p>
+        <p class="toc-sub">Structure of the Declaro documentation set. Items linked to an available document open directly; unlinked items are structural headings only.</p>
         <ol class="toc-tree" id="tocTree"></ol>
       </div>
     </section>
@@ -903,22 +949,24 @@
       { id:"out", label:"Outward (OUT)" },
       { id:"coo", label:"Certificate of Origin (COO)" }
     ]},
-    { id:"iptupd", title:"IPTUPD DECLARATION MANAGEMENT", crumb:"IPTUPD Declaration Management", items:[
-      { id:"ipt-amendment", label:"Amendment" },
-      { id:"ipt-refund",    label:"Refund" },
-      { id:"ipt-cancel",    label:"Cancel" }
-    ]},
-    { id:"inpupd", title:"INPUPD DECLARATION MANAGEMENT", crumb:"INPUPD Declaration Management", items:[
-      { id:"inp-amendment", label:"Amendment" },
-      { id:"inp-cancel",    label:"Cancel" }
-    ]},
-    { id:"tnpupd", title:"TNPUPD DECLARATION MANAGEMENT", crumb:"TNPUPD Declaration Management", items:[
-      { id:"tnp-amendment", label:"Amendment" },
-      { id:"tnp-cancel",    label:"Cancel" }
-    ]},
-    { id:"outupd", title:"OUTUPD DECLARATION MANAGEMENT", crumb:"OUTUPD Declaration Management", items:[
-      { id:"out-amendment", label:"Amendment" },
-      { id:"out-cancel",    label:"Cancel" }
+    { id:"amendment-declaration", title:"AMENDMENT DECLARATION", crumb:"Amendment Declaration", items:[
+      { id:"amendment-ipt", group:"IPT Declaration", items:[
+        { id:"ipt-amendment", label:"IPT Declaration Amend" },
+        { id:"ipt-cancel",    label:"IPT Declaration Cancel" },
+        { id:"ipt-refund",    label:"IPT Declaration Refund" }
+      ]},
+      { id:"amendment-inp", group:"INP Declaration", items:[
+        { id:"inp-amendment", label:"INP Declaration Amend" },
+        { id:"inp-cancel",    label:"INP Declaration Cancel" }
+      ]},
+      { id:"amendment-tnp", group:"TNP Declaration", items:[
+        { id:"tnp-amendment", label:"TNP Declaration Amend" },
+        { id:"tnp-cancel",    label:"TNP Declaration Cancel" }
+      ]},
+      { id:"amendment-out", group:"OUT Declaration", items:[
+        { id:"out-amendment", label:"OUT Declaration Amend" },
+        { id:"out-cancel",    label:"OUT Declaration Cancel" }
+      ]}
     ]},
     { id:"masters", title:"MASTERS", crumb:"Masters", items:[
       { id:"location-information", label:"Location Information" },
@@ -1068,8 +1116,8 @@
       { number:"1.2", title:"Scope", docId:"scope" }
     ]},
     { number:"2", title:"System Overview", children:[
-      { number:"2.1", title:"Application Overview" },
-      { number:"2.2", title:"User Roles" }
+      { number:"2.1", title:"Application Overview", docId:"application-overview" },
+      { number:"2.2", title:"User Roles", docId:"user-roles" }
     ]},
     { number:"3", title:"Module Overview", children:[
       { number:"3.1", title:"Dashboard",             docId:"dashboard" },
@@ -1205,7 +1253,7 @@
   function pdfMasthead(docId, title){
     return '<div class="pdf-masthead">' +
         '<img class="pdf-masthead-logo" src="assets/' + docId + '/palminds-logo.jpg" width="460" height="145" alt="Opalminds Ideas Empowered logo">' +
-        '<div class="pdf-masthead-brand">Tradenix</div>' +
+        '<div class="pdf-masthead-brand">Declaro</div>' +
         '<div class="pdf-masthead-meta">Version – 1&nbsp;&nbsp;&nbsp;11-09-2026</div>' +
       '</div>' +
       '<hr class="pdf-masthead-rule">' +
@@ -1217,7 +1265,7 @@
       header: pdfMasthead("dashboard", "Dashboard Page Documentation"),
       sections: [
         { id:"dashboard-c-1", label:"1. Page Overview", html:
-          '<p>This document describes the Tradenix Dashboard page shown in the provided application screenshot. It covers the dashboard filters, chart controls, summary panels, table layout, refresh action, and the expected user flow for reviewing declaration status information.</p>'
+          '<p>This document describes the Declaro Dashboard page shown in the provided application screenshot. It covers the dashboard filters, chart controls, summary panels, table layout, refresh action, and the expected user flow for reviewing declaration status information.</p>'
         },
         { id:"dashboard-c-2", label:"2. Page Purpose", html:
           '<p>The Dashboard provides a consolidated view of declaration activity. It allows an authorized user to filter the displayed information by declaration flow and status, switch the chart presentation between Bar and Pie views, review period-based summaries, and refresh the displayed dashboard data.</p>'
@@ -1227,7 +1275,7 @@
         },
         { id:"dashboard-c-4", label:"4. Dashboard Page Overview", html:
           '<p>The page contains declaration and status filters at the top, chart-type controls, period-based charts and summary tables, and a REFRESH DB action. The visible declaration flow codes in the tables are IPT, INP, OUT, TNP, and COO.</p>' +
-          dashboardFig("dashboard", 1, "Tradenix Dashboard page", 1550, 815)
+          dashboardFig("dashboard", 1, "Declaro Dashboard page", 1550, 815)
         },
         { id:"dashboard-c-5", label:"5. Filter and Control Descriptions", html:
           '<table><thead><tr><th>Control</th><th>Type</th><th>Purpose</th><th>Expected Behavior</th></tr></thead><tbody>' +
@@ -1297,10 +1345,10 @@
       header: pdfMasthead("status-list", "Status List Page Documentation"),
       sections: [
         { id:"sl-c-1", label:"1. Page Overview", html:
-          '<p>This document describes the Tradenix Status List page, including its purpose, navigation path, visible status codes, search controls, and expected end-user behavior. The documentation is based only on the supplied Status List screenshot.</p>'
+          '<p>This document describes the Declaro Status List page, including its purpose, navigation path, visible status codes, search controls, and expected end-user behavior. The documentation is based only on the supplied Status List screenshot.</p>'
         },
         { id:"sl-c-2", label:"2. Page Purpose", html:
-          '<p>The Status List page provides a reference list of declaration status codes and their corresponding descriptions. It allows users to quickly identify the meaning of a status code used elsewhere in Tradenix and to filter the list by code or description.</p>'
+          '<p>The Status List page provides a reference list of declaration status codes and their corresponding descriptions. It allows users to quickly identify the meaning of a status code used elsewhere in Declaro and to filter the list by code or description.</p>'
         },
         { id:"sl-c-3", label:"3. Navigation", html:
           '<p><strong>Expected navigation path:</strong> Dashboard → Status List</p>' +
@@ -1310,7 +1358,7 @@
         { id:"sl-c-4", label:"4. Page Overview", html:
           '<p>The page contains a two-column reference table. The first column displays the Status Code and the second column displays its Description. A search field is available under each column header for filtering the visible list.</p>' +
           '<table><thead><tr><th>Page Element</th><th>Type</th><th>Purpose</th><th>Expected Behavior</th></tr></thead><tbody>' +
-          '<tr><td>Status Code</td><td>Table column</td><td>Displays the declaration status code.</td><td>Shows the short code used by Tradenix for a declaration status.</td></tr>' +
+          '<tr><td>Status Code</td><td>Table column</td><td>Displays the declaration status code.</td><td>Shows the short code used by Declaro for a declaration status.</td></tr>' +
           '<tr><td>Description</td><td>Table column</td><td>Displays the meaning of the status code.</td><td>Shows the corresponding human-readable status description.</td></tr>' +
           '<tr><td>Search code</td><td>Text filter</td><td>Filter the list by status code.</td><td>Entering a value should narrow the visible rows to matching status codes.</td></tr>' +
           '<tr><td>Search description</td><td>Text filter</td><td>Filter the list by description.</td><td>Entering a value should narrow the visible rows to matching descriptions.</td></tr>' +
@@ -1338,7 +1386,7 @@
         },
         { id:"sl-c-6", label:"6. Step-by-Step Procedure", html:"" },
         { id:"sl-step-1", label:"Step 1 – Open the Status List page", sub:true, html:
-          '<p>From the Tradenix left navigation menu, select Status List. The system displays the Status List page containing the declaration status codes and descriptions.</p>'
+          '<p>From the Declaro left navigation menu, select Status List. The system displays the Status List page containing the declaration status codes and descriptions.</p>'
         },
         { id:"sl-step-2", label:"Step 2 – Review the status reference", sub:true, html:
           '<p>Review the Status Code and Description columns to identify the required declaration status and its meaning.</p>'
@@ -1441,7 +1489,7 @@
           '<p>The following screenshots show the In-Payment declaration workflow, including dashboard navigation, declaration creation, completed tabs, draft saving, and successful submission.</p>'
         },
         { id:"ipt-step-1", label:"Step 1: Open the Dashboard", sub:true, html:
-          '<p>Open Tradenix and select Dashboard from the left navigation menu. The Dashboard displays declaration activity for Today, This Week, and This Month. Use the Declaration and Status filters when a filtered operational view is required.</p>' +
+          '<p>Open Declaro and select Dashboard from the left navigation menu. The Dashboard displays declaration activity for Today, This Week, and This Month. Use the Declaration and Status filters when a filtered operational view is required.</p>' +
           fig("ipt", 1, "Dashboard", 1550, 732)
         },
         { id:"ipt-step-2", label:"Step 2: Open IPT Declaration Management", sub:true, html:
@@ -2000,25 +2048,25 @@
     },
 
     "introduction": {
-      header: pdfMasthead("introduction", "Introduction to the Tradenix Application"),
+      header: pdfMasthead("introduction", "Introduction to the Declaro Application"),
       sections: [
         { id:"introduction-c-1", label:"Overview", html:
-          '<p>Tradenix is a centralized customs declaration management application designed to support the end-to-end handling of declaration-related activities within a controlled and structured environment. It provides authorized users with a single platform to review declaration information, manage operational master data, monitor status conditions, and perform declaration actions according to assigned roles and permissions.</p>' +
-          '<p>The application is designed for freight forwarding and customs operations where multiple users, departments, forwarders, and mailboxes need to be managed with clear access control. Tradenix uses role- and permission-based authorization so that each user can access only the functions and operations permitted for their assigned responsibility.</p>' +
+          '<p>Declaro is a centralized customs declaration management application designed to support the end-to-end handling of declaration-related activities within a controlled and structured environment. It provides authorized users with a single platform to review declaration information, manage operational master data, monitor status conditions, and perform declaration actions according to assigned roles and permissions.</p>' +
+          '<p>The application is designed for freight forwarding and customs operations where multiple users, departments, forwarders, and mailboxes need to be managed with clear access control. Declaro uses role- and permission-based authorization so that each user can access only the functions and operations permitted for their assigned responsibility.</p>' +
           '<p>Through the Dashboard, users can monitor declaration activity and review status conditions such as Approved Permit, Rejected, Awaiting, and Amendment. The dashboard presents declaration summaries for Today, This Week, and This Month, helping users quickly understand current and recent declaration activity.</p>' +
-          '<p>Tradenix also supports declaration management activities such as creating, viewing, cloning, editing, and deleting declarations where the assigned permission allows the operation. Administrative modules support the management of users, forwarders, departments, mailboxes, roles, permissions, and related configuration data required for declaration processing.</p>' +
+          '<p>Declaro also supports declaration management activities such as creating, viewing, cloning, editing, and deleting declarations where the assigned permission allows the operation. Administrative modules support the management of users, forwarders, departments, mailboxes, roles, permissions, and related configuration data required for declaration processing.</p>' +
           '<p>The application provides a consistent workflow for operational and administrative users while improving visibility, traceability, data organization, and control over customs declaration activities.</p>'
         }
       ]
     },
 
     "purpose": {
-      header: pdfMasthead("purpose", "Purpose of the Tradenix Application"),
+      header: pdfMasthead("purpose", "Purpose of the Declaro Application"),
       sections: [
         { id:"purpose-c-1", label:"Overview", html:
-          '<p>Tradenix is designed to streamline and manage customs declaration activities within a centralized platform. The application helps freight forwarding and customs operations teams efficiently create, process, review, and manage import and export declarations.</p>' +
+          '<p>Declaro is designed to streamline and manage customs declaration activities within a centralized platform. The application helps freight forwarding and customs operations teams efficiently create, process, review, and manage import and export declarations.</p>' +
           '<p>The system provides role-based access control to ensure that users can perform only the actions permitted for their assigned roles and responsibilities. It also supports the management of users, forwarders, departments, mailboxes, declarations, reports, and related operational data.</p>' +
-          '<p>The primary purpose of Tradenix is to:</p>' +
+          '<p>The primary purpose of Declaro is to:</p>' +
           '<ul>' +
           '<li>Simplify the customs declaration process.</li>' +
           '<li>Reduce manual effort and operational errors.</li>' +
@@ -2034,10 +2082,10 @@
     },
 
     "scope": {
-      header: pdfMasthead("scope", "Scope of the Tradenix Application"),
+      header: pdfMasthead("scope", "Scope of the Declaro Application"),
       sections: [
         { id:"scope-c-1", label:"Overview", html:
-          '<p>The scope of the Tradenix application is to provide a centralized platform for managing customs declaration activities, user access, operational master data, declaration processing, status tracking, and reporting.</p>' +
+          '<p>The scope of the Declaro application is to provide a centralized platform for managing customs declaration activities, user access, operational master data, declaration processing, status tracking, and reporting.</p>' +
           '<ul>' +
           '<li><strong>Dashboard Monitoring:</strong> Displays declaration activity and status summaries for Today, This Week, and This Month, including statuses such as Approved Permit, Rejected, Awaiting, and Amendment.</li>' +
           '<li><strong>Declaration Management:</strong> Supports the creation, viewing, cloning, editing, and deletion of declarations based on the permissions assigned to the user.</li>' +
@@ -2050,7 +2098,7 @@
           '<li><strong>Reports and Operational Visibility:</strong> Provides access to declaration-related information and reports based on the user\'s assigned permissions.</li>' +
           '<li><strong>Controlled Access:</strong> Ensures that protected functions and system operations are available only to authorized users.</li>' +
           '</ul>' +
-          '<p>The overall scope of Tradenix is to improve the efficiency, accuracy, traceability, and control of customs declaration operations while providing a structured workflow for administrators, declarants, reporting users, and other authorized personnel.</p>'
+          '<p>The overall scope of Declaro is to improve the efficiency, accuracy, traceability, and control of customs declaration operations while providing a structured workflow for administrators, declarants, reporting users, and other authorized personnel.</p>'
         }
       ]
     },
@@ -2059,7 +2107,7 @@
       header: pdfMasthead("users", "Management User Page Documentation"),
       sections: [
         { id:"users-c-1", label:"1. Page Overview", html:
-          '<p>The Onboard User page is used by an authorized administrator to create a new Tradenix user and assign the appropriate organization-level and forwarder-specific access permissions.</p>'
+          '<p>The Onboard User page is used by an authorized administrator to create a new Declaro user and assign the appropriate organization-level and forwarder-specific access permissions.</p>'
         },
         { id:"users-c-2", label:"2. Navigation", html:
           '<p><strong>Expected navigation path:</strong></p><ul><li>Management → Users → Create Onboard User</li></ul>'
@@ -2177,7 +2225,7 @@
           '<li><strong>Activate</strong> – To activate the user account.</li>' +
           '<li><strong>Delete</strong> – To delete the user account.</li>' +
           '</ul>' +
-          '<div class="note-box"><strong>Note:</strong> Role protection is a system integrity requirement. If a protected role is removed or altered, users assigned to that role may lose the permissions required to execute Tradenix operations.</div>'
+          '<div class="note-box"><strong>Note:</strong> Role protection is a system integrity requirement. If a protected role is removed or altered, users assigned to that role may lose the permissions required to execute Declaro operations.</div>'
         }
       ]
     },
@@ -2416,7 +2464,7 @@
         },
         { id:"departments-c-appendix", label:"Appendix A – UI Reference", html: "" },
         { id:"departments-step-1", label:"Step 1: Open Department Management", sub:true, html:
-          '<p>From the Tradenix dashboard, navigate to Management → Departments. The Department Management page displays the existing departments. Click the highlighted + ADD DEPARTMENT button to start creating a new department.</p>' +
+          '<p>From the Declaro dashboard, navigate to Management → Departments. The Department Management page displays the existing departments. Click the highlighted + ADD DEPARTMENT button to start creating a new department.</p>' +
           fig("departments", 1, "Department Management", 1600, 814)
         },
         { id:"departments-step-2", label:"Step 2: Enter Department Details", sub:true, html:
@@ -2632,16 +2680,653 @@
           '<div class="note-box"><strong>Note:</strong> For each mapped Mailbox ID, a specific job sequence number range is configured. Jobs can be created only using sequence numbers within the assigned Sequence Pool ID range.</div>'
         }
       ]
+    },
+
+    "ipt-amendment": {
+      header: pdfMasthead("ipt-amendment", "IPT Amendment"),
+      sections: [
+        { id:"ipt-amendment-c-1", label:"1. Page Overview", html:
+          '<p>The IPT Amendment workflow is used to create and submit amendments against an existing In-Payment declaration or permit. The amendment process allows authorized users to select an existing declaration, create an amendment record, review or update the declaration information across the same operational tabs, enter the amendment reason, confirm the declaration indicator, save the amendment as a draft, validate it, and submit the amendment.</p>'
+        },
+        { id:"ipt-amendment-c-2", label:"2. Navigation", html:
+          '<p><strong>Expected navigation path:</strong></p>' +
+          '<p>Declarations → In-Payment (IPT) → select declaration → AMENDMENT</p>' +
+          '<p>The IPTUPD Declaration Management page is also used to review amendment/update records and their current statuses.</p>'
+        },
+        { id:"ipt-amendment-c-3", label:"3. Amendment Workflow Tabs", html:
+          '<table><thead><tr><th>Tab</th><th>Purpose</th><th>Navigation</th></tr></thead><tbody>' +
+          '<tr><td>Shipment Info (S)</td><td>Declaration type, cargo type, transport mode, release location, receipt location, permit/check information, and related declaration details.</td><td>First amendment tab / use NEXT to continue.</td></tr>' +
+          '<tr><td>Transport Info (T)</td><td>Cargo details, package and weight information, inward transport means, port and flight data, and container details where applicable.</td><td>PREVIOUS returns to Shipment Info; NEXT opens Party Info.</td></tr>' +
+          '<tr><td>Party Info (P)</td><td>Importer, inward carrier, freight forwarder, declaring agent, claimant party, and UEN information.</td><td>PREVIOUS returns to Transport Info; NEXT opens Invoice Info.</td></tr>' +
+          '<tr><td>Invoice Info (V)</td><td>Invoice details, supplier/manufacturer party, currency, invoice charges, exchange rate, CIF, duties, and GST.</td><td>PREVIOUS returns to Party Info; NEXT opens Items.</td></tr>' +
+          '<tr><td>Items (I)</td><td>Item-level HS code, description, country of origin, quantity, value, CASC, shipping marks, GST calculation, and item summary.</td><td>PREVIOUS returns to Invoice Info; NEXT opens CPC.</td></tr>' +
+          '<tr><td>CPC (C)</td><td>CPC-related options including AEO, CWC, SEASTORE, STS, STS &amp; CWC, International Permit Exchange, CNB, and Deferred Printing of CO.</td><td>PREVIOUS returns to Items; NEXT opens Summary.</td></tr>' +
+          '<tr><td>Summary (Y)</td><td>Review totals, duties, taxes, remarks, and overall declaration values before amendment details are finalized.</td><td>PREVIOUS returns to CPC; NEXT opens Amendment.</td></tr>' +
+          '<tr><td>Amendment (A)</td><td>Displays update information and captures the Amendment Reason, Permit Validity Extension when applicable, Declaration Indicator, and final amendment submission.</td><td>Final tab; PREVIOUS returns to Summary.</td></tr>' +
+          '</tbody></table>'
+        },
+        { id:"ipt-amendment-c-4", label:"4. Amendment Controls", html:
+          '<table><thead><tr><th>Control</th><th>Action</th><th>Important Note</th></tr></thead><tbody>' +
+          '<tr><td>AMENDMENT</td><td>Starts a new amendment record from an eligible IPT declaration.</td><td>The record-selection dialog may also provide CANCEL PERMIT and REFUND options.</td></tr>' +
+          '<tr><td>PREVIOUS</td><td>Moves to the immediately preceding amendment tab.</td><td>Use to review or correct previously entered information.</td></tr>' +
+          '<tr><td>NEXT</td><td>Moves to the immediately following amendment tab.</td><td>Proceed only after reviewing the current section.</td></tr>' +
+          '<tr><td>SAVE DRAFT</td><td>Saves the current amendment without final submission.</td><td>Use when the amendment needs further review or completion.</td></tr>' +
+          '<tr><td>SUBMIT AMENDMENT</td><td>Performs final validation and submits the amendment.</td><td>Available on the Amendment tab after the required amendment information is completed.</td></tr>' +
+          '<tr><td>Permit Validity Extension</td><td>Marks the amendment as a permit validity extension when applicable.</td><td>Use only when the amendment is specifically intended to extend permit validity.</td></tr>' +
+          '<tr><td>EXIT AMENDMENT</td><td>Leaves the amendment workflow.</td><td>Save required changes before exiting where necessary.</td></tr>' +
+          '<tr><td>CIF / CCP</td><td>Provides related document/action controls where enabled.</td><td>Availability can depend on the amendment or permit state.</td></tr>' +
+          '</tbody></table>'
+        },
+        { id:"ipt-amendment-c-5", label:"5. Validation Requirements", html:
+          '<ul>' +
+          '<li>All fields marked with * should be treated as mandatory.</li>' +
+          '<li>The Amendment Reason is mandatory and should describe the reason for the update clearly.</li>' +
+          '<li>The Amendment Reason field supports a maximum of 280 characters as shown in the amendment screen.</li>' +
+          '<li>The Declaration Indicator must be confirmed before final submission.</li>' +
+          '<li>Required declaration, shipment, transport, party, invoice, item, CPC, and summary information should remain valid after amendment changes.</li>' +
+          '<li>If Permit Validity Extension is selected, the amendment should be treated as a validity-extension request according to the applicable business rule.</li>' +
+          '<li>Invalid, incomplete, or inconsistent data should prevent successful amendment submission.</li>' +
+          '<li>SAVE DRAFT should store the amendment without final submission.</li>' +
+          '<li>SUBMIT AMENDMENT should perform final validation before the amendment is submitted.</li>' +
+          '<li>Successful validation should display a Validation Passed notification.</li>' +
+          '<li>Successful amendment processing should display an Amendment Submitted confirmation and the amendment/update record should appear in IPTUPD Declaration Management with the appropriate status.</li>' +
+          '</ul>'
+        },
+        { id:"ipt-amendment-c-6", label:"6. Suggested IPT Amendment Flow", html:
+          '<ol>' +
+          '<li>Open Declarations → In-Payment (IPT).</li>' +
+          '<li>Locate the declaration to be amended.</li>' +
+          '<li>Open the record action and choose AMENDMENT from the Create New Record dialog.</li>' +
+          '<li>Review the Shipment Info values inherited from the existing declaration and update only the information that must change.</li>' +
+          '<li>Use NEXT to proceed through Transport Info, Party Info, Invoice Info, Items, CPC, Summary, and Amendment.</li>' +
+          '<li>Review cargo, transport, party, invoice, item, CPC, and summary details to ensure the amendment remains internally consistent.</li>' +
+          '<li>On the Amendment tab, review Update Permit Number, Update Indicator, and Update Request No.</li>' +
+          '<li>Enter the Amendment Reason. Select Permit Validity Extension only when the amendment is specifically for extending permit validity.</li>' +
+          '<li>Confirm the Declaration Indicator.</li>' +
+          '<li>Use SAVE DRAFT if the amendment must be stored for later completion.</li>' +
+          '<li>Select SUBMIT AMENDMENT after all required amendment information is complete and correct.</li>' +
+          '<li>Verify the Validation Passed and Amendment Submitted notifications.</li>' +
+          '<li>Confirm the resulting amendment/update record in IPTUPD Declaration Management and review its resulting status.</li>' +
+          '</ol>'
+        },
+        { id:"ipt-amendment-c-appendix", label:"Appendix A – UI Reference", html: "" },
+        { id:"ipt-amendment-step-1", label:"Step 1: Open IPTUPD Declaration Management", sub:true, html:
+          '<p>Open the IPT update/amendment management page. The page lists amendment/update records with Job ID, Message Reference, Declaration Type, Sequence Number, Created By, Status, Permit Number, Created At, Declarant ID, Release Location, and row actions. The page also provides controls such as BACK TO IPT, AMENDMENT, REFUND, and CANCEL.</p>' +
+          fig("ipt-amendment", 1, "IPTUPD Declaration Management", 1594, 812)
+        },
+        { id:"ipt-amendment-step-2", label:"Step 2: Select the Amendment Action", sub:true, html:
+          '<p>From the IPT Declaration Management list, select the applicable declaration action. The Create New Record dialog displays the available actions for the selected Job ID. Choose AMENDMENT to begin the amendment workflow. CANCEL PERMIT and REFUND are separate operations and should be selected only when required.</p>' +
+          fig("ipt-amendment", 2, "Create New Record - Select Amendment", 1596, 801)
+        },
+        { id:"ipt-amendment-step-3", label:"Step 3: Review Shipment Information", sub:true, html:
+          '<p>The amendment opens with the existing declaration values populated. Review Declaration Type, Cargo Type, Inward Transport Mode, Release Location, Receipt Location, previous permit/check information, license/document controls, and any additional recipient details. Update only the values required for the amendment.</p>' +
+          fig("ipt-amendment", 3, "Amendment - Shipment Information", 1591, 809)
+        },
+        { id:"ipt-amendment-step-4", label:"Step 4: Review Transport Information", sub:true, html:
+          '<p>Select Transport Info (T) or use NEXT. Review Total Package, UOM, Gross Weight, arrival date, loading port, inward flight and aircraft details, airway bill information, and container details where applicable.</p>' +
+          fig("ipt-amendment", 4, "Amendment - Transport Information", 1600, 810)
+        },
+        { id:"ipt-amendment-step-5", label:"Step 5: Review Party Information", sub:true, html:
+          '<p>Select Party Info (P) or use NEXT. Review or update the Importer, Inward Carrier, Freight Forwarder, Declaring Agent, Claimant Party, and corresponding UEN values.</p>' +
+          fig("ipt-amendment", 5, "Amendment - Party Information", 1600, 809)
+        },
+        { id:"ipt-amendment-step-6", label:"Step 6: Review Invoice Information", sub:true, html:
+          '<p>Select Invoice Info (V) or use NEXT. Review the invoice number, invoice date, term type, supplier/manufacturer party, currency, exchange rate, invoice amount, CIF, duties, taxes, and GST values.</p>' +
+          fig("ipt-amendment", 6, "Amendment - Invoice Information", 1600, 811)
+        },
+        { id:"ipt-amendment-step-7", label:"Step 7: Review Item Information", sub:true, html:
+          '<p>Select Items (I) or use NEXT. Review invoice reference, HAWB, HS Code, description, brand, country of origin, quantity, UOM, item value, shipping marks, CASC data, GST calculation, and the item summary.</p>' +
+          fig("ipt-amendment", 7, "Amendment - Item Information", 1600, 671)
+        },
+        { id:"ipt-amendment-step-8", label:"Step 8: Review CPC Information", sub:true, html:
+          '<p>Select CPC (C) or use NEXT. Review the CPC-related declaration options such as AEO, CWC, SEASTORE, STS, STS &amp; CWC, International Permit Exchange, CNB, and Deferred Printing of CO.</p>' +
+          fig("ipt-amendment", 8, "Amendment - CPC Information", 1599, 814)
+        },
+        { id:"ipt-amendment-step-9", label:"Step 9: Review the Amendment Summary", sub:true, html:
+          '<p>Select Summary (Y) or use NEXT. Review total items, total item amount, total item CIF, invoice totals, customs duty, excise duty, GST amount, other tax, total amount payable, and remarks before proceeding to the Amendment tab.</p>' +
+          fig("ipt-amendment", 9, "Amendment - Summary", 1601, 808)
+        },
+        { id:"ipt-amendment-step-10", label:"Step 10: Enter Amendment Information", sub:true, html:
+          '<p>Open the Amendment (A) tab. Review the Update Permit Number, Update Indicator, and Update Request No. Enter the mandatory Amendment Reason, confirm the Declaration Indicator, and select Permit Validity Extension only when applicable. Use SUBMIT AMENDMENT for final processing.</p>' +
+          fig("ipt-amendment", 10, "Amendment Information and Submit Amendment", 1600, 812)
+        },
+        { id:"ipt-amendment-step-11", label:"Step 11: Verify Successful Amendment Submission", sub:true, html:
+          '<p>After successful validation, the system displays Validation Passed with the message that the amendment is ready for submission. After completion, an Amendment Submitted confirmation is displayed. The amendment/update record is then visible in IPTUPD Declaration Management with the resulting status.</p>' +
+          fig("ipt-amendment", 11, "Validation Passed and Amendment Submitted", 1599, 815)
+        },
+        { id:"ipt-amendment-step-12", label:"Step 12: Create a Amendment", sub:true, html:
+          '<p>For an amendment specifically intended to extend permit validity, enter a suitable Amendment Reason and select Permit Validity Extension. Confirm the Declaration Indicator before selecting SUBMIT AMENDMENT.</p>' +
+          fig("ipt-amendment", 12, "Amendment - Permit Validity Extension", 1597, 812)
+        },
+        { id:"ipt-amendment-step-13", label:"Step 13: Create a Cancellation Amendment", sub:true, html:
+          '<p>For a permit cancellation, open the Cancellation (A) tab. Review the Update Permit Number, Update Indicator (CNL), Update Request No., and Replacement Permit Number where applicable. Select the required Reason for Cancellation, enter the Description of Reason, add Reference Documents or Additional Recipients when required, confirm the Declaration Indicator, and use SAVE DRAFT or SUBMIT AMENDMENT as appropriate.</p>' +
+          fig("ipt-amendment", 13, "Cancellation Information - Draft Saved", 1598, 813)
+        },
+        { id:"ipt-amendment-step-14", label:"Step 14: Verify Cancellation Submission", sub:true, html:
+          '<p>After the cancellation amendment passes validation, the system displays a Validation Passed notification followed by Cancellation Submitted. Verify that the cancellation/update record appears in IPTUPD Declaration Management with the resulting status.</p>' +
+          fig("ipt-amendment", 14, "Validation Passed and Cancellation Submitted", 1600, 812)
+        },
+        { id:"ipt-amendment-step-15", label:"Step 15: Create a Refund", sub:true, html:
+          '<p>For a refund request, open the selected declaration and review the existing Shipment Info and supporting declaration details before proceeding through the workflow. Confirm that the permit and declaration information selected for refund is correct.</p>' +
+          fig("ipt-amendment", 15, "Refund Workflow - Declaration Information", 1600, 809)
+        },
+        { id:"ipt-amendment-step-16", label:"Step 16: Complete Refund Information", sub:true, html:
+          '<p>Open the Refund (A) tab. Review the Update Permit Number, Update Indicator (REF), Update Request No., and Replacement Permit Number where applicable. Select the Type of Refund and Reason for Refund, enter the Description of Reason, review the Refund Summary values, add Reference Documents or Additional Recipients when required, confirm the Declaration Indicator, and select SUBMIT AMENDMENT for final processing.</p>' +
+          fig("ipt-amendment", 16, "Refund Information and Refund Summary", 1593, 820)
+        }
+      ]
+    },
+
+    "inp-amendment": {
+      header: pdfMasthead("inp-amendment", "INP Amendment"),
+      sections: [
+        { id:"inp-amendment-c-1", label:"1. Page Overview", html:
+          '<p>The INP Amendment workflow is used by authorized users to create an amendment against an existing In-Non-Payment declaration. The amendment allows permitted declaration information to be reviewed and updated across Shipment Info, Transport Info, Party Info, Invoice Info, Items, CPC, Summary, and Amendment Details.</p>'
+        },
+        { id:"inp-amendment-c-2", label:"2. Navigation", html:
+          '<p><strong>Expected navigation path:</strong></p>' +
+          '<p>Declarations → In-Non-Payment (INP) → Select Record → Create New Record → AMENDMENT</p>'
+        },
+        { id:"inp-amendment-c-3", label:"3. Amendment Workflow Tabs", html:
+          '<table><thead><tr><th>Tab</th><th>Purpose</th><th>Navigation</th></tr></thead><tbody>' +
+          '<tr><td>Shipment Info (S)</td><td>Review and amend declaration and shipment-level information.</td><td>First amendment tab; use NEXT to continue.</td></tr>' +
+          '<tr><td>Transport Info (T)</td><td>Review and amend cargo, inward transport, port, and container information.</td><td>PREVIOUS returns to Shipment Info; NEXT opens Party Info.</td></tr>' +
+          '<tr><td>Party Info (P)</td><td>Review and amend importer, carrier, freight forwarder, and declaring-agent details.</td><td>PREVIOUS returns to Transport Info; NEXT opens Invoice Info.</td></tr>' +
+          '<tr><td>Invoice Info (V)</td><td>Review and amend invoice, supplier/manufacturer, charges, CIF, duty, tax, and GST information.</td><td>PREVIOUS returns to Party Info; NEXT opens Items.</td></tr>' +
+          '<tr><td>Items (I)</td><td>Review and amend item, HS code, quantity, value, CASC, tariff, shipping-mark, and GST details.</td><td>PREVIOUS returns to Invoice Info; NEXT opens CPC.</td></tr>' +
+          '<tr><td>CPC (C)</td><td>Review and amend CPC-related options.</td><td>PREVIOUS returns to Items; NEXT opens Summary.</td></tr>' +
+          '<tr><td>Summary (Y)</td><td>Review amendment totals and remarks.</td><td>PREVIOUS returns to CPC; NEXT opens Amendment Details.</td></tr>' +
+          '<tr><td>Amendment Details (A)</td><td>Enter amendment reason, extension reason, update details, and declaration confirmation.</td><td>PREVIOUS returns to Summary; final stage for SAVE DRAFT or SUBMIT AMENDMENT.</td></tr>' +
+          '</tbody></table>'
+        },
+        { id:"inp-amendment-c-4", label:"4. Control and Navigation Notes", html:
+          '<table><thead><tr><th>Control</th><th>Action</th><th>Important Note</th></tr></thead><tbody>' +
+          '<tr><td>AMENDMENT</td><td>Starts an amendment for the selected INP declaration.</td><td>Available from the Create New Record dialog for the selected declaration.</td></tr>' +
+          '<tr><td>PREVIOUS</td><td>Moves to the immediately preceding amendment tab.</td><td>Use it to review or correct previously entered amendment information.</td></tr>' +
+          '<tr><td>NEXT</td><td>Moves to the immediately following amendment tab.</td><td>Proceed in sequence after reviewing or updating the current section.</td></tr>' +
+          '<tr><td>SAVE DRAFT</td><td>Saves the amendment without final submission.</td><td>The screenshot shows a Draft Saved notification after a successful save.</td></tr>' +
+          '<tr><td>SUBMIT AMENDMENT</td><td>Performs final amendment validation and submission.</td><td>Use only after reviewing all tabs and completing Amendment Details.</td></tr>' +
+          '<tr><td>CIF</td><td>Downloads or accesses CIF-related output where available.</td><td>The control is visible on the amendment page.</td></tr>' +
+          '<tr><td>CCP</td><td>CCP-related action shown on the amendment page.</td><td>The screenshot shows the control in a disabled state.</td></tr>' +
+          '<tr><td>EXIT</td><td>Leaves the amendment workflow.</td><td>Use when the amendment process should be exited.</td></tr>' +
+          '</tbody></table>'
+        },
+        { id:"inp-amendment-c-5", label:"5. Validation Requirements", html:
+          '<ul>' +
+          '<li>Fields marked with * should be treated as mandatory.</li>' +
+          '<li>Existing approved permit information should be reviewed carefully before making amendment changes.</li>' +
+          '<li>The amendment should preserve existing declaration values unless the user intentionally modifies them.</li>' +
+          '<li>PREVIOUS should return to the immediately preceding tab without submitting the amendment.</li>' +
+          '<li>NEXT should move to the immediately following tab and preserve information already reviewed or modified.</li>' +
+          '<li>The Amendment Details section should contain the required update information before final submission.</li>' +
+          '<li>Amendment Reason should be entered when required by the amendment scenario.</li>' +
+          '<li>Permit Validity Extension Indicator and Extension Reason should be used only when applicable.</li>' +
+          '<li>The declaration confirmation should be selected before final submission where required.</li>' +
+          '<li>SAVE DRAFT should save the amendment without final submission and provide a clear confirmation message.</li>' +
+          '<li>SUBMIT AMENDMENT should perform validation before final submission.</li>' +
+          '<li>If validation fails, the amendment should remain available for correction and should not be treated as successfully submitted.</li>' +
+          '<li>Successful validation and submission should provide clear Validation Passed and Amendment Submitted notifications.</li>' +
+          '</ul>'
+        },
+        { id:"inp-amendment-c-6", label:"6. Suggested INP Amendment Management Flow", html:
+          '<ol>' +
+          '<li>Open Declarations → In-Non-Payment (INP).</li>' +
+          '<li>Locate the required declaration record.</li>' +
+          '<li>Open the Create New Record dialog for the selected declaration.</li>' +
+          '<li>Select AMENDMENT.</li>' +
+          '<li>Review and update Shipment Info as required.</li>' +
+          '<li>Use NEXT to proceed through Transport Info, Party Info, Invoice Info, Items, CPC, and Summary. Use PREVIOUS whenever earlier information must be reviewed or corrected.</li>' +
+          '<li>Review all declaration values and modify only the fields that require amendment.</li>' +
+          '<li>Open Amendment Details and review the Update Permit Number, Update Indicator, and Update Request No.</li>' +
+          '<li>Enter the Amendment Reason and Extension Reason where applicable.</li>' +
+          '<li>Select Permit Validity Extension Indicator when the amendment is related to permit validity extension.</li>' +
+          '<li>Confirm the declaration statement.</li>' +
+          '<li>Use SAVE DRAFT when the amendment must be stored without final submission.</li>' +
+          '<li>Select SUBMIT AMENDMENT after all required amendment information is complete and correct.</li>' +
+          '<li>Verify the Validation Passed and Amendment Submitted notifications.</li>' +
+          '<li>Confirm that the amendment record appears in the INPUPD Declaration Management list with the appropriate status.</li>' +
+          '</ol>'
+        },
+        { id:"inp-amendment-c-appendix", label:"Appendix A – UI Reference", html: "" },
+        { id:"inp-amendment-step-1", label:"Step 1: Open INP Declaration Management", sub:true, html:
+          '<p>Open Declarations → In-Non-Payment (INP). The INP Declaration Management page displays existing declarations, statuses, filters, row actions, and list-level controls. Select the required declaration record for which an amendment must be created.</p>' +
+          fig("inp-amendment", 1, "INP Declaration Management", 1598, 810)
+        },
+        { id:"inp-amendment-step-2", label:"Step 2: Choose Amendment", sub:true, html:
+          '<p>From the selected declaration record, open the Create New Record dialog. The dialog provides record options including AMENDMENT and CANCEL PERMIT. Select AMENDMENT to start the amendment process for the selected Job ID.</p>' +
+          '<div class="note-box"><strong>Note:</strong> Select AMENDMENT to create an amendment record for the selected declaration.</div>' +
+          fig("inp-amendment", 2, "Create New Record - Amendment Option", 1598, 810)
+        },
+        { id:"inp-amendment-step-3", label:"Step 3: Review and Update Shipment Information", sub:true, html:
+          '<p>The Amend Declaration page opens at Shipment Info (S). Review the existing declaration values and update the fields that require amendment. The page also displays Amendment Info on the left, including the original Permit No., Update No., Message Reference, URN ID, Sequence Number, Declarant Name, Declarant Code, and other amendment-related details.</p>' +
+          '<div class="note-box"><strong>Note:</strong> Shipment Info is the first amendment tab. Use NEXT to continue to Transport Info.</div>' +
+          fig("inp-amendment", 3, "INP Amendment - Shipment Info", 1600, 817)
+        },
+        { id:"inp-amendment-step-4", label:"Step 4: Review and Update Transport Information", sub:true, html:
+          '<p>Select Transport Info (T) or use NEXT from Shipment Info. Review cargo and inward transport details such as Total Package, UOM, Gross Weight, Arrival Date, Loading Port, Port Name, Inward Flight Number, aircraft registration number, Inward Master Air Waybill, and container details. Modify only the values that require amendment.</p>' +
+          '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Shipment Info. NEXT proceeds to Party Info.</div>' +
+          fig("inp-amendment", 4, "INP Amendment - Transport Info", 1600, 813)
+        },
+        { id:"inp-amendment-step-5", label:"Step 5: Review and Update Party Information", sub:true, html:
+          '<p>Select Party Info (P) or use NEXT from Transport Info. Review the party information, including Importer, Inward Carrier, Freight Forwarder, Declaring Agent, and the corresponding UEN values. Update the required party details where amendment is needed.</p>' +
+          '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Transport Info. NEXT proceeds to Invoice Info.</div>' +
+          fig("inp-amendment", 5, "INP Amendment - Party Info", 1600, 808)
+        },
+        { id:"inp-amendment-step-6", label:"Step 6: Review and Update Invoice Information", sub:true, html:
+          '<p>Select Invoice Info (V) or use NEXT from Party Info. Review the invoice number, invoice date, term type, supplier/manufacturer information, currency, invoice value, charges, CIF values, duties, taxes, and GST. Update only the fields required for the amendment.</p>' +
+          '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Party Info. NEXT proceeds to Items.</div>' +
+          fig("inp-amendment", 6, "INP Amendment - Invoice Info", 1600, 814)
+        },
+        { id:"inp-amendment-step-7", label:"Step 7: Review and Update Item Information", sub:true, html:
+          '<p>Select Items (I) or use NEXT from Invoice Info. Review item-level information such as invoice reference, HAWB references, HS Code, description, brand, country of origin, quantity, UOM, item value, CASC details, tariff and lot identification, shipping marks, and GST calculation. Update the applicable item information.</p>' +
+          '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Invoice Info. NEXT proceeds to CPC.</div>' +
+          fig("inp-amendment", 7, "INP Amendment - Item Info", 1598, 813)
+        },
+        { id:"inp-amendment-step-8", label:"Step 8: Review CPC Information", sub:true, html:
+          '<p>Select CPC (C) or use NEXT from Items. Review the applicable CPC-related options, including AEO, CWC, SEASTORE, STS, STS &amp; CWC, International Permit Exchange, CNB, and Deferred Printing of CO. Update the selections only when required by the amendment.</p>' +
+          '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Items. NEXT proceeds to Summary.</div>' +
+          fig("inp-amendment", 8, "INP Amendment - CPC Info", 1597, 813)
+        },
+        { id:"inp-amendment-step-9", label:"Step 9: Review the Amendment Summary", sub:true, html:
+          '<p>Select Summary (Y) or use NEXT from CPC. Review the declaration totals and remarks, including Number of Invoices, Number of Items, Sum of Invoice Amount, Sum of Item Amount, Total Invoice CIF Value, Total CIF/FOB Value, GST Amount, Excise Duty Amount, Customs Duty Amount, Other Tax Amount, and Total Amount Payable. Enter or review remarks as required.</p>' +
+          '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to CPC. NEXT proceeds to Amendment Details.</div>' +
+          fig("inp-amendment", 9, "INP Amendment - Summary", 1600, 811)
+        },
+        { id:"inp-amendment-step-10", label:"Step 10: Complete Amendment Details", sub:true, html:
+          '<p>Select Amendment Details (A) or use NEXT from Summary. Review the Update Information, including Update Permit Number, Update Indicator, and Update Request No. Enter the Amendment Reason and Extension Reason where applicable. Select Permit Validity Extension Indicator when relevant and confirm the declaration statement. Use SAVE DRAFT to save the amendment without final submission, or select SUBMIT AMENDMENT when the amendment is complete.</p>' +
+          '<div class="note-box"><strong>Note:</strong> Amendment Details is the final stage. Use SAVE DRAFT to save without final submission or SUBMIT AMENDMENT to validate and submit.</div>' +
+          fig("inp-amendment", 10, "INP Amendment - Amendment Details", 1599, 754)
+        },
+        { id:"inp-amendment-step-11", label:"Step 11: Verify Successful Amendment Submission", sub:true, html:
+          '<p>After successful validation and submission, the system displays Validation Passed and Amendment Submitted notifications. The amendment appears in the INPUPD Declaration Management list with its updated status. Verify that the amendment record is listed and that the submission confirmation is displayed.</p>' +
+          '<div class="note-box"><strong>Note:</strong> Successful processing is confirmed by Validation Passed and Amendment Submitted notifications.</div>' +
+          fig("inp-amendment", 11, "INP Amendment - Validation Passed and Submitted", 1593, 818)
+        },
+        { id:"inp-amendment-additional", label:"Additional Flow: Complete Cancellation Details", sub:true, html:
+          '<p>When CANCEL PERMIT is selected for an eligible INP declaration, the workflow opens the Cancellation Details (A) stage. Review the Update Information, including Update Permit Number, Update Indicator, Update Request No., and Replacement Permit Number where applicable. Select the Reason for Cancellation and enter the Description of Reason. Add Reference Documents or Additional Recipients when required, confirm the declaration statement, and then use SAVE DRAFT or SUBMIT AMENDMENT according to the required action.</p>' +
+          '<div class="note-box"><strong>Note:</strong> The supplied screenshot is from the INP cancellation flow and shows Update Indicator CNL, cancellation reason information, reference-document controls, additional-recipient controls, and the declaration indicator.</div>' +
+          fig("inp-amendment", 12, "INP Cancellation Details - Cancellation Reason and Declaration Indicator", 1600, 816)
+        }
+      ]
+    },
+
+    "tnp-amendment": {
+      header: pdfMasthead("tnp-amendment", "TNP Amendment"),
+      sections: [
+        { id:"tnp-amendment-c-1", label:"1. Page Overview", html:
+          '<p>The TNP Amendment workflow is used to amend an existing Transhipment TradeNet declaration. Authorized users can select an eligible TNP declaration, create an amendment record, review and update the declaration across Shipment Info, Transport Info, Party Info, Items, CPC, Summary, and Amendment Details, save the amendment as a draft, validate the information, and submit the amendment.</p>'
+        },
+        { id:"tnp-amendment-c-2", label:"2. Navigation", html:
+          '<p><strong>Expected navigation path:</strong></p>' +
+          '<p>Declarations -&gt; Transhipment (TNP) -&gt; select declaration -&gt; AMENDMENT</p>' +
+          '<p>Submitted and in-progress amendment records are managed from the TNPUPD Declaration Management page.</p>'
+        },
+        { id:"tnp-amendment-c-3", label:"3. Amendment Workflow Tabs", html:
+          '<table><thead><tr><th>Tab</th><th>Purpose</th><th>Navigation</th></tr></thead><tbody>' +
+          '<tr><td>Shipment Info (S)</td><td>Declaration type, cargo type, inward/outward transport IDs, release/receipt locations, previous permit, checks, license/document and additional recipients.</td><td>First amendment tab / use NEXT to continue.</td></tr>' +
+          '<tr><td>Transport Info (T)</td><td>Cargo details, inward and outward transport means, dates, ports, voyage/flight details, destination and container information.</td><td>PREVIOUS returns to Shipment Info; NEXT opens Party Info.</td></tr>' +
+          '<tr><td>Party Info (P)</td><td>Inward Carrier, Outward Carrier, Handling Agent, Declaring Agent, Consignee and End User information.</td><td>PREVIOUS returns to Transport Info; NEXT opens Items.</td></tr>' +
+          '<tr><td>Items (I)</td><td>Shipment references, HS Code, description, country of origin, packing details, quantity/value, CASC, tariff and shipping marks.</td><td>PREVIOUS returns to Party Info; NEXT opens CPC.</td></tr>' +
+          '<tr><td>CPC (C)</td><td>CPC-related options such as AEO, CWC, SEASTORE, STS, STS &amp; CWC and International Permit Exchange.</td><td>PREVIOUS returns to Items; NEXT opens Summary.</td></tr>' +
+          '<tr><td>Summary (Y)</td><td>Final review of item count, CIF/FOB value, package and weight totals, plus remarks.</td><td>PREVIOUS returns to CPC; NEXT opens Amendment Details.</td></tr>' +
+          '<tr><td>Amendment Details (A)</td><td>Update information, Amendment Reason, Permit Validity Extension, Declaration Indicator, draft save and final amendment submission.</td><td>Final tab; PREVIOUS returns to Summary.</td></tr>' +
+          '</tbody></table>'
+        },
+        { id:"tnp-amendment-c-4", label:"4. Amendment Controls", html:
+          '<table><thead><tr><th>Control</th><th>Action</th><th>Important Note</th></tr></thead><tbody>' +
+          '<tr><td>AMENDMENT</td><td>Creates a TNP amendment record from an eligible TNP declaration.</td><td>Use from the Create New Record dialog.</td></tr>' +
+          '<tr><td>CANCEL PERMIT</td><td>Starts a cancellation workflow for the selected permit.</td><td>This is a separate operation from amendment.</td></tr>' +
+          '<tr><td>PREVIOUS</td><td>Moves to the immediately preceding amendment tab.</td><td>Use to review or correct earlier information.</td></tr>' +
+          '<tr><td>NEXT</td><td>Moves to the immediately following amendment tab.</td><td>Proceed after reviewing the current section.</td></tr>' +
+          '<tr><td>SAVE DRAFT</td><td>Saves the current TNP amendment without final submission.</td><td>A successful save is confirmed by a Draft Saved notification.</td></tr>' +
+          '<tr><td>SUBMIT AMENDMENT</td><td>Performs final validation and submits the amendment.</td><td>Use only after all required amendment information is complete.</td></tr>' +
+          '<tr><td>Permit Validity Extension</td><td>Flags the amendment as a permit validity extension when applicable.</td><td>Select only when the amendment is specifically for permit validity extension.</td></tr>' +
+          '<tr><td>EXIT AMENDMENT</td><td>Leaves the amendment workflow.</td><td>Save required changes before exiting when necessary.</td></tr>' +
+          '</tbody></table>'
+        },
+        { id:"tnp-amendment-c-5", label:"5. Validation Requirements", html:
+          '<ul>' +
+          '<li>All fields marked with * should be treated as mandatory.</li>' +
+          '<li>Existing permit and declaration information should be reviewed before changing amendment values.</li>' +
+          '<li>The Amendment Reason is mandatory and supports a maximum of 280 characters as shown in the screen.</li>' +
+          '<li>The Declaration Indicator must be confirmed before final submission.</li>' +
+          '<li>Transport details must remain consistent with the selected inward and outward transport modes.</li>' +
+          '<li>Required party, item, CPC and summary information must remain valid after amendment changes.</li>' +
+          '<li>SAVE DRAFT should save the amendment without final submission and display a Draft Saved confirmation.</li>' +
+          '<li>SUBMIT AMENDMENT should perform final validation before submission.</li>' +
+          '<li>Successful validation should display a Validation Passed notification.</li>' +
+          '<li>Successful amendment submission should display an Amendment Submitted confirmation.</li>' +
+          '<li>After successful submission, the amendment record should appear in TNPUPD Declaration Management with the appropriate resulting status.</li>' +
+          '</ul>'
+        },
+        { id:"tnp-amendment-c-6", label:"6. Suggested TNP Amendment Flow", html:
+          '<ol>' +
+          '<li>Open Declarations -&gt; Transhipment (TNP).</li>' +
+          '<li>Locate the TNP declaration to be amended.</li>' +
+          '<li>Open the record action and select AMENDMENT from the Create New Record dialog.</li>' +
+          '<li>Review Shipment Info and update only the fields required by the amendment.</li>' +
+          '<li>Use NEXT to proceed through Transport Info, Party Info, Items, CPC, Summary and Amendment Details.</li>' +
+          '<li>Review inward/outward transport details, ports, parties, item information, CPC options and summary totals.</li>' +
+          '<li>On Amendment Details, verify Update Permit Number, Update Indicator and Update Request No.</li>' +
+          '<li>Enter a clear Amendment Reason. Select Permit Validity Extension only when applicable.</li>' +
+          '<li>Confirm the Declaration Indicator.</li>' +
+          '<li>Use SAVE DRAFT if the amendment must be saved for later completion.</li>' +
+          '<li>Select SUBMIT AMENDMENT when all required information is correct.</li>' +
+          '<li>Verify Validation Passed and Amendment Submitted notifications.</li>' +
+          '<li>Confirm the submitted amendment record in TNPUPD Declaration Management.</li>' +
+          '</ol>'
+        },
+        { id:"tnp-amendment-c-appendix", label:"Appendix A - UI Reference", html: "" },
+        { id:"tnp-amendment-step-1", label:"Step 1: Open TNP Declaration Management", sub:true, html:
+          '<p>Open Declarations and select Transhipment (TNP). The TNP Declaration Management page displays existing declarations, filters, permit/status information and row actions. Use the applicable action on an eligible declaration to create a new update record.</p>' +
+          fig("tnp-amendment", 1, "TNP Declaration Management", 1599, 813)
+        },
+        { id:"tnp-amendment-step-2", label:"Step 2: Select the Amendment Action", sub:true, html:
+          '<p>The Create New Record dialog displays the available record types for the selected TNP declaration. Select AMENDMENT to begin the amendment workflow. CANCEL PERMIT is a separate operation.</p>' +
+          fig("tnp-amendment", 2, "Create New Record - Select Amendment", 1598, 809)
+        },
+        { id:"tnp-amendment-step-3", label:"Step 3: Review Shipment Information", sub:true, html:
+          '<p>The amendment opens with existing permit and declaration information populated. Review Declaration Type, Cargo Type, Inward Transport ID, Outward Transport ID, Release Location, Receipt Location, previous permit information, checks, license/document controls and additional recipients.</p>' +
+          fig("tnp-amendment", 3, "TNP Amendment - Shipment Information", 1599, 810)
+        },
+        { id:"tnp-amendment-step-4", label:"Step 4: Review Transport Information", sub:true, html:
+          '<p>Select Transport Info (T) or use NEXT. Review Total Package, package UOM, Gross Weight, inward transport details, outward transport details, departure/arrival dates, ports, flight or voyage information, country of final destination and container details.</p>' +
+          fig("tnp-amendment", 4, "TNP Amendment - Transport Information", 1600, 809)
+        },
+        { id:"tnp-amendment-step-5", label:"Step 5: Review Party Information", sub:true, html:
+          '<p>Select Party Info (P) or use NEXT. Review the Inward Carrier, Outward Carrier, Handling Agent, Declaring Agent, Consignee and End User details together with the applicable UEN and address information.</p>' +
+          fig("tnp-amendment", 5, "TNP Amendment - Party Information", 1598, 817)
+        },
+        { id:"tnp-amendment-step-6", label:"Step 6: Review Item Information", sub:true, html:
+          '<p>Select Items (I) or use NEXT. Review shipment references, HS Code, description, country of origin, packing information, quantity, UOM, item value, CASC details, tariff/lot identification and shipping marks. Add or update item information only when required by the amendment.</p>' +
+          fig("tnp-amendment", 6, "TNP Amendment - Item Information", 1601, 812)
+        },
+        { id:"tnp-amendment-step-7", label:"Step 7: Review CPC Information", sub:true, html:
+          '<p>Select CPC (C) or use NEXT. Review the applicable CPC-related options, including AEO, CWC, SEASTORE, STS, STS &amp; CWC and International Permit Exchange.</p>' +
+          fig("tnp-amendment", 7, "TNP Amendment - CPC Information", 1600, 809)
+        },
+        { id:"tnp-amendment-step-8", label:"Step 8: Review the Amendment Summary", sub:true, html:
+          '<p>Select Summary (Y) or use NEXT. Review the Number of Items, Total CIF/FOB Value, Total Package, Package UOM, Total Gross Weight, Weight UOM and remarks before proceeding to Amendment Details.</p>' +
+          fig("tnp-amendment", 8, "TNP Amendment - Summary", 1600, 809)
+        },
+        { id:"tnp-amendment-step-9", label:"Step 9: Enter Amendment Details", sub:true, html:
+          '<p>Open Amendment Details (A). Review the Update Permit Number, Update Indicator and Update Request No. Enter the mandatory Amendment Reason. Select Permit Validity Extension only when applicable, confirm the Declaration Indicator and then use SAVE DRAFT or SUBMIT AMENDMENT as required.</p>' +
+          fig("tnp-amendment", 9, "TNP Amendment Details", 1600, 811)
+        },
+        { id:"tnp-amendment-step-10", label:"Step 10: Save the Amendment as Draft", sub:true, html:
+          '<p>Select SAVE DRAFT when the amendment must be saved without final submission. A successful save is confirmed by the Draft Saved notification stating that the amendment draft was saved successfully.</p>' +
+          fig("tnp-amendment", 10, "TNP Amendment - Draft Saved", 1600, 806)
+        },
+        { id:"tnp-amendment-step-11", label:"Step 11: Validate and Submit the Amendment", sub:true, html:
+          '<p>Select SUBMIT AMENDMENT after confirming all required information. The system displays Validation Passed when the amendment is ready to submit and Amendment Submitted after successful processing. Verify the submitted amendment in TNPUPD Declaration Management.</p>' +
+          fig("tnp-amendment", 11, "Validation Passed and TNP Amendment Submitted", 1600, 812)
+        }
+      ]
+    },
+
+    "out-amendment": {
+      header: pdfMasthead("out-amendment", "OUT Amendment"),
+      sections: [
+        { id:"out-amendment-c-1", label:"1. Page Overview", html:
+          '<p>The OUT Amendment workflow is used to create and submit amendments against an existing Outward declaration or permit. Authorized users can select an eligible OUT declaration, create an amendment record, review the existing declaration data, update the required information across the declaration tabs, enter the amendment reason, save the amendment as a draft, validate it, and submit the amendment.</p>'
+        },
+        { id:"out-amendment-c-2", label:"2. Navigation", html:
+          '<p><strong>Expected navigation path:</strong></p>' +
+          '<p>Declarations → Outward (OUT) → select eligible declaration → AMENDMENT</p>' +
+          '<p>After an amendment is created, the resulting update record is managed from the OUTUPD Declaration Management page.</p>'
+        },
+        { id:"out-amendment-c-3", label:"3. Amendment Workflow Tabs", html:
+          '<table><thead><tr><th>Tab</th><th>Purpose</th><th>Navigation</th></tr></thead><tbody>' +
+          '<tr><td>Shipment Info (S)</td><td>Declaration type, cargo type, inward/outward transport mode, release and receipt locations, certificate-of-origin information, checks, and related shipment information.</td><td>First amendment tab / use NEXT to continue.</td></tr>' +
+          '<tr><td>Transport Info (T)</td><td>Cargo details, inward and outward transport means, ports, voyage details, country of final destination, vessel information, and container details.</td><td>PREVIOUS returns to Shipment Info; NEXT opens Party Info.</td></tr>' +
+          '<tr><td>Party Info (P)</td><td>Importer, carriers, freight forwarder, declaring agent, exporter, consignee, end user, manufacturer, UEN, and address details.</td><td>PREVIOUS returns to Transport Info; NEXT opens Invoice Info.</td></tr>' +
+          '<tr><td>Invoice Info (V)</td><td>Invoice details, supplier/manufacturer party, currency, invoice amount, freight, insurance, exchange rate, CIF, duties, tax, and GST.</td><td>PREVIOUS returns to Party Info; NEXT opens Items.</td></tr>' +
+          '<tr><td>Items (I)</td><td>Item references, HS code, description, country of origin, quantity, value, CASC, Certificate of Origin item details, and item summary.</td><td>PREVIOUS returns to Invoice Info; NEXT opens CPC.</td></tr>' +
+          '<tr><td>CPC (C)</td><td>CPC-related options including AEO, CWC, SEASTORE, STS, STS &amp; CWC, International Permit Exchange, CNB, and Deferred Printing of CO.</td><td>PREVIOUS returns to Items; NEXT opens Summary.</td></tr>' +
+          '<tr><td>Summary (Y)</td><td>Final review of declaration values and remarks before entering amendment-specific information.</td><td>PREVIOUS returns to CPC; NEXT opens Amendment Details.</td></tr>' +
+          '<tr><td>Amendment Details (A)</td><td>Displays update information and captures the Amendment Reason and Permit Validity Extension Indicator before final submission.</td><td>Final tab; PREVIOUS returns to Summary.</td></tr>' +
+          '</tbody></table>'
+        },
+        { id:"out-amendment-c-4", label:"4. Amendment Controls", html:
+          '<table><thead><tr><th>Control</th><th>Action</th><th>Important Note</th></tr></thead><tbody>' +
+          '<tr><td>AMENDMENT</td><td>Starts an amendment from an eligible OUT declaration.</td><td>The Create New Record dialog may also show CANCEL PERMIT as a separate operation.</td></tr>' +
+          '<tr><td>PREVIOUS</td><td>Moves to the immediately preceding amendment tab.</td><td>Use to review or correct existing information.</td></tr>' +
+          '<tr><td>NEXT</td><td>Moves to the immediately following amendment tab.</td><td>Proceed after reviewing the current section.</td></tr>' +
+          '<tr><td>SAVE DRAFT</td><td>Saves the amendment without final submission.</td><td>A successful save is confirmed by a Draft Saved notification.</td></tr>' +
+          '<tr><td>SUBMIT AMENDMENT</td><td>Performs final validation and submits the amendment.</td><td>Available on Amendment Details after required information is complete.</td></tr>' +
+          '<tr><td>Permit Validity Extension Indicator</td><td>Marks the amendment as a permit-validity-extension request when applicable.</td><td>Select only when the amendment is specifically for extending permit validity.</td></tr>' +
+          '<tr><td>CIF / CCP</td><td>Provides related document/action controls where enabled.</td><td>Availability can depend on declaration or permit state.</td></tr>' +
+          '<tr><td>EXIT</td><td>Leaves the amendment workflow.</td><td>Save required work before exiting when necessary.</td></tr>' +
+          '</tbody></table>'
+        },
+        { id:"out-amendment-c-5", label:"5. Validation Requirements", html:
+          '<ul>' +
+          '<li>All mandatory fields marked with * must be completed.</li>' +
+          '<li>The Amendment Reason must clearly explain why the update is being submitted.</li>' +
+          '<li>The Amendment Reason field shown in the OUT amendment screen supports a maximum of 70 characters.</li>' +
+          '<li>The Declaration Indicator must be confirmed before final submission.</li>' +
+          '<li>Shipment, transport, party, invoice, item, CPC, and summary information should remain valid after any amendment changes.</li>' +
+          '<li>Permit Validity Extension Indicator should be selected only when the requested amendment is for extending permit validity.</li>' +
+          '<li>Invalid, incomplete, or inconsistent information should prevent successful submission.</li>' +
+          '<li>SAVE DRAFT should store the current amendment without final submission and display a Draft Saved confirmation.</li>' +
+          '<li>SUBMIT AMENDMENT should perform final validation before processing.</li>' +
+          '<li>Successful validation should display Validation Passed.</li>' +
+          '<li>Successful processing should display Amendment Submitted, and the update record should appear in OUTUPD Declaration Management with the appropriate status.</li>' +
+          '</ul>'
+        },
+        { id:"out-amendment-c-6", label:"6. Suggested OUT Amendment Flow", html:
+          '<ol>' +
+          '<li>Open Declarations → Outward (OUT).</li>' +
+          '<li>Locate an eligible declaration or permit that requires amendment.</li>' +
+          '<li>Open the row action and select AMENDMENT from the Create New Record dialog.</li>' +
+          '<li>Review Shipment Info and update only the fields that require amendment.</li>' +
+          '<li>Use NEXT to proceed through Transport Info, Party Info, Invoice Info, Items, CPC, Summary, and Amendment Details.</li>' +
+          '<li>Review all existing declaration information to ensure the amended record remains complete and internally consistent.</li>' +
+          '<li>On Amendment Details, review Update Permit Number, Update Indicator, and Update Request No.</li>' +
+          '<li>Enter the Amendment Reason and select Permit Validity Extension Indicator only when applicable.</li>' +
+          '<li>Confirm the Declaration Indicator.</li>' +
+          '<li>Use SAVE DRAFT if the amendment must be stored for later completion.</li>' +
+          '<li>Select SUBMIT AMENDMENT after all required amendment information has been reviewed and completed.</li>' +
+          '<li>Verify Validation Passed and Amendment Submitted notifications.</li>' +
+          '<li>Confirm the amendment record in OUTUPD Declaration Management and verify the resulting status.</li>' +
+          '</ol>'
+        },
+        { id:"out-amendment-c-appendix", label:"Appendix A – UI Reference", html: "" },
+        { id:"out-amendment-step-1", label:"Step 1: Open OUT Declaration Management", sub:true, html:
+          '<p>Open Declarations → Outward (OUT). The OUT Declaration Management page displays existing outward declarations, filters, permit information, status, row actions, and OUT-level controls. Locate the declaration that requires amendment.</p>' +
+          fig("out-amendment", 1, "OUT Declaration Management", 1599, 804)
+        },
+        { id:"out-amendment-step-2", label:"Step 2: Select the Amendment Action", sub:true, html:
+          '<p>Open the action for the selected declaration. The Create New Record dialog identifies the selected Job ID and displays the available record actions. Select AMENDMENT to start the amendment workflow. CANCEL PERMIT is a separate operation.</p>' +
+          fig("out-amendment", 2, "Create New Record - Select Amendment", 1598, 810)
+        },
+        { id:"out-amendment-step-3", label:"Step 3: Review Shipment Information", sub:true, html:
+          '<p>The amendment opens with the existing declaration information populated. Review Declaration Type, Cargo Type, Inward Transport Mode, Outward Transport Mode, Release Location, Receipt Location, Certificate of Origin details, checks, and any additional recipients. Update only the information required by the amendment.</p>' +
+          fig("out-amendment", 3, "OUT Amendment - Shipment Information", 1600, 809)
+        },
+        { id:"out-amendment-step-4", label:"Step 4: Review Transport Information", sub:true, html:
+          '<p>Select Transport Info (T) or use NEXT. Review Total Package, UOM, Gross Weight, inward and outward voyage details, arrival and departure dates, ports, country of final destination, vessel information, and container details where applicable.</p>' +
+          fig("out-amendment", 4, "OUT Amendment - Transport Information", 1600, 811)
+        },
+        { id:"out-amendment-step-5", label:"Step 5: Review Party Information", sub:true, html:
+          '<p>Select Party Info (P) or use NEXT. Review or update the Importer, Inward Carrier, Freight Forwarder, Outward Carrier, Declaring Agent, Exporter, Consignee, End User, Manufacturer, corresponding UEN values, and address details as applicable.</p>' +
+          fig("out-amendment", 5, "OUT Amendment - Party Information", 1600, 710)
+        },
+        { id:"out-amendment-step-6", label:"Step 6: Review Invoice Information", sub:true, html:
+          '<p>Select Invoice Info (V) or use NEXT. Review the invoice number, invoice date, term type, supplier/manufacturer information, currency, invoice amount, freight and insurance charges, exchange rate, CIF, duties, taxes, and GST values.</p>' +
+          fig("out-amendment", 6, "OUT Amendment - Invoice Information", 1599, 768)
+        },
+        { id:"out-amendment-step-7", label:"Step 7: Review Item Information", sub:true, html:
+          '<p>Select Items (I) or use NEXT. Review inward/outward shipment references, HS Code, description, brand, country of origin, quantity, UOM, item value, CASC details, tariff or shipping marks, Certificate of Origin item details, and the item summary.</p>' +
+          fig("out-amendment", 7, "OUT Amendment - Item Information", 1599, 766)
+        },
+        { id:"out-amendment-step-8", label:"Step 8: Review CPC Information", sub:true, html:
+          '<p>Select CPC (C) or use NEXT. Review applicable CPC-related options including AEO, CWC, SEASTORE, STS, STS &amp; CWC, International Permit Exchange, CNB, and Deferred Printing of CO.</p>' +
+          fig("out-amendment", 8, "OUT Amendment - CPC Information", 1600, 799)
+        },
+        { id:"out-amendment-step-9", label:"Step 9: Enter Amendment Details", sub:true, html:
+          '<p>Open Amendment Details (A). Review the Update Permit Number, Update Indicator, and Update Request No. Enter the Amendment Reason, select Permit Validity Extension Indicator only when applicable, confirm the Declaration Indicator, and use SUBMIT AMENDMENT for final processing.</p>' +
+          fig("out-amendment", 9, "OUT Amendment Details", 1600, 812)
+        },
+        { id:"out-amendment-step-10", label:"Step 10: Save the Amendment as Draft", sub:true, html:
+          '<p>Select SAVE DRAFT when the amendment must be stored without final submission. The system displays a Draft Saved notification confirming that the amendment draft was saved successfully.</p>' +
+          fig("out-amendment", 10, "OUT Amendment - Draft Saved", 1599, 815)
+        },
+        { id:"out-amendment-step-11", label:"Step 11: Validate and Submit the Amendment", sub:true, html:
+          '<p>After all required information is complete, select SUBMIT AMENDMENT. The system performs final validation. A successful submission displays Validation Passed followed by Amendment Submitted. The resulting record is visible in OUTUPD Declaration Management with the appropriate status.</p>' +
+          fig("out-amendment", 11, "Validation Passed and Amendment Submitted", 1600, 812)
+        }
+      ]
+    },
+
+    "application-overview": {
+      header: pdfMasthead("application-overview", "Application Overview"),
+      sections: [
+        { id:"application-overview-c-1", label:"Overview", html:
+          '<p>Declaro is a centralized customs declaration management application designed to support freight forwarding and customs operations. The application brings together declaration processing, status monitoring, user administration, master-data management, permissions, and reporting within a single controlled platform.</p>' +
+          '<p>The application provides authorized users with a dashboard that presents declaration information for Today, This Week, and This Month. The dashboard allows users to review key declaration conditions such as Approved Permit, Rejected, Awaiting, and Amendment, and to filter the displayed information based on the required declaration flow and status.</p>' +
+          '<p>Declaro also supports declaration-related operations including viewing declaration details, creating new declarations where permitted, cloning existing declarations, and performing edit or delete actions according to the permissions assigned to the user\'s role.</p>' +
+          '<p>Administrative functions include user onboarding and management, role and permission control, forwarder management, department management, mailbox configuration, and other master-data activities required for day-to-day customs operations.</p>' +
+          '<p>Through role-based access control, Declaro ensures that users can access only the modules and actions assigned to them. This provides a structured, secure, and traceable operating environment for customs declaration processing and related administrative activities.</p>'
+        }
+      ]
+    },
+
+    "user-roles": {
+      header: pdfMasthead("user-roles", "Roles &amp; Permissions Management Documentation"),
+      sections: [
+        { id:"user-roles-c-1", label:"1. Page Overview", html:
+          '<p>The Roles &amp; Permissions module is used by an authorized administrator to define application roles, associate permissions with those roles, and maintain the resources against which permissions are organized. A role represents an access profile, while a permission represents a specific operation or capability. Resources provide the functional grouping or application area to which permissions belong.</p>'
+        },
+        { id:"user-roles-c-2", label:"2. Navigation", html:
+          '<p><strong>Expected navigation paths:</strong></p><ul><li>Roles &amp; Permissions → Roles</li></ul>'
+        },
+        { id:"user-roles-c-3-1", label:"3.1 Role Management List", html:
+          '<p>The Role Management page lists configured roles and provides actions to view, edit, or delete a role. The supplied UI shows roles such as REPORT_ADMIN, SUPER_ADMIN, DECLARANT, and FORWARDER_ADMIN.</p>' +
+          '<table><thead><tr><th>Element</th><th>Type</th><th>Purpose</th><th>Expected Behavior</th></tr></thead><tbody>' +
+          '<tr><td>Name</td><td>Table column / filter</td><td>Displays the role name and supports filtering.</td><td>Role names should be unique and searchable.</td></tr>' +
+          '<tr><td>View</td><td>Action icon</td><td>Opens role details.</td><td>Navigates to the selected role\'s View Role page.</td></tr>' +
+          '<tr><td>Edit</td><td>Action icon</td><td>Modifies the role.</td><td>Opens the role edit flow, subject to authorization.</td></tr>' +
+          '<tr><td>Delete</td><td>Action icon</td><td>Deletes the role.</td><td>Should require confirmation and should be blocked where the role is in protected or active use.</td></tr>' +
+          '<tr><td>Refresh</td><td>Button</td><td>Reloads the role list.</td><td>Refreshes the current table data.</td></tr>' +
+          '<tr><td>Custom Column</td><td>Button</td><td>Controls visible table columns.</td><td>Allows the administrator to customize the grid presentation.</td></tr>' +
+          '<tr><td>Add Role</td><td>Primary button</td><td>Starts creation of a new role.</td><td>Navigates to the Add Role page.</td></tr>' +
+          '</tbody></table>'
+        },
+        { id:"user-roles-c-3-2", label:"3.2 Add Role", html:
+          '<table><thead><tr><th>Field</th><th>Required</th><th>Input Type</th><th>Purpose</th><th>Expected Validation</th></tr></thead><tbody>' +
+          '<tr><td>Name</td><td>Yes (*)</td><td>Text</td><td>Defines the role identifier/name.</td><td>Must not be blank; should satisfy the application\'s naming convention and uniqueness rules.</td></tr>' +
+          '</tbody></table>' +
+          '<p>The Create Role button is initially unavailable when the required Name field is empty. After a valid role name is entered, the action should become available.</p>'
+        },
+        { id:"user-roles-c-3-3", label:"3.3 View Role", html:
+          '<p>The View Role page displays the role name and the permissions currently assigned to the role. The supplied example shows FORWARDER_ADMIN with no permissions initially assigned.</p>' +
+          '<table><thead><tr><th>Area</th><th>Purpose</th><th>Expected Behavior</th></tr></thead><tbody>' +
+          '<tr><td>Role details</td><td>Displays the selected role name.</td><td>Read-only in View mode; editable through the Edit action.</td></tr>' +
+          '<tr><td>Permissions grid</td><td>Lists permissions assigned to the role.</td><td>Shows Permission, Resource, Description, and Actions.</td></tr>' +
+          '<tr><td>Filter by Resource</td><td>Filters assigned permissions by resource.</td><td>Selecting a resource limits the grid to matching permission entries.</td></tr>' +
+          '<tr><td>Assign Permission</td><td>Adds an existing permission to the role.</td><td>Opens the Assign Permission dialog.</td></tr>' +
+          '<tr><td>Create Permission</td><td>Starts creation of a new permission.</td><td>Navigates to or opens the permission-creation flow.</td></tr>' +
+          '<tr><td>Edit</td><td>Modifies role details.</td><td>Available only to authorized administrators.</td></tr>' +
+          '<tr><td>Delete</td><td>Deletes the role.</td><td>Should require confirmation and dependency checks.</td></tr>' +
+          '<tr><td>Back</td><td>Returns to role list.</td><td>Navigates back without changing the role.</td></tr>' +
+          '</tbody></table>'
+        },
+        { id:"user-roles-c-4", label:"4. Validation Requirements", html:
+          '<ul>' +
+          '<li>All fields marked with * should be treated as mandatory.</li>' +
+          '<li>Role Name should not accept blank or whitespace-only input.</li>' +
+          '<li>Role Name should comply with the application\'s naming convention and uniqueness rules.</li>' +
+          '<li>Resource Name should not accept blank or whitespace-only input and should be unique.</li>' +
+          '<li>Resource Description should be required and should not accept whitespace-only input.</li>' +
+          '<li>Create Role and Create Resource should remain unavailable/disabled while mandatory data is incomplete, where that is the intended UI behavior.</li>' +
+          '<li>Assign should remain unavailable/disabled until a permission is selected.</li>' +
+          '<li>The same permission should not be assigned to the same role more than once.</li>' +
+          '<li>Removing a permission must require explicit confirmation.</li>' +
+          '<li>Deleting a role or resource should be subject to dependency checks and application rules.</li>' +
+          '<li>Validation messages should be displayed close to the relevant field or action and should be understandable to the administrator.</li>' +
+          '</ul>'
+        },
+        { id:"user-roles-c-5", label:"5. Suggested Role &amp; Permission Flow", html:
+          '<ol>' +
+          '<li>Open Roles &amp; Permissions → Roles.</li>' +
+          '<li>Select Add Role.</li>' +
+          '<li>Enter the Role Name.</li>' +
+          '<li>Select Create Role.</li>' +
+          '<li>Open the newly created role using the View action.</li>' +
+          '<li>Select Assign Permission.</li>' +
+          '<li>Search for and select the required permission.</li>' +
+          '<li>Select Assign.</li>' +
+          '<li>Verify that the permission appears in the role\'s Permissions grid with its Resource and Description.</li>' +
+          '<li>Repeat the assignment process for additional permissions as required.</li>' +
+          '<li>To remove an assignment, select the remove/delete action on the permission row.</li>' +
+          '<li>Confirm Remove in the confirmation dialog.</li>' +
+          '<li>Verify that the permission is no longer shown for the role.</li>' +
+          '</ol>'
+        },
+        { id:"user-roles-c-appendix", label:"Appendix A – UI Reference", html: "" },
+        { id:"user-roles-step-1", label:"Step 1: Add Role", sub:true, html:
+          '<p>From Roles &amp; Permissions → Roles, select Add Role. Enter the required role Name. The Create Role action becomes available when valid data is entered.</p>' +
+          fig("user-roles", 1, "Add Role", 1600, 804)
+        },
+        { id:"user-roles-step-2", label:"Step 2: Role Management", sub:true, html:
+          '<p>After successful creation, the Role Management page is displayed and a success notification confirms that the role has been created.</p>' +
+          fig("user-roles", 2, "Role Management", 1600, 814)
+        },
+        { id:"user-roles-step-3", label:"Step 3: View Role", sub:true, html:
+          '<p>Open the required role using the View action. The role detail page shows the role name and its assigned permissions.</p>' +
+          fig("user-roles", 3, "View Role", 1599, 808)
+        },
+        { id:"user-roles-step-4", label:"Step 4: Assign Permission", sub:true, html:
+          '<p>Select Assign Permission. A searchable dialog displays available permissions.</p>' +
+          fig("user-roles", 4, "Step 4: Assign Permission", 1599, 811)
+        },
+        { id:"user-roles-step-5", label:"Step 5: Select Permission", sub:true, html:
+          '<p>Select the required permission. The Assign action becomes available.</p>' +
+          fig("user-roles", 5, "Step 5: Select Permission", 1600, 806)
+        },
+        { id:"user-roles-step-6", label:"Step 6: Permission Assigned", sub:true, html:
+          '<p>After assignment, the permission appears in the role Permissions grid and a success notification confirms the operation.</p>' +
+          fig("user-roles", 6, "Permission Assigned", 1594, 807)
+        },
+        { id:"user-roles-step-7", label:"Step 7: Remove Permission", sub:true, html:
+          '<p>Select the remove/delete action for the assigned permission. A confirmation dialog is displayed.</p>' +
+          fig("user-roles", 7, "Remove Permission", 1599, 807)
+        },
+        { id:"user-roles-step-8", label:"Step 8: Permission Removed", sub:true, html:
+          '<p>After confirmation, the permission is removed from the role and the UI displays a success notification.</p>' +
+          fig("user-roles", 8, "Permission Removed", 1599, 812)
+        }
+      ]
     }
   };
 
   /* ============================================================
      3. LOOKUP HELPERS
      ============================================================ */
-  var itemIndex = {};   // id -> { item, section }
+  // A section's `items` array is normally a flat list of leaf
+  // { id, label } entries. Some sections (e.g. Amendment Declaration)
+  // nest leaves one level deeper under a non-clickable { group, items }
+  // heading; this flattens either shape into a plain leaf-item list.
+  function flattenNavItems(items){
+    var out = [];
+    items.forEach(function(entry){
+      if(entry.items){ out = out.concat(flattenNavItems(entry.items)); }
+      else { out.push(entry); }
+    });
+    return out;
+  }
+
+  var itemIndex = {};   // id -> { item, section, group }
   NAV_SECTIONS.forEach(function(section){
-    section.items.forEach(function(item){
-      itemIndex[item.id] = { item: item, section: section };
+    section.items.forEach(function(entry){
+      if(entry.items){
+        entry.items.forEach(function(item){
+          itemIndex[item.id] = { item: item, section: section, group: entry };
+        });
+      } else {
+        itemIndex[entry.id] = { item: entry, section: section, group: null };
+      }
     });
   });
 
@@ -2700,7 +3385,8 @@
   var state = {
     activeId: null,
     view: "landing",  // "landing" | "doc" | "toc"
-    expanded: {}   // sectionId -> bool
+    expanded: {},        // sectionId -> bool
+    expandedGroups: {}   // groupId -> bool (nested mid-level dropdowns, e.g. Amendment Declaration's IPT/INP/TNP/OUT groups)
   };
 
   /* ============================================================
@@ -2722,9 +3408,25 @@
       html += '    <span class="label">' + section.title + '</span>';
       html += '  </button>';
       html += '  <ul class="nav-items">';
-      section.items.forEach(function(item){
-        var active = item.id === state.activeId;
-        html += '<li class="nav-item' + (active ? " active" : "") + '" data-doc="' + item.id + '">' + item.label + '</li>';
+      section.items.forEach(function(entry){
+        if(entry.items){
+          var groupExpanded = !!state.expandedGroups[entry.id];
+          html += '<li class="nav-subgroup-wrap' + (groupExpanded ? " expanded" : "") + '">';
+          html += '  <button type="button" class="nav-subgroup-btn" data-subtoggle="' + entry.id + '">';
+          html += chevronSVG();
+          html += '    <span class="label">' + escapeHtml(entry.group) + '</span>';
+          html += '  </button>';
+          html += '  <ul class="nav-items-sub">';
+          entry.items.forEach(function(item){
+            var active = item.id === state.activeId;
+            html += '<li class="nav-item nav-item-sub' + (active ? " active" : "") + '" data-doc="' + item.id + '">' + item.label + '</li>';
+          });
+          html += '  </ul>';
+          html += '</li>';
+        } else {
+          var active = entry.id === state.activeId;
+          html += '<li class="nav-item' + (active ? " active" : "") + '" data-doc="' + entry.id + '">' + entry.label + '</li>';
+        }
       });
       html += '  </ul>';
       html += '</div>';
@@ -2737,6 +3439,13 @@
     if(toggleBtn){
       var sid = toggleBtn.getAttribute("data-toggle");
       state.expanded[sid] = !state.expanded[sid];
+      renderSidebar();
+      return;
+    }
+    var subToggleBtn = e.target.closest("[data-subtoggle]");
+    if(subToggleBtn){
+      var gid = subToggleBtn.getAttribute("data-subtoggle");
+      state.expandedGroups[gid] = !state.expandedGroups[gid];
       renderSidebar();
       return;
     }
@@ -2754,9 +3463,10 @@
   (function renderCards(){
     var html = "";
     NAV_SECTIONS.forEach(function(section){
+      var count = flattenNavItems(section.items).length;
       html += '<div class="module-card" data-open-section="' + section.id + '">';
       html += '  <div class="module-card-title">' + titleCase(section.crumb) + '</div>';
-      html += '  <div class="module-card-count">' + section.items.length + (section.items.length === 1 ? " document" : " documents") + '</div>';
+      html += '  <div class="module-card-count">' + count + (count === 1 ? " document" : " documents") + '</div>';
       html += '</div>';
     });
     cardGrid.innerHTML = html;
@@ -2771,8 +3481,9 @@
     var section = NAV_SECTIONS.filter(function(s){ return s.id === sid; })[0];
     if(!section) return;
     state.expanded[sid] = true;
-    if(section.items.length){
-      navigateTo(section.items[0].id);
+    var firstItem = flattenNavItems(section.items)[0];
+    if(firstItem){
+      navigateTo(firstItem.id);
     }
   });
 
@@ -2826,16 +3537,20 @@
     state.activeId = id;
     state.view = "doc";
 
-    // Auto-expand the parent section, then render once
+    // Auto-expand the parent section (and, where the item lives inside a
+    // nested mid-level group such as Amendment Declaration's IPT/INP/TNP/
+    // OUT dropdowns, that specific group too), then render once.
     state.expanded[found.section.id] = true;
+    if(found.group){ state.expandedGroups[found.group.id] = true; }
     renderSidebar();
 
-    // Front-matter TOC entries (Introduction/Purpose/Scope) and the
-    // Management module docs (Users/Forwarders/Departments/Mailboxes) get
-    // an explicit way back to the TOC page they were opened from. Left
-    // hidden for every other document (Dashboard, Status List, IPT/INP/
-    // TNP/OUT/COO, etc.).
-    tocBackBtn.style.display = (found.section.id === "toc-front-matter" || found.section.id === "management") ? "" : "none";
+    // Front-matter TOC entries (Introduction/Purpose/Scope), the
+    // Management module docs (Users/Forwarders/Departments/Mailboxes),
+    // and the Amendment Declaration docs (IPT/INP/TNP/OUT Amend/Cancel/
+    // Refund) get an explicit way back to the TOC page they were opened
+    // from. Left hidden for every other document (Dashboard, Status
+    // List, IPT/INP/TNP/OUT/COO declarations, etc.).
+    tocBackBtn.style.display = (found.section.id === "toc-front-matter" || found.section.id === "management" || found.section.id === "amendment-declaration") ? "" : "none";
 
     // Breadcrumb
     breadcrumbEl.innerHTML =
@@ -3044,7 +3759,7 @@
   // Sidebar/document entries
   var searchFlat = [];
   NAV_SECTIONS.forEach(function(section){
-    section.items.forEach(function(item){
+    flattenNavItems(section.items).forEach(function(item){
       searchFlat.push({ kind:"doc", docId:item.id, label:item.label, path:section.crumb });
     });
   });
