@@ -1,0 +1,2290 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tradenix Documentation Portal</title>
+<style>
+  /* ============================================================
+     THEME TOKENS
+     ============================================================ */
+  :root{
+    --header-bg:#12151c;
+    --header-border:#232732;
+    --header-text:#e7e9ee;
+    --header-text-dim:#9aa1b1;
+    --accent:#2fb1a3;
+    --accent-hover:#3fc4b6;
+    --accent-contrast:#06201d;
+  }
+  html[data-theme="dark"]{
+    --bg:#0d0f14;
+    --surface:#12151c;
+    --surface-alt:#171b24;
+    --sidebar-bg:#0f1218;
+    --border:#232732;
+    --text:#e7e9ee;
+    --text-dim:#9aa1b1;
+    --text-faint:#6b7280;
+    --hover-bg:#1c212c;
+    --active-bg:#182a29;
+    --active-text:#4fd0c1;
+    --card-bg:#161a22;
+    --shadow:0 4px 16px rgba(0,0,0,.35);
+    --scrollbar:#2a2f3b;
+  }
+  html[data-theme="light"]{
+    --bg:#f7f8fa;
+    --surface:#ffffff;
+    --surface-alt:#f1f2f5;
+    --sidebar-bg:#ffffff;
+    --border:#e3e5ea;
+    --text:#1a1d24;
+    --text-dim:#5b6170;
+    --text-faint:#8a90a0;
+    --hover-bg:#f0f1f4;
+    --active-bg:#e6f7f4;
+    --active-text:#0f8a7c;
+    --card-bg:#ffffff;
+    --shadow:0 2px 10px rgba(20,20,30,.08);
+    --scrollbar:#d7d9e0;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-size:14px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+  a{color:inherit;}
+  ::-webkit-scrollbar{width:8px;height:8px;}
+  ::-webkit-scrollbar-thumb{background:var(--scrollbar);border-radius:8px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+
+  button{font-family:inherit;}
+
+  /* ============================================================
+     HEADER
+     ============================================================ */
+  .app-header{
+    height:56px;
+    min-height:56px;
+    background:var(--header-bg);
+    border-bottom:1px solid var(--header-border);
+    display:flex;
+    align-items:center;
+    padding:0 16px;
+    gap:16px;
+    color:var(--header-text);
+    z-index:100;
+    position:relative;
+  }
+  .header-left{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    min-width:0;
+  }
+  .hamburger{
+    display:none;
+    background:none;
+    border:none;
+    color:var(--header-text);
+    cursor:pointer;
+    padding:6px;
+    border-radius:6px;
+  }
+  .hamburger:hover{background:rgba(255,255,255,.08);}
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    cursor:pointer;
+    padding:6px 8px;
+    border-radius:6px;
+    white-space:nowrap;
+  }
+  .brand:hover{background:rgba(255,255,255,.06);}
+  .brand-mark{
+    width:26px;height:26px;
+    border-radius:7px;
+    background:linear-gradient(135deg,var(--accent),#1c7a70);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:700;font-size:13px;color:#06201d;
+    flex-shrink:0;
+  }
+  .brand-name{font-weight:600;font-size:14.5px;color:var(--header-text);}
+  .brand-chevron{color:var(--header-text-dim);display:flex;}
+
+  .top-nav{
+    display:flex;
+    align-items:center;
+    gap:4px;
+    flex:1;
+    min-width:0;
+  }
+  .top-nav a{
+    text-decoration:none;
+    color:var(--header-text-dim);
+    font-size:13.5px;
+    padding:8px 12px;
+    border-radius:6px;
+    white-space:nowrap;
+    transition:background .15s,color .15s;
+  }
+  .top-nav a:hover{background:rgba(255,255,255,.06);color:var(--header-text);}
+  .top-nav a.current{color:var(--header-text);}
+
+  .header-right{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-left:auto;
+  }
+
+  .header-search{
+    position:relative;
+    width:240px;
+  }
+  .header-search input{
+    width:100%;
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.09);
+    color:var(--header-text);
+    border-radius:7px;
+    padding:7px 10px 7px 32px;
+    font-size:13px;
+    outline:none;
+    transition:border-color .15s,background .15s;
+  }
+  .header-search input::placeholder{color:var(--header-text-dim);}
+  .header-search input:focus{border-color:var(--accent);background:rgba(255,255,255,.09);}
+  .header-search svg{
+    position:absolute;left:9px;top:50%;transform:translateY(-50%);
+    color:var(--header-text-dim);pointer-events:none;
+  }
+  .search-kbd{
+    position:absolute;right:7px;top:50%;transform:translateY(-50%);
+    font-size:10.5px;color:var(--header-text-dim);
+    border:1px solid rgba(255,255,255,.15);
+    border-radius:4px;padding:1px 5px;
+    pointer-events:none;
+  }
+  .search-results{
+    position:absolute;
+    top:calc(100% + 6px);
+    left:0;right:0;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:8px;
+    box-shadow:var(--shadow);
+    max-height:360px;
+    overflow-y:auto;
+    display:none;
+    z-index:200;
+  }
+  .search-results.open{display:block;}
+  .search-result-item{
+    padding:9px 12px;
+    cursor:pointer;
+    display:flex;
+    flex-direction:column;
+    gap:1px;
+    border-bottom:1px solid var(--border);
+  }
+  .search-result-item:last-child{border-bottom:none;}
+  .search-result-item:hover,.search-result-item.hl{background:var(--hover-bg);}
+  .search-result-label{font-size:13px;color:var(--text);font-weight:500;}
+  .search-result-path{font-size:11.5px;color:var(--text-faint);}
+  .search-empty{padding:14px 12px;font-size:13px;color:var(--text-faint);}
+
+  .icon-btn{
+    background:none;
+    border:none;
+    color:var(--header-text-dim);
+    cursor:pointer;
+    width:32px;height:32px;
+    display:flex;align-items:center;justify-content:center;
+    border-radius:7px;
+    transition:background .15s,color .15s;
+  }
+  .icon-btn:hover{background:rgba(255,255,255,.08);color:var(--header-text);}
+
+  /* ============================================================
+     LAYOUT
+     ============================================================ */
+  .app-body{
+    flex:1;
+    display:flex;
+    min-height:0;
+    position:relative;
+  }
+
+  .sidebar-backdrop{
+    display:none;
+    position:fixed;
+    inset:56px 0 0 0;
+    background:rgba(0,0,0,.45);
+    z-index:150;
+  }
+  .sidebar-backdrop.open{display:block;}
+
+  .contents-backdrop{
+    display:none;
+    position:fixed;
+    inset:56px 0 0 0;
+    background:rgba(0,0,0,.45);
+    z-index:150;
+  }
+  .contents-backdrop.open{display:block;}
+
+  .sidebar{
+    width:288px;
+    min-width:288px;
+    background:var(--sidebar-bg);
+    border-right:1px solid var(--border);
+    overflow-y:auto;
+    padding:14px 10px 40px;
+    position:relative;
+    z-index:160;
+  }
+
+  .nav-section{margin-bottom:2px;}
+  .nav-section-btn{
+    width:100%;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:none;
+    border:none;
+    text-align:left;
+    padding:9px 8px;
+    cursor:pointer;
+    border-radius:6px;
+    color:var(--text-dim);
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+  }
+  .nav-section-btn:hover{background:var(--hover-bg);color:var(--text);}
+  .nav-section-btn .chev{
+    display:flex;
+    transition:transform .15s ease;
+    color:var(--text-faint);
+    flex-shrink:0;
+  }
+  .nav-section.expanded .nav-section-btn .chev{transform:rotate(90deg);}
+  .nav-section-btn .label{flex:1;}
+
+  .nav-items{
+    list-style:none;
+    margin:0;
+    padding:0;
+    overflow:hidden;
+    max-height:0;
+    transition:max-height .18s ease;
+  }
+  .nav-section.expanded .nav-items{max-height:1000px;}
+
+  .nav-item{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:7px 10px 7px 30px;
+    margin:1px 0;
+    border-radius:6px;
+    cursor:pointer;
+    color:var(--text-dim);
+    font-size:13px;
+    position:relative;
+    transition:background .12s,color .12s;
+  }
+  .nav-item:hover{background:var(--hover-bg);color:var(--text);}
+  .nav-item.active{
+    background:var(--active-bg);
+    color:var(--active-text);
+    font-weight:600;
+  }
+  .nav-item.active::before{
+    content:"";
+    position:absolute;
+    left:14px;top:50%;
+    transform:translateY(-50%);
+    width:4px;height:4px;
+    border-radius:50%;
+    background:var(--active-text);
+  }
+
+  /* ============================================================
+     MAIN CONTENT
+     ============================================================ */
+  .main{
+    flex:1;
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+
+  /* Welcome / landing page */
+  .landing{
+    flex:1;
+    overflow-y:auto;
+    padding:48px 40px 60px;
+  }
+  .landing-inner{max-width:920px;margin:0 auto;}
+  .landing-eyebrow{
+    color:var(--accent);
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    margin-bottom:10px;
+  }
+  .landing h1{
+    font-size:32px;
+    margin:0 0 14px;
+    font-weight:700;
+    letter-spacing:-.01em;
+  }
+  .landing p.lead{
+    color:var(--text-dim);
+    font-size:15.5px;
+    max-width:640px;
+    margin:0 0 36px;
+  }
+  .card-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+    gap:14px;
+  }
+  .module-card{
+    background:var(--card-bg);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:16px;
+    cursor:pointer;
+    transition:border-color .15s,transform .15s,box-shadow .15s;
+  }
+  .module-card:hover{
+    border-color:var(--accent);
+    box-shadow:var(--shadow);
+    transform:translateY(-1px);
+  }
+  .module-card-title{
+    font-weight:600;
+    font-size:14px;
+    margin-bottom:4px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .module-card-count{
+    color:var(--text-faint);
+    font-size:12.5px;
+  }
+
+  /* Document viewer */
+  .doc-view{
+    flex:1;
+    display:none;
+    flex-direction:column;
+    min-height:0;
+  }
+  .doc-view.active{display:flex;}
+
+  .breadcrumb{
+    padding:12px 24px 0;
+    font-size:12.5px;
+    color:var(--text-faint);
+    display:flex;
+    align-items:center;
+    gap:6px;
+    flex-wrap:wrap;
+  }
+  .breadcrumb .sep{color:var(--text-faint);}
+  .breadcrumb .current{color:var(--text-dim);font-weight:500;}
+
+  .doc-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:8px 24px 16px;
+    border-bottom:1px solid var(--border);
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .doc-header h2{
+    margin:0;
+    font-size:20px;
+    font-weight:700;
+    letter-spacing:-.01em;
+  }
+  .doc-header-actions{
+    display:flex;
+    gap:8px;
+  }
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:7px 13px;
+    border-radius:7px;
+    border:1px solid var(--border);
+    background:var(--surface-alt);
+    color:var(--text);
+    font-size:12.5px;
+    font-weight:500;
+    cursor:pointer;
+    text-decoration:none;
+    transition:background .15s,border-color .15s;
+  }
+  .btn:hover{background:var(--hover-bg);border-color:var(--accent);}
+  .btn-primary{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:var(--accent-contrast);
+  }
+  .btn-primary:hover{background:var(--accent-hover);border-color:var(--accent-hover);}
+
+  .pdf-viewer-wrap{
+    flex:1;
+    min-height:0;
+    padding:16px 24px 24px;
+    display:flex;
+  }
+  .pdf-frame-container{
+    flex:1;
+    border-radius:10px;
+    overflow:hidden;
+    border:1px solid var(--border);
+    background:var(--surface-alt);
+    position:relative;
+  }
+  .pdf-frame-container iframe{
+    width:100%;
+    height:100%;
+    border:none;
+    background:#525659;
+    display:block;
+  }
+  .pdf-missing{
+    position:absolute;
+    inset:0;
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    padding:24px;
+    text-align:center;
+    color:var(--text-dim);
+    background:var(--surface-alt);
+  }
+  .pdf-missing.show{display:flex;}
+  .pdf-missing code{
+    background:var(--surface);
+    border:1px solid var(--border);
+    padding:2px 7px;
+    border-radius:5px;
+    font-size:12px;
+    color:var(--active-text);
+  }
+
+  /* ============================================================
+     TABLE OF CONTENTS VIEW
+     ============================================================ */
+  .toc-view{
+    flex:1;
+    display:none;
+    overflow-y:auto;
+    padding:40px 40px 60px;
+  }
+  .toc-view.active{display:block;}
+  .toc-inner{max-width:820px;margin:0 auto;}
+  .toc-inner h1{
+    font-size:26px;
+    margin:0 0 6px;
+    font-weight:700;
+    letter-spacing:-.01em;
+  }
+  .toc-inner p.toc-sub{
+    color:var(--text-dim);
+    font-size:14px;
+    margin:0 0 28px;
+  }
+  .toc-tree, .toc-children{
+    list-style:none;
+    margin:0;
+    padding:0;
+  }
+  .toc-children{
+    margin-left:11px;
+    padding-left:16px;
+    border-left:1px dashed var(--border);
+  }
+  .toc-node{margin:1px 0;}
+  .toc-row{
+    display:flex;
+    align-items:baseline;
+    gap:9px;
+    padding:6px 10px;
+    border-radius:6px;
+    cursor:default;
+    color:var(--text-dim);
+    transition:background .12s,color .12s;
+  }
+  .toc-row.clickable{cursor:pointer;color:var(--text);}
+  .toc-row.clickable:hover{background:var(--hover-bg);color:var(--active-text);}
+  .toc-row.active{background:var(--active-bg);color:var(--active-text);font-weight:600;}
+  .toc-number{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:12px;
+    color:var(--text-faint);
+    min-width:34px;
+    flex-shrink:0;
+  }
+  .toc-row.clickable .toc-number{color:var(--accent);}
+  .toc-label{font-size:13.5px;}
+  .toc-nodoc-tag{
+    font-size:10.5px;
+    color:var(--text-faint);
+    border:1px solid var(--border);
+    border-radius:4px;
+    padding:1px 6px;
+    margin-left:4px;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+  }
+  .toc-node[data-depth="0"] > .toc-row .toc-label{font-weight:700;font-size:14.5px;color:var(--text);}
+  .toc-node[data-depth="0"] > .toc-row.clickable .toc-label{color:var(--text);}
+  .toc-node[data-depth="0"]{margin-top:14px;}
+  .toc-node[data-depth="0"]:first-child{margin-top:0;}
+
+  /* ============================================================
+     CONTENTS PANEL (right-hand, per-document section index)
+     ============================================================ */
+  .contents-panel{
+    width:230px;
+    min-width:230px;
+    border-left:1px solid var(--border);
+    background:var(--surface);
+    overflow-y:auto;
+    padding:20px 16px 40px;
+    display:none;
+  }
+  .contents-panel.docview-visible{display:block;}
+  .contents-title{
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.07em;
+    text-transform:uppercase;
+    color:var(--text-faint);
+    margin:0 0 12px;
+  }
+  .contents-list{list-style:none;margin:0;padding:0;}
+  .contents-item{
+    font-size:13px;
+    color:var(--text-dim);
+    padding:6px 8px;
+    border-radius:6px;
+    border-left:2px solid transparent;
+    margin-bottom:1px;
+  }
+  .contents-item.linkable{cursor:pointer;}
+  .contents-item.linkable:hover{background:var(--hover-bg);color:var(--text);border-left-color:var(--accent);}
+  .contents-item.contents-sub{
+    padding-left:18px;
+    font-size:12.5px;
+    color:var(--text-faint);
+  }
+  .contents-empty{
+    font-size:12.5px;
+    color:var(--text-faint);
+    line-height:1.6;
+  }
+  .contents-toggle{display:none;}
+
+  /* ============================================================
+     HTML-RENDERED DOCUMENT (extracted PDF content, no PDF viewer)
+     ============================================================ */
+  .pdf-frame-container{display:none;}
+  .pdf-frame-container.active{display:block;}
+  .html-doc-container{
+    flex:1;
+    display:none;
+    overflow-y:auto;
+    border:1px solid var(--border);
+    border-radius:10px;
+    background:var(--surface);
+  }
+  .html-doc-container.active{display:block;}
+  .doc-html{max-width:880px;margin:0 auto;padding:24px 28px 48px;}
+  .doc-html-subtitle{
+    color:var(--text-dim);
+    font-style:italic;
+    font-size:13.5px;
+    margin:-4px 0 24px;
+  }
+  .doc-html section{margin-bottom:32px;scroll-margin-top:16px;}
+  .doc-html h2{
+    font-size:17px;
+    margin:0 0 14px;
+    padding-bottom:8px;
+    border-bottom:1px solid var(--border);
+    font-weight:700;
+    color:var(--text);
+  }
+  .doc-html p{margin:0 0 12px;color:var(--text-dim);font-size:13.5px;line-height:1.65;}
+  .doc-html table{width:100%;border-collapse:collapse;margin:10px 0 18px;font-size:13px;}
+  .doc-html th,.doc-html td{border:1px solid var(--border);padding:8px 10px;text-align:left;vertical-align:top;}
+  .doc-html th{background:var(--surface-alt);font-weight:600;color:var(--text);white-space:nowrap;}
+  .doc-html td{color:var(--text-dim);}
+  .doc-html ul,.doc-html ol{margin:0 0 14px;padding-left:22px;color:var(--text-dim);font-size:13.5px;line-height:1.7;}
+  .doc-html li{margin-bottom:5px;}
+  .doc-html .note-box{
+    background:var(--surface-alt);
+    border-left:3px solid var(--accent);
+    padding:10px 14px;
+    margin:8px 0 16px;
+    font-size:13px;
+    color:var(--text-dim);
+    border-radius:0 6px 6px 0;
+  }
+  .doc-html .doc-figure{
+    margin:10px 0 4px;
+    border:1px solid var(--border);
+    border-radius:8px;
+    overflow:hidden;
+    background:var(--surface-alt);
+  }
+  .doc-html .doc-figure img{
+    display:block;
+    width:100%;
+    height:auto;
+  }
+  .doc-html .doc-figure figcaption{
+    padding:8px 12px;
+    font-size:12.5px;
+    color:var(--text-dim);
+    font-style:italic;
+    border-top:1px solid var(--border);
+    background:var(--card-bg);
+  }
+
+  /* ============================================================
+     RESPONSIVE
+     ============================================================ */
+  @media (max-width:1024px){
+    .top-nav{display:none;}
+  }
+  @media (max-width:1150px){
+    .contents-panel.docview-visible{
+      position:fixed;
+      top:56px;
+      bottom:0;
+      right:0;
+      width:260px;
+      transform:translateX(100%);
+      transition:transform .2s ease;
+      box-shadow:var(--shadow);
+      z-index:160;
+    }
+    .contents-panel.docview-visible.drawer-open{transform:translateX(0);}
+    .contents-toggle{
+      display:inline-flex;
+    }
+  }
+  @media (max-width:860px){
+    .hamburger{display:flex;}
+    .header-search{width:170px;}
+    .sidebar{
+      position:fixed;
+      top:56px;
+      bottom:0;
+      left:0;
+      transform:translateX(-100%);
+      transition:transform .2s ease;
+      box-shadow:var(--shadow);
+      width:280px;
+    }
+    .sidebar.open{transform:translateX(0);}
+  }
+  @media (max-width:560px){
+    .header-search{width:120px;}
+    .landing{padding:28px 18px 40px;}
+    .landing h1{font-size:24px;}
+    .doc-header,.breadcrumb,.pdf-viewer-wrap{padding-left:16px;padding-right:16px;}
+    .toc-view{padding:24px 16px 40px;}
+    .contents-panel{width:82vw;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     HEADER
+     ============================================================ -->
+<header class="app-header">
+  <div class="header-left">
+    <button class="hamburger" id="hamburgerBtn" aria-label="Toggle navigation">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <div class="brand" id="brandHome">
+      <div class="brand-mark">TX</div>
+      <span class="brand-name">Tradenix Documentation</span>
+      <span class="brand-chevron">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </span>
+    </div>
+  </div>
+
+  <nav class="top-nav" id="topNav">
+    <a href="#/" data-nav="home" class="current">Home</a>
+    <a href="#/toc" data-nav="toc">Documentation</a>
+    <a href="#/" data-nav="home">Modules</a>
+    <a href="#/" data-nav="home">Resources</a>
+  </nav>
+
+  <div class="header-right">
+    <div class="header-search">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="searchInput" placeholder="Search documentation..." autocomplete="off">
+      <span class="search-kbd">/</span>
+      <div class="search-results" id="searchResults"></div>
+    </div>
+    <button class="icon-btn" id="themeToggle" aria-label="Toggle theme" title="Toggle theme"></button>
+    <button class="icon-btn" id="fullscreenToggle" aria-label="Toggle fullscreen" title="Toggle fullscreen">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- ============================================================
+     BODY: SIDEBAR + MAIN
+     ============================================================ -->
+<div class="app-body">
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <main class="main">
+    <!-- Landing / welcome page -->
+    <section class="landing" id="landingView">
+      <div class="landing-inner">
+        <div class="landing-eyebrow">Tradenix Documentation</div>
+        <h1>Documentation Portal</h1>
+        <p class="lead">Welcome to the Tradenix Documentation Portal. Select a document from the left navigation, or select a section from the Table of Contents, to view its documentation.</p>
+        <div style="margin-bottom:28px;">
+          <a href="#/toc" class="btn btn-primary">View Table of Contents</a>
+        </div>
+        <div class="card-grid" id="moduleCardGrid"></div>
+      </div>
+    </section>
+
+    <!-- Table of Contents view -->
+    <section class="toc-view" id="tocView">
+      <div class="toc-inner">
+        <h1>Table of Contents</h1>
+        <p class="toc-sub">Structure of the Tradenix documentation set. Items linked to an available document open directly; unlinked items are structural headings only.</p>
+        <ol class="toc-tree" id="tocTree"></ol>
+      </div>
+    </section>
+
+    <!-- Document viewer -->
+    <section class="doc-view" id="docView">
+      <div class="breadcrumb" id="breadcrumb"></div>
+      <div class="doc-header">
+        <h2 id="docTitle">Document</h2>
+        <div class="doc-header-actions">
+          <button class="btn contents-toggle" id="contentsToggleBtn">Contents</button>
+          <button class="btn" id="printBtn">Print</button>
+          <a class="btn btn-primary" id="openNewTabBtn" href="#" target="_blank" rel="noopener">Open in New Tab</a>
+        </div>
+      </div>
+      <div class="pdf-viewer-wrap">
+        <div class="pdf-frame-container" id="pdfFrameContainer">
+          <iframe id="pdfFrame" title="Document viewer"></iframe>
+          <div class="pdf-missing" id="pdfMissing">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <div>No PDF has been linked for this document yet.</div>
+            <div>Expected file: <code id="pdfMissingPath"></code></div>
+          </div>
+        </div>
+        <div class="html-doc-container" id="htmlDocContainer">
+          <div class="doc-html" id="htmlDocContent"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="contents-backdrop" id="contentsBackdrop"></div>
+  <aside class="contents-panel" id="contentsPanel">
+    <div class="contents-title">Contents</div>
+    <div id="contentsBody"></div>
+  </aside>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============================================================
+     1. NAVIGATION DATA (single source of truth for the sidebar,
+        the landing-page cards, and search)
+     ============================================================ */
+  var NAV_SECTIONS = [
+    { id:"dashboard",   title:"DASHBOARD",   crumb:"Dashboard", items:[
+      { id:"dashboard", label:"Dashboard" }
+    ]},
+    { id:"status-list", title:"STATUS LIST", crumb:"Status List", items:[
+      { id:"status-list", label:"Status List" }
+    ]},
+    { id:"management", title:"MANAGEMENT", crumb:"Management", items:[
+      { id:"users",        label:"Users" },
+      { id:"forwarders",   label:"Forwarders" },
+      { id:"departments",  label:"Departments" },
+      { id:"mailboxes",    label:"Mailboxes" }
+    ]},
+    { id:"declarations", title:"DECLARATIONS", crumb:"Declarations", items:[
+      { id:"ipt", label:"Inpayment (IPT)" },
+      { id:"inp", label:"In-Non-Payment (INP)" },
+      { id:"tnp", label:"Transhipment (TNP)" },
+      { id:"out", label:"Outward (OUT)" },
+      { id:"coo", label:"Certificate of Origin (COO)" }
+    ]},
+    { id:"iptupd", title:"IPTUPD DECLARATION MANAGEMENT", crumb:"IPTUPD Declaration Management", items:[
+      { id:"ipt-amendment", label:"Amendment" },
+      { id:"ipt-refund",    label:"Refund" },
+      { id:"ipt-cancel",    label:"Cancel" }
+    ]},
+    { id:"inpupd", title:"INPUPD DECLARATION MANAGEMENT", crumb:"INPUPD Declaration Management", items:[
+      { id:"inp-amendment", label:"Amendment" },
+      { id:"inp-cancel",    label:"Cancel" }
+    ]},
+    { id:"tnpupd", title:"TNPUPD DECLARATION MANAGEMENT", crumb:"TNPUPD Declaration Management", items:[
+      { id:"tnp-amendment", label:"Amendment" },
+      { id:"tnp-cancel",    label:"Cancel" }
+    ]},
+    { id:"outupd", title:"OUTUPD DECLARATION MANAGEMENT", crumb:"OUTUPD Declaration Management", items:[
+      { id:"out-amendment", label:"Amendment" },
+      { id:"out-cancel",    label:"Cancel" }
+    ]},
+    { id:"masters", title:"MASTERS", crumb:"Masters", items:[
+      { id:"location-information", label:"Location Information" },
+      { id:"exchange-rates",       label:"Exchange Rates" }
+    ]},
+    { id:"parties", title:"PARTIES", crumb:"Parties", items:[
+      { id:"declarant-company",     label:"Declarant Company" },
+      { id:"importer",              label:"Importer" },
+      { id:"exporter",              label:"Exporter" },
+      { id:"consignee",             label:"Consignee" },
+      { id:"end-user",              label:"End User" },
+      { id:"manufacturer",          label:"Manufacturer" },
+      { id:"handling-agent",        label:"Handling Agent" },
+      { id:"freight-forwarder",     label:"Freight Forwarder" },
+      { id:"claimant-party",        label:"Claimant Party" },
+      { id:"inward-carrier-agent",  label:"Inward Carrier Agent" },
+      { id:"outward-carrier-agent", label:"Outward Carrier Agent" }
+    ]},
+    { id:"items", title:"ITEMS", crumb:"Items", items:[
+      { id:"hs-codes",           label:"HS Codes" },
+      { id:"product-code",       label:"Product Code" },
+      { id:"pending-approvals",  label:"Pending Approvals" },
+      { id:"loading-ports",      label:"Loading Ports" },
+      { id:"country-code",       label:"Country Code" },
+      { id:"data-transfer",      label:"Data Transfer" }
+    ]},
+    { id:"roles-permissions", title:"ROLES & PERMISSIONS", crumb:"Roles & Permissions", items:[
+      { id:"roles",       label:"Roles" },
+      { id:"resources",   label:"Resources" },
+      { id:"permissions", label:"Permissions" }
+    ]},
+    { id:"audit", title:"AUDIT", crumb:"Audit", items:[
+      { id:"declaration-audit", label:"Declaration Audit" },
+      { id:"audit-history",     label:"Audit History" }
+    ]},
+    { id:"reports", title:"REPORTS", crumb:"Reports", items:[
+      { id:"permit-report",              label:"Permit Report" },
+      { id:"user-statistics",            label:"User Statistics" },
+      { id:"gst-duty-report",            label:"GST/Duty Report" },
+      { id:"gst-duty-invoice-details",   label:"GST/Duty Invoice Details" },
+      { id:"main-report",                label:"Main Report" },
+      { id:"customs-report-builder",     label:"Customs Report Builder" }
+    ]}
+  ];
+
+  /* ============================================================
+     2. PDF DOCUMENT MAP  ---  EDIT THIS SECTION ONLY
+     ------------------------------------------------------------
+     Replace each placeholder path below with the real path/URL
+     to the existing Tradenix PDF for that document. The key on
+     the left MUST match the item `id` used in NAV_SECTIONS above.
+     Paths can be relative ("documents/ipt.pdf"), absolute
+     ("/docs/ipt.pdf"), or a full URL served by your backend.
+     ============================================================ */
+  var DOCUMENT_MAP = {
+    /* DASHBOARD */
+    "dashboard":                 "documents/PLACEHOLDER-dashboard.pdf",
+
+    /* STATUS LIST */
+    "status-list":                "documents/PLACEHOLDER-status-list.pdf",
+
+    /* MANAGEMENT */
+    "users":                      "documents/PLACEHOLDER-users.pdf",
+    "forwarders":                 "documents/PLACEHOLDER-forwarders.pdf",
+    "departments":                "documents/PLACEHOLDER-departments.pdf",
+    "mailboxes":                  "documents/PLACEHOLDER-mailboxes.pdf",
+
+    /* DECLARATIONS */
+    "ipt":                        "documents/Tradenix_IPT_Declaration_Procedure.pdf",
+    "inp":                        "documents/Tradenix_INP_Declaration_Procedure.pdf",
+    "tnp":                        "documents/Tradenix_TNP_Declaration_Step_by_Step_Procedure.pdf",
+    "out":                        "documents/Tradenix_OUT_Declaration_Procedure.pdf",
+    "coo":                        "documents/Tradenix_COO_Declaration_Procedure.pdf",
+
+    /* IPTUPD DECLARATION MANAGEMENT */
+    "ipt-amendment":              "documents/PLACEHOLDER-ipt-amendment.pdf",
+    "ipt-refund":                 "documents/PLACEHOLDER-ipt-refund.pdf",
+    "ipt-cancel":                 "documents/PLACEHOLDER-ipt-cancel.pdf",
+
+    /* INPUPD DECLARATION MANAGEMENT */
+    "inp-amendment":              "documents/PLACEHOLDER-inp-amendment.pdf",
+    "inp-cancel":                 "documents/PLACEHOLDER-inp-cancel.pdf",
+
+    /* TNPUPD DECLARATION MANAGEMENT */
+    "tnp-amendment":              "documents/PLACEHOLDER-tnp-amendment.pdf",
+    "tnp-cancel":                 "documents/PLACEHOLDER-tnp-cancel.pdf",
+
+    /* OUTUPD DECLARATION MANAGEMENT */
+    "out-amendment":              "documents/PLACEHOLDER-out-amendment.pdf",
+    "out-cancel":                 "documents/PLACEHOLDER-out-cancel.pdf",
+
+    /* MASTERS */
+    "location-information":       "documents/PLACEHOLDER-location-information.pdf",
+    "exchange-rates":              "documents/PLACEHOLDER-exchange-rates.pdf",
+
+    /* PARTIES */
+    "declarant-company":          "documents/PLACEHOLDER-declarant-company.pdf",
+    "importer":                   "documents/PLACEHOLDER-importer.pdf",
+    "exporter":                   "documents/PLACEHOLDER-exporter.pdf",
+    "consignee":                  "documents/PLACEHOLDER-consignee.pdf",
+    "end-user":                   "documents/PLACEHOLDER-end-user.pdf",
+    "manufacturer":               "documents/PLACEHOLDER-manufacturer.pdf",
+    "handling-agent":             "documents/PLACEHOLDER-handling-agent.pdf",
+    "freight-forwarder":          "documents/PLACEHOLDER-freight-forwarder.pdf",
+    "claimant-party":             "documents/PLACEHOLDER-claimant-party.pdf",
+    "inward-carrier-agent":       "documents/PLACEHOLDER-inward-carrier-agent.pdf",
+    "outward-carrier-agent":      "documents/PLACEHOLDER-outward-carrier-agent.pdf",
+
+    /* ITEMS */
+    "hs-codes":                   "documents/PLACEHOLDER-hs-codes.pdf",
+    "product-code":               "documents/PLACEHOLDER-product-code.pdf",
+    "pending-approvals":          "documents/PLACEHOLDER-pending-approvals.pdf",
+    "loading-ports":              "documents/PLACEHOLDER-loading-ports.pdf",
+    "country-code":               "documents/PLACEHOLDER-country-code.pdf",
+    "data-transfer":              "documents/PLACEHOLDER-data-transfer.pdf",
+
+    /* ROLES & PERMISSIONS */
+    "roles":                      "documents/PLACEHOLDER-roles.pdf",
+    "resources":                  "documents/PLACEHOLDER-resources.pdf",
+    "permissions":                "documents/PLACEHOLDER-permissions.pdf",
+
+    /* AUDIT */
+    "declaration-audit":          "documents/PLACEHOLDER-declaration-audit.pdf",
+    "audit-history":              "documents/PLACEHOLDER-audit-history.pdf",
+
+    /* REPORTS */
+    "permit-report":              "documents/PLACEHOLDER-permit-report.pdf",
+    "user-statistics":            "documents/PLACEHOLDER-user-statistics.pdf",
+    "gst-duty-report":            "documents/PLACEHOLDER-gst-duty-report.pdf",
+    "gst-duty-invoice-details":   "documents/PLACEHOLDER-gst-duty-invoice-details.pdf",
+    "main-report":                "documents/PLACEHOLDER-main-report.pdf",
+    "customs-report-builder":     "documents/PLACEHOLDER-customs-report-builder.pdf"
+  };
+
+  /* ============================================================
+     2B. TABLE OF CONTENTS  ---  source: Tradenix TOC document
+     ------------------------------------------------------------
+     Mirrors the supplied Table of Contents structure exactly.
+     Each node may carry a `docId` that matches a key in
+     DOCUMENT_MAP / NAV_SECTIONS above; nodes without a `docId`
+     are structural headings only (no corresponding PDF) and are
+     rendered as plain, non-clickable text.
+     ============================================================ */
+  var TOC_STRUCTURE = [
+    { number:"1", title:"Introduction", children:[
+      { number:"1.1", title:"Purpose" },
+      { number:"1.2", title:"Scope" }
+    ]},
+    { number:"2", title:"System Overview", children:[
+      { number:"2.1", title:"Application Overview" },
+      { number:"2.2", title:"User Roles" }
+    ]},
+    { number:"3", title:"Module Overview", children:[
+      { number:"3.1", title:"Dashboard",             docId:"dashboard" },
+      { number:"3.2", title:"Status List",            docId:"status-list" },
+      { number:"3.3", title:"User Management",        docId:"users" },
+      { number:"3.4", title:"Forwarder Management",   docId:"forwarders" },
+      { number:"3.5", title:"Department Management",  docId:"departments" },
+      { number:"3.6", title:"Mailbox Management",     docId:"mailboxes" }
+    ]},
+    { number:"4", title:"Declaration Management", children:[
+      { number:"4.1", title:"IPT Declaration", docId:"ipt" },
+      { number:"4.2", title:"INP Declaration", docId:"inp" },
+      { number:"4.3", title:"TNP Declaration", docId:"tnp" },
+      { number:"4.4", title:"OUT Declaration", docId:"out" },
+      { number:"4.5", title:"COO Declaration", docId:"coo" }
+    ]},
+    { number:"5", title:"Amendment Declaration", children:[
+      { number:"5.1", title:"IPT Declaration", children:[
+        { number:"5.1.1", title:"IPT Declaration Amend",  docId:"ipt-amendment" },
+        { number:"5.1.2", title:"IPT Declaration Cancel", docId:"ipt-cancel" },
+        { number:"5.1.3", title:"IPT Declaration Refund", docId:"ipt-refund" }
+      ]},
+      { number:"5.2", title:"INP Declaration", children:[
+        { number:"5.2.1", title:"INP Declaration Amend",  docId:"inp-amendment" },
+        { number:"5.2.2", title:"INP Declaration Cancel", docId:"inp-cancel" }
+      ]},
+      { number:"5.3", title:"TNP Declaration", children:[
+        { number:"5.3.1", title:"TNP Declaration Amend",  docId:"tnp-amendment" },
+        { number:"5.3.2", title:"TNP Declaration Cancel", docId:"tnp-cancel" }
+      ]},
+      { number:"5.4", title:"OUT Declaration", children:[
+        { number:"5.4.1", title:"OUT Declaration Amend",  docId:"out-amendment" },
+        { number:"5.4.2", title:"OUT Declaration Cancel", docId:"out-cancel" }
+      ]}
+    ]},
+    { number:"6", title:"Masters", children:[
+      { number:"6.1", title:"Location Information", docId:"location-information" },
+      { number:"6.2", title:"Exchange Rates",        docId:"exchange-rates" }
+    ]},
+    { number:"7", title:"Parties", children:[
+      { number:"7.1",  title:"Declarant Company",     docId:"declarant-company" },
+      { number:"7.2",  title:"Importer",               docId:"importer" },
+      { number:"7.3",  title:"Exporter",                docId:"exporter" },
+      { number:"7.4",  title:"Consignee",               docId:"consignee" },
+      { number:"7.5",  title:"End User",                docId:"end-user" },
+      { number:"7.6",  title:"Manufacturer",            docId:"manufacturer" },
+      { number:"7.7",  title:"Handling Agent",          docId:"handling-agent" },
+      { number:"7.8",  title:"Freight Forwarder",       docId:"freight-forwarder" },
+      { number:"7.9",  title:"Claimant Party",          docId:"claimant-party" },
+      { number:"7.10", title:"Inward Carrier Agent",    docId:"inward-carrier-agent" },
+      { number:"7.11", title:"Outward Carrier Agent",   docId:"outward-carrier-agent" }
+    ]},
+    { number:"8", title:"Items", children:[
+      { number:"8.1", title:"HS Code",           docId:"hs-codes" },
+      { number:"8.2", title:"Product Code",       docId:"product-code" },
+      { number:"8.3", title:"Pending Approvals",  docId:"pending-approvals" },
+      { number:"8.4", title:"Loading Ports",      docId:"loading-ports" },
+      { number:"8.5", title:"Country Code",       docId:"country-code" },
+      { number:"8.6", title:"Data Transfer",      docId:"data-transfer" }
+    ]},
+    { number:"9", title:"Audits", children:[
+      { number:"9.1", title:"Declaration Audit", docId:"declaration-audit" },
+      { number:"9.2", title:"Audit History",     docId:"audit-history" }
+    ]},
+    { number:"10", title:"Reports", children:[
+      { number:"10.1", title:"Permit Report",              docId:"permit-report" },
+      { number:"10.2", title:"User Statistics",             docId:"user-statistics" },
+      { number:"10.3", title:"GST/Duty Report",             docId:"gst-duty-report" },
+      { number:"10.4", title:"GST/Duty Invoice Detail",     docId:"gst-duty-invoice-details" },
+      { number:"10.5", title:"Main Report",                 docId:"main-report" },
+      { number:"10.6", title:"Custom Report Builder",       docId:"customs-report-builder" }
+    ]},
+    { number:"11", title:"Conclusion" }
+  ];
+
+  /* ============================================================
+     2C. PER-DOCUMENT CONTENTS INDEX  ---  EDIT AS NEEDED
+     ------------------------------------------------------------
+     Optional right-hand "Contents" list shown while a document is
+     open. These are section labels only (no page numbers, since
+     none were supplied) so entries are informational, not
+     clickable deep-links. Add/remove keys as real section indexes
+     become available; a document with no entry here simply shows
+     an empty-state message instead of an invented structure.
+     ============================================================ */
+  var CONTENTS_MAP = {
+    /* All five declaration documents now have full HTML_DOCS content
+       (see below), which takes priority over this map. Add an entry
+       here only for a document that has a PDF but no extracted HTML
+       content yet. */
+  };
+
+  /* ============================================================
+     2D. HTML-RENDERED DOCUMENTS  ---  EDIT AS NEEDED
+     ------------------------------------------------------------
+     For documents where the source PDF's content has been
+     extracted and should be rendered as native HTML instead of
+     an embedded PDF viewer. A key present here takes priority
+     over DOCUMENT_MAP/PDF rendering for that document id.
+     Each section becomes a scrollable, anchorable block and also
+     drives the right-hand Contents panel for that document.
+     ============================================================ */
+  function fig(docId, num, caption){
+    var n = String(num).length < 2 ? "0" + num : String(num);
+    var src = "assets/" + docId + "/figure-" + n + ".png";
+    var altText = "Figure " + num + ". " + caption;
+    return '<figure class="doc-figure">' +
+      '<img src="' + src + '" alt="' + escapeHtml(altText) + '" loading="lazy">' +
+      '<figcaption>' + escapeHtml(altText) + '</figcaption>' +
+      '</figure>';
+  }
+
+  var HTML_DOCS = {
+    "ipt": {
+      subtitle: "Declarations → In-Payment (IPT)",
+      sections: [
+        { id:"ipt-c-1", label:"1. Page Overview", html:
+          '<p>The In-Payment (IPT) declaration workflow is used by authorized users to create, review, save, validate, and submit IPT declarations. The declaration is completed across a sequence of tabs: Shipment Info, Transport Info, Party Info, Invoice Info, Items, CPC, and Summary.</p>'
+        },
+        { id:"ipt-c-2", label:"2. Navigation", html:
+          '<p><strong>Expected navigation path:</strong></p><p>Declarations → In-Payment (IPT) → + NEW DECLARATION</p>'
+        },
+        { id:"ipt-c-3", label:"3. Declaration Workflow Tabs", html:
+          '<table><thead><tr><th>Tab</th><th>Purpose</th><th>Navigation</th></tr></thead><tbody>' +
+          '<tr><td>Shipment Info (S)</td><td>Declaration and shipment-level information.</td><td>First tab / use NEXT to continue.</td></tr>' +
+          '<tr><td>Transport Info (T)</td><td>Cargo, transport means, arrival, port, and container information.</td><td>PREVIOUS returns to Shipment Info; NEXT opens Party Info.</td></tr>' +
+          '<tr><td>Party Info (P)</td><td>Importer, carrier, forwarder, declaring agent, and claimant details.</td><td>PREVIOUS returns to Transport Info; NEXT opens Invoice Info.</td></tr>' +
+          '<tr><td>Invoice Info (V)</td><td>Invoice, supplier/manufacturer, currency, charges, duties, and GST.</td><td>PREVIOUS returns to Party Info; NEXT opens Items.</td></tr>' +
+          '<tr><td>Items (I)</td><td>Item, HS code, quantity, value, CASC, shipping mark, tariff, and GST details.</td><td>PREVIOUS returns to Invoice Info; NEXT opens CPC.</td></tr>' +
+          '<tr><td>CPC (C)</td><td>CPC-related declaration options.</td><td>PREVIOUS returns to Items; NEXT opens Summary.</td></tr>' +
+          '<tr><td>Summary (Y)</td><td>Final declaration review, remarks, totals, and submission.</td><td>PREVIOUS returns to CPC; NEXT is not applicable at the final tab.</td></tr>' +
+          '</tbody></table>'
+        },
+        { id:"ipt-c-4", label:"4. Navigation Button Notes", html:
+          '<table><thead><tr><th>Control</th><th>Action</th><th>Important Note</th></tr></thead><tbody>' +
+          '<tr><td>PREVIOUS</td><td>Moves the user to the immediately preceding declaration tab. It is used to review or correct information already entered. Using PREVIOUS does not submit the declaration.</td><td>Use this button when information on an earlier tab needs to be reviewed or corrected.</td></tr>' +
+          '<tr><td>NEXT</td><td>Moves the user to the immediately following declaration tab. Before moving forward, complete the mandatory fields required by the current tab. Data already entered should remain available while navigating through the declaration workflow.</td><td>Use this button to proceed in sequence after the current tab has been completed.</td></tr>' +
+          '<tr><td>SAVE DRAFT</td><td>Saves the current declaration without final submission so the user can continue or revise it later. A successful save is confirmed by a Draft Saved notification.</td><td>Saving a draft is not the same as submitting the declaration.</td></tr>' +
+          '<tr><td>SUBMIT DECLARATION</td><td>Available on the Summary stage for final processing. The system validates the declaration and, when validation passes, submits it. Successful validation and submission are confirmed by notifications.</td><td>Submission should be performed only after reviewing the Summary and confirming the declaration details.</td></tr>' +
+          '</tbody></table>'
+        },
+        { id:"ipt-c-5", label:"5. Validation Requirements", html:
+          '<ul>' +
+          '<li>All fields marked with * should be treated as mandatory.</li>' +
+          '<li>Mandatory declaration information should not accept blank or whitespace-only values where text input is required.</li>' +
+          '<li>The user should complete the required fields on the current tab before proceeding when the application enforces tab-level validation.</li>' +
+          '<li>PREVIOUS should return to the immediately preceding declaration tab without submitting the declaration.</li>' +
+          '<li>NEXT should move to the immediately following declaration tab and should preserve information already entered on previous tabs.</li>' +
+          '<li>Invalid, incomplete, or inconsistent declaration data should prevent successful final submission.</li>' +
+          '<li>Validation messages should be displayed clearly and should identify the field or section that requires correction.</li>' +
+          '<li>SAVE DRAFT should save the current declaration without final submission and should display a clear Draft Saved confirmation message.</li>' +
+          '<li>SUBMIT DECLARATION should perform final validation before the declaration is submitted.</li>' +
+          '<li>If validation fails, the declaration should remain available for correction and should not be treated as successfully submitted.</li>' +
+          '<li>Successful validation and submission should provide clear confirmation notifications to the user.</li>' +
+          '<li>After successful submission, the declaration should be visible in the IPT Declaration Management list with the appropriate status.</li>' +
+          '</ul>'
+        },
+        { id:"ipt-c-6", label:"6. Suggested In-Payment Declaration Management Flow", html:
+          '<ol>' +
+          '<li>Open Declarations → In-Payment (IPT).</li>' +
+          '<li>Review the existing IPT declaration list or use the available filters to locate a declaration.</li>' +
+          '<li>Select + NEW DECLARATION to create a new In-Payment declaration.</li>' +
+          '<li>Complete the Shipment Info section and enter all mandatory declaration and shipment details.</li>' +
+          '<li>Use NEXT to proceed through Transport Info, Party Info, Invoice Info, Items, CPC, and Summary. Use PREVIOUS whenever information on an earlier tab must be reviewed or corrected.</li>' +
+          '<li>Enter and verify the required transport, party, invoice, item, CPC, and other applicable declaration information.</li>' +
+          '<li>Use SAVE DRAFT when the declaration must be saved without final submission. Verify the Draft Saved confirmation message.</li>' +
+          '<li>Open the Summary page and review the declaration totals, importer details, shipment information, remarks, and declaration statement.</li>' +
+          '<li>Select SUBMIT DECLARATION only after confirming that all required information is complete and correct.</li>' +
+          '<li>The system validates the declaration before submission. If validation fails, correct the identified information and submit again.</li>' +
+          '<li>After successful validation and submission, verify the confirmation notifications and confirm that the declaration appears in the IPT Declaration Management list with the appropriate status.</li>' +
+          '</ol>'
+        },
+        { id:"ipt-c-appendix", label:"Appendix A – UI Reference", html:
+          '<p>The following screenshots show the In-Payment declaration workflow, including dashboard navigation, declaration creation, completed tabs, draft saving, and successful submission.</p>'
+        },
+        { id:"ipt-step-1", label:"Step 1: Open the Dashboard", sub:true, html:
+          '<p>Open Tradenix and select Dashboard from the left navigation menu. The Dashboard displays declaration activity for Today, This Week, and This Month. Use the Declaration and Status filters when a filtered operational view is required.</p>' +
+          fig("ipt", 1, "Dashboard")
+        },
+        { id:"ipt-step-2", label:"Step 2: Open IPT Declaration Management", sub:true, html:
+          '<p>From the left navigation menu, expand Declarations and select In-Payment (IPT). The IPT Declaration Management page displays existing IPT declarations, list filters, status information, row actions, and declaration-level controls. Select + NEW DECLARATION to begin a new IPT declaration.</p>' +
+          fig("ipt", 2, "IPT Declaration Management - Add New Declaration")
+        },
+        { id:"ipt-step-3", label:"Step 3: Start the New IPT Declaration", sub:true, html:
+          '<p>The system opens the IPT declaration entry page at Shipment Info (S). Complete the mandatory declaration fields shown on the page, including Declaration Type, Cargo Type, Release Location, and Receipt Location, together with any other information required for the shipment.</p>' +
+          '<div class="note-box"><strong>Note:</strong> Select NEXT to proceed from Shipment Info to Transport Info. PREVIOUS is unavailable or not required on the first workflow tab.</div>' +
+          fig("ipt", 3, "New IPT Declaration - Shipment Info")
+        },
+        { id:"ipt-step-4", label:"Step 4: Complete Shipment Information", sub:true, html:
+          '<p>Enter or select the required Shipment Info values. The page may contain additional controls such as Previous Permit Number, BG Indicator, Blanket Start Date, Supply Indicator, License, Document, and Additional Recipients, depending on the declaration scenario.</p>' +
+          '<div class="note-box"><strong>Note:</strong> Use NEXT to continue to Transport Info after reviewing the Shipment Info values. Use PREVIOUS on later tabs to return and correct these details if necessary.</div>' +
+          fig("ipt", 4, "Completed Shipment Information")
+        },
+        { id:"ipt-step-5", label:"Step 5: Complete Transport Information", sub:true, html:
+          '<p>Select Transport Info (T) or use NEXT from Shipment Info. Enter cargo details such as Total Package, package UOM, Gross Weight, and weight UOM. Complete the applicable inward transport details, including arrival date, loading port, transport reference information, and container details when relevant.</p>' +
+          '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Shipment Info. NEXT proceeds to Party Info.</div>' +
+          fig("ipt", 5, "Transport Information")
+        },
+        { id:"ipt-step-6", label:"Step 6: Complete Party Information", sub:true, html:
+          '<p>Select Party Info (P) or use NEXT from Transport Info. Enter or verify the parties involved in the declaration, such as Importer, Inward Carrier, Freight Forwarder, Declaring Agent, and Claimant Party where applicable. Verify the corresponding UEN values before proceeding.</p>' +
+          '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Transport Info. NEXT proceeds to Invoice Info.</div>' +
+          fig("ipt", 6, "Party Information")
+        },
+        { id:"ipt-step-7", label:"Step 7: Complete Invoice Information", sub:true, html:
+          '<p>Select Invoice Info (V) or use NEXT from Party Info. Enter the invoice number, invoice date, term type, supplier/manufacturer information, currency, invoice amount, and other applicable charges. Review the calculated values such as CIF, duties, tax, and GST where displayed.</p>' +
+          '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Party Info. NEXT proceeds to Items.</div>' +
+          fig("ipt", 7, "Invoice Information")
+        },
+        { id:"ipt-step-8", label:"Step 8: Complete Item Information", sub:true, html:
+          '<p>Select Items (I) or use NEXT from Invoice Info. Add the required item details, including invoice reference, HAWB or shipment reference where applicable, HS Code, description, brand, country of origin, quantity, UOM, item value, and supporting CASC, shipping mark, tariff, or GST details as required.</p>' +
+          '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Invoice Info. NEXT proceeds to CPC.</div>' +
+          fig("ipt", 8, "Item Information")
+        },
+        { id:"ipt-step-9", label:"Step 9: Complete CPC Information", sub:true, html:
+          '<p>Select CPC (C) or use NEXT from Items. Select the required CPC-related options applicable to the declaration, such as AEO, CWC, SEASTORE, STS, STS & CWC, International Permit Exchange, CNB, or Deferred Printing of CO.</p>' +
+          '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Items. NEXT proceeds to Summary.</div>' +
+          fig("ipt", 9, "CPC Information")
+        },
+        { id:"ipt-step-10", label:"Step 10: Review the Declaration Summary", sub:true, html:
+          '<p>Select Summary (Y) or use NEXT from CPC. Review the overall declaration summary, item totals, invoice values, CIF value, customs duty, excise duty, GST, other tax, total amount payable, importer information, package details, gross weight, item quantity totals, and declaration references. Enter remarks when required and confirm the declaration statement before submission.</p>' +
+          '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to CPC. Summary is the final workflow tab; review all values before using SAVE DRAFT or SUBMIT DECLARATION.</div>' +
+          fig("ipt", 10, "Declaration Summary")
+        },
+        { id:"ipt-step-11", label:"Step 11: Save the Declaration as Draft", sub:true, html:
+          '<p>Select SAVE DRAFT when the declaration must be saved without final submission. After a successful save, the system displays a Draft Saved notification confirming that the IPT declaration draft has been saved successfully.</p>' +
+          '<div class="note-box"><strong>Note:</strong> SAVE DRAFT stores the current declaration without final submission. The declaration can be opened again for further review or completion.</div>' +
+          fig("ipt", 11, "Draft Saved Confirmation")
+        },
+        { id:"ipt-step-12", label:"Step 12: Validate and Submit the Declaration", sub:true, html:
+          '<p>When all required information is complete, select SUBMIT DECLARATION from the Summary page. The system validates the declaration before submission. After successful validation and submission, confirmation notifications are displayed and the IPT Declaration Management list shows the resulting declaration status.</p>' +
+          '<div class="note-box"><strong>Note:</strong> SUBMIT DECLARATION performs final validation and submission. PREVIOUS can be used before submission to revisit earlier information.</div>' +
+          fig("ipt", 12, "Validation Passed and Declaration Submitted")
+        }
+      ]
+    },
+
+    "inp": {
+      subtitle: "Declarations → In-Non-Payment (INP)",
+      sections: [
+        { id:"inp-c-1", label:"1. Page Overview", html:
+          '<p>The In-Non-Payment (INP) declaration workflow is used by authorized users to create, review, save, validate, and submit INP declarations. The declaration is completed across a sequence of tabs: Shipment Info, Transport Info, Party Info, Invoice Info, Items, CPC, and Summary.</p>'
+        },
+        { id:"inp-c-2", label:"2. Navigation", html:
+          '<p><strong>Expected navigation path:</strong></p><p>Declarations → In-Non-Payment (INP) → + NEW DECLARATION</p>'
+        },
+        { id:"inp-c-3", label:"3. Declaration Workflow Tabs", html:
+          '<table><thead><tr><th>Tab</th><th>Purpose</th><th>Navigation</th></tr></thead><tbody>' +
+          '<tr><td>Shipment Info (S)</td><td>Declaration and shipment-level information.</td><td>First tab; use NEXT to continue.</td></tr>' +
+          '<tr><td>Transport Info (T)</td><td>Cargo, transport means, arrival, port, and container information.</td><td>PREVIOUS returns to Shipment Info; NEXT opens Party Info.</td></tr>' +
+          '<tr><td>Party Info (P)</td><td>Importer, carrier, freight forwarder, and declaring agent details.</td><td>PREVIOUS returns to Transport Info; NEXT opens Invoice Info.</td></tr>' +
+          '<tr><td>Invoice Info (V)</td><td>Invoice, supplier/manufacturer, charges, CIF, duty, tax, and GST information.</td><td>PREVIOUS returns to Party Info; NEXT opens Items.</td></tr>' +
+          '<tr><td>Items (I)</td><td>Item, HS code, quantity, value, CASC, tariff, shipping mark, and GST details.</td><td>PREVIOUS returns to Invoice Info; NEXT opens CPC.</td></tr>' +
+          '<tr><td>CPC (C)</td><td>CPC-related declaration options.</td><td>PREVIOUS returns to Items; NEXT opens Summary.</td></tr>' +
+          '<tr><td>Summary (Y)</td><td>Final review, declaration totals, remarks, declaration statement, draft save, validation, and submission.</td><td>PREVIOUS returns to CPC; NEXT is not applicable on the final tab.</td></tr>' +
+          '</tbody></table>'
+        },
+        { id:"inp-c-4", label:"4. Navigation Button Notes", html:
+          '<table><thead><tr><th>Control</th><th>Action</th><th>Important Note</th></tr></thead><tbody>' +
+          '<tr><td>PREVIOUS</td><td>Moves the user to the immediately preceding declaration tab.</td><td>Use this button to review or correct information already entered. It does not submit the declaration.</td></tr>' +
+          '<tr><td>NEXT</td><td>Moves the user to the immediately following declaration tab.</td><td>Complete the mandatory fields required on the current tab before proceeding. Previously entered data should remain available.</td></tr>' +
+          '<tr><td>SAVE DRAFT</td><td>Saves the current INP declaration without final submission.</td><td>A successful save is confirmed by a Draft Saved notification. Saving a draft is not the same as submitting the declaration.</td></tr>' +
+          '<tr><td>SUBMIT DECLARATION</td><td>Performs final validation and submits the declaration when validation passes.</td><td>Use only after reviewing the Summary and confirming all required declaration details.</td></tr>' +
+          '</tbody></table>'
+        },
+        { id:"inp-c-5", label:"5. Validation Requirements", html:
+          '<ul>' +
+          '<li>All fields marked with * should be treated as mandatory.</li>' +
+          '<li>Mandatory declaration fields should not accept blank or whitespace-only values where text input is required.</li>' +
+          '<li>The required Shipment Info, Transport Info, Party Info, Invoice Info, Items, CPC, and Summary information should be completed according to the selected declaration type.</li>' +
+          '<li>PREVIOUS should return to the immediately preceding declaration tab without submitting the declaration.</li>' +
+          '<li>NEXT should move to the immediately following declaration tab and should preserve information already entered on previous tabs.</li>' +
+          '<li>Invalid, incomplete, or inconsistent declaration data should prevent successful final submission.</li>' +
+          '<li>Validation messages should clearly identify the field or section requiring correction.</li>' +
+          '<li>If Declaration Type is missing, the system should prevent the related operation and display a clear validation error.</li>' +
+          '<li>SAVE DRAFT should save the current declaration without final submission and display a clear Draft Saved confirmation message when successful.</li>' +
+          '<li>SUBMIT DECLARATION should perform final validation before submission.</li>' +
+          '<li>If validation fails, the declaration should remain available for correction and should not be treated as successfully submitted.</li>' +
+          '<li>When multiple mandatory fields are missing, the application may display a detailed validation list so the user can correct each required field.</li>' +
+          '<li>Successful validation and submission should display clear confirmation notifications and update the declaration status in the INP Declaration Management list.</li>' +
+          '</ul>'
+        },
+        { id:"inp-c-6", label:"6. Suggested In-Non-Payment Declaration Management Flow", html:
+          '<ol>' +
+          '<li>Open Declarations → In-Non-Payment (INP).</li>' +
+          '<li>Review the existing INP declaration list or use the available filters to locate a declaration.</li>' +
+          '<li>Select + NEW DECLARATION to create a new In-Non-Payment declaration.</li>' +
+          '<li>Complete the Shipment Info section and enter all mandatory declaration and shipment details.</li>' +
+          '<li>Use NEXT to proceed through Transport Info, Party Info, Invoice Info, Items, CPC, and Summary. Use PREVIOUS whenever information on an earlier tab must be reviewed or corrected.</li>' +
+          '<li>Enter and verify the required transport, party, invoice, item, CPC, and other applicable declaration information.</li>' +
+          '<li>Use SAVE DRAFT when the declaration must be saved without final submission and verify the Draft Saved notification.</li>' +
+          '<li>Open the Summary page and review the declaration totals, importer details, shipment information, remarks, and declaration statement.</li>' +
+          '<li>Select SUBMIT DECLARATION only after confirming that all required information is complete and correct.</li>' +
+          '<li>If validation fails, review the validation message or detailed error list and return to the relevant tabs to correct the missing or invalid information.</li>' +
+          '<li>Repeat validation after the required corrections are completed.</li>' +
+          '<li>After successful validation and submission, verify the Validation Passed and Declaration Submitted notifications and confirm that the declaration appears in the INP Declaration Management list with the appropriate status.</li>' +
+          '</ol>'
+        },
+        { id:"inp-c-appendix", label:"Appendix A – UI Reference", html: "" },
+        { id:"inp-step-1", label:"Step 1: Open INP Declaration Management", sub:true, html:
+          '<p>From the left navigation menu, expand Declarations and select In-Non-Payment (INP). The INP Declaration Management page displays existing INP declarations, filters, declaration statuses, row-level actions, and list-level controls. Select + NEW DECLARATION to create a new INP declaration.</p>' +
+          fig("inp", 1, "INP Declaration Management - Add New Declaration")
+        },
+        { id:"inp-step-2", label:"Step 2: Start a New INP Declaration", sub:true, html:
+          '<p>The system opens the INP declaration entry page at Shipment Info (S). Complete the mandatory declaration and shipment fields shown on the page, including Declaration Type, Cargo Type, Release Location, Receipt Location, and other applicable information.</p>' +
+          '<div class="note-box"><strong>Note:</strong> Shipment Info is the first declaration tab. Use NEXT to continue to Transport Info after completing the required fields.</div>' +
+          fig("inp", 2, "New INP Declaration - Shipment Info")
+        },
+        { id:"inp-step-3", label:"Step 3: Complete Shipment Information", sub:true, html:
+          '<p>Enter or select the required Shipment Info values. Depending on the declaration type, the form may also require Inward Transport Mode, Storage Location, Previous Permit Number, BG Indicator, Blanket Start Date, Supply Indicator, License, Document, and Additional Recipients.</p>' +
+          '<div class="note-box"><strong>Note:</strong> Use NEXT to continue from Shipment Info to Transport Info. On later tabs, PREVIOUS can be used to return and correct Shipment Info values.</div>' +
+          fig("inp", 3, "Completed Shipment Information")
+        },
+        { id:"inp-step-4", label:"Step 4: Complete Transport Information", sub:true, html:
+          '<p>Select Transport Info (T) or use NEXT from Shipment Info. Enter cargo details such as Total Package, package UOM, Gross Weight, and weight UOM. Complete applicable inward transport details including Arrival Date, Loading Port, Port Name, Inward Flight Number, aircraft registration number, Inward Master Air Waybill, and container details where required.</p>' +
+          '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Shipment Info. NEXT proceeds to Party Info.</div>' +
+          fig("inp", 4, "Transport Information")
+        },
+        { id:"inp-step-5", label:"Step 5: Complete Party Information", sub:true, html:
+          '<p>Select Party Info (P) or use NEXT from Transport Info. Enter or verify the declaration parties, including Importer, Inward Carrier, Freight Forwarder, and Declaring Agent. Verify the corresponding UEN values before proceeding.</p>' +
+          '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Transport Info. NEXT proceeds to Invoice Info.</div>' +
+          fig("inp", 5, "Party Information")
+        },
+        { id:"inp-step-6", label:"Step 6: Complete Invoice Information", sub:true, html:
+          '<p>Select Invoice Info (V) or use NEXT from Party Info. Enter the invoice number, invoice date, term type, supplier/manufacturer details, currency, invoice amount, and other applicable charges. Review the calculated CIF, duty, tax, and GST values displayed by the system.</p>' +
+          '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Party Info. NEXT proceeds to Items.</div>' +
+          fig("inp", 6, "Invoice Information")
+        },
+        { id:"inp-step-7", label:"Step 7: Complete Item Information", sub:true, html:
+          '<p>Select Items (I) or use NEXT from Invoice Info. Add the required item details such as invoice reference, HAWB or shipment reference, HS Code, description, brand, country of origin, quantity, UOM, item value, currency, and applicable CASC, shipping mark, tariff, or GST information.</p>' +
+          '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Invoice Info. NEXT proceeds to CPC.</div>' +
+          fig("inp", 7, "Item Information")
+        },
+        { id:"inp-step-8", label:"Step 8: Complete CPC Information", sub:true, html:
+          '<p>Select CPC (C) or use NEXT from Items. Select the applicable CPC-related options, such as AEO, CWC, SEASTORE, STS, STS & CWC, International Permit Exchange, CNB, or Deferred Printing of CO.</p>' +
+          '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Items. NEXT proceeds to Summary.</div>' +
+          fig("inp", 8, "CPC Information")
+        },
+        { id:"inp-step-9", label:"Step 9: Review the Declaration Summary", sub:true, html:
+          '<p>Select Summary (Y) or use NEXT from CPC. Review the declaration totals, number of invoices and items, invoice and item amounts, CIF/FOB values, GST, customs duty, excise duty, other tax, total amount payable, importer details, package details, gross weight, item quantity totals, HAWB number, and declaration references. Enter remarks where required and confirm the declaration statement before final submission.</p>' +
+          '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to CPC. Summary is the final workflow tab; review all values before using SAVE DRAFT or SUBMIT DECLARATION.</div>' +
+          fig("inp", 9, "Declaration Summary")
+        },
+        { id:"inp-step-10", label:"Step 10: Save the INP Declaration as Draft", sub:true, html:
+          '<p>Select SAVE DRAFT when the declaration must be stored without final submission. After a successful save, the system displays a Draft Saved notification confirming that the INP declaration draft has been saved successfully.</p>' +
+          '<div class="note-box"><strong>Note:</strong> SAVE DRAFT stores the current declaration without final submission and confirms the save with a Draft Saved notification.</div>' +
+          fig("inp", 10, "Draft Saved Confirmation")
+        },
+        { id:"inp-step-11", label:"Step 11: Validate and Submit the Declaration", sub:true, html:
+          '<p>When all required information is complete, select SUBMIT DECLARATION from the Summary page. The system validates the declaration before submission. After successful validation and submission, the system displays Validation Passed and Declaration Submitted notifications and returns to the INP Declaration Management list with the updated status.</p>' +
+          '<div class="note-box"><strong>Note:</strong> SUBMIT DECLARATION performs final validation. When validation passes, the declaration is submitted and confirmation notifications are displayed.</div>' +
+          fig("inp", 11, "Validation Passed and Declaration Submitted")
+        },
+        { id:"inp-step-12", label:"Step 12: Validation Error - Missing Declaration Type", sub:true, html:
+          '<p>If a mandatory field is missing, the system prevents successful submission and displays a validation message. In the example shown, the Declaration Type is missing and the system displays a Validation Error instructing the user to select a Declaration Type before saving.</p>' +
+          '<div class="note-box"><strong>Note:</strong> Validation errors must be corrected before the declaration can be successfully processed.</div>' +
+          fig("inp", 12, "Validation Error - Declaration Type Required")
+        },
+        { id:"inp-step-13", label:"Step 13: Validation Failed - Required Fields Incomplete", sub:true, html:
+          '<p>If required declaration information is incomplete, the system displays Validation Failed and instructs the user to fill in all required fields before validation can proceed.</p>' +
+          '<div class="note-box"><strong>Note:</strong> A Validation Failed message indicates that required information is still incomplete.</div>' +
+          fig("inp", 13, "Validation Failed - Required Fields Incomplete")
+        },
+        { id:"inp-step-14", label:"Step 14: Review Detailed Validation Errors", sub:true, html:
+          '<p>When validation fails, the system may display a detailed list of missing or invalid fields. Review each listed validation item, return to the relevant declaration tabs, correct the required information, and repeat validation before final submission.</p>' +
+          '<div class="note-box"><strong>Note:</strong> Use the detailed validation list to identify all missing fields, then navigate back using PREVIOUS or the declaration tabs to correct them.</div>' +
+          fig("inp", 14, "Detailed Validation Errors")
+        }
+      ]
+    },
+
+    "tnp": {
+      subtitle: "Declarations → Transhipment (TNP)",
+      sections: [
+        { id:"tnp-c-1", label:"1. Page Overview", html:
+          '<p>The Transhipment (TNP) declaration workflow is used by authorized users to create, review, save, validate, and submit transhipment declarations. The declaration is completed across Shipment Info, Transport Info, Party Info, Items, CPC, and Summary.</p>'
+        },
+        { id:"tnp-c-2", label:"2. Navigation", html:
+          '<p><strong>Expected navigation path:</strong></p><p>Declarations → Transhipment (TNP) → + NEW DECLARATION</p>'
+        },
+        { id:"tnp-c-3", label:"3. Declaration Workflow Tabs", html:
+          '<table><thead><tr><th>Tab</th><th>Purpose</th><th>Navigation</th></tr></thead><tbody>' +
+          '<tr><td>Shipment Info (S)</td><td>Declaration and shipment-level information.</td><td>First tab; use NEXT to continue.</td></tr>' +
+          '<tr><td>Transport Info (T)</td><td>Cargo, inward/outward transport, port, destination, and container information.</td><td>PREVIOUS returns to Shipment Info; NEXT opens Party Info.</td></tr>' +
+          '<tr><td>Party Info (P)</td><td>Carrier, handling agent, declaring agent, consignee, and end-user details.</td><td>PREVIOUS returns to Transport Info; NEXT opens Items.</td></tr>' +
+          '<tr><td>Items (I)</td><td>Item, transport references, HS code, packing, quantity, value, CASC, and shipping-mark details.</td><td>PREVIOUS returns to Party Info; NEXT opens CPC.</td></tr>' +
+          '<tr><td>CPC (C)</td><td>CPC-related declaration options.</td><td>PREVIOUS returns to Items; NEXT opens Summary.</td></tr>' +
+          '<tr><td>Summary (Y)</td><td>Final review, package/weight totals, remarks, declaration statement, save, validation, and submission.</td><td>PREVIOUS returns to CPC; NEXT is not applicable on the final tab.</td></tr>' +
+          '</tbody></table>'
+        },
+        { id:"tnp-c-4", label:"4. Navigation Button Notes", html:
+          '<table><thead><tr><th>Control</th><th>Action</th><th>Important Note</th></tr></thead><tbody>' +
+          '<tr><td>PREVIOUS</td><td>Moves to the immediately preceding declaration tab.</td><td>Use it to review or correct information already entered. It does not submit the declaration.</td></tr>' +
+          '<tr><td>NEXT</td><td>Moves to the immediately following declaration tab.</td><td>Complete the mandatory information required on the current tab before proceeding.</td></tr>' +
+          '<tr><td>SAVE DRAFT</td><td>Saves the current TNP declaration without final submission.</td><td>A successful save should display a Draft Saved confirmation.</td></tr>' +
+          '<tr><td>SUBMIT DECLARATION</td><td>Performs final validation and submits the declaration when validation passes.</td><td>Use only after reviewing Summary and confirming all required details.</td></tr>' +
+          '</tbody></table>'
+        },
+        { id:"tnp-c-5", label:"5. Validation Requirements", html:
+          '<ul>' +
+          '<li>All fields marked with * should be treated as mandatory.</li>' +
+          '<li>Mandatory declaration fields should not accept blank or whitespace-only values where text input is required.</li>' +
+          '<li>Declaration Type, Cargo Type, required transport references, Release Location, Receipt Location, package details, gross weight, item information, and declaration confirmation should be completed where applicable.</li>' +
+          '<li>PREVIOUS should return to the immediately preceding tab without submitting the declaration.</li>' +
+          '<li>NEXT should move to the immediately following tab and should preserve information already entered.</li>' +
+          '<li>Invalid, incomplete, or inconsistent declaration data should prevent successful final submission.</li>' +
+          '<li>Validation messages should clearly identify the field or section requiring correction.</li>' +
+          '<li>If Declaration Type is missing, the system should display a clear Validation Error and prevent the related operation.</li>' +
+          '<li>When multiple required fields are missing, the application may display a detailed validation list grouped by section.</li>' +
+          '<li>SAVE DRAFT should store the declaration without final submission and display a clear confirmation when successful.</li>' +
+          '<li>SUBMIT DECLARATION should perform final validation before submission.</li>' +
+          '<li>If validation fails, the declaration should remain available for correction and should not be treated as successfully submitted.</li>' +
+          '<li>Successful submission should provide a clear confirmation and update the declaration status in the TNP Declaration Management list.</li>' +
+          '</ul>'
+        },
+        { id:"tnp-c-6", label:"6. Suggested Transhipment Declaration Management Flow", html:
+          '<ol>' +
+          '<li>Open Declarations → Transhipment (TNP).</li>' +
+          '<li>Review the existing TNP declaration list or use the available filters to locate a declaration.</li>' +
+          '<li>Select + NEW DECLARATION to create a new transhipment declaration.</li>' +
+          '<li>Complete Shipment Info and enter all mandatory declaration and shipment details.</li>' +
+          '<li>Use NEXT to proceed through Transport Info, Party Info, Items, CPC, and Summary. Use PREVIOUS to return to earlier tabs when corrections are required.</li>' +
+          '<li>Complete inward and outward transport information, including applicable arrival/departure dates, ports, transport modes, destination, and container details.</li>' +
+          '<li>Enter and verify all required party information.</li>' +
+          '<li>Enter and verify the required item details, HS codes, packing information, quantities, UOMs, country of origin, transport references, and related item data.</li>' +
+          '<li>Complete the applicable CPC options.</li>' +
+          '<li>Review the Summary page, including package and weight totals, transport references, remarks, and declaration statement.</li>' +
+          '<li>Use SAVE DRAFT when the declaration must be stored without final submission.</li>' +
+          '<li>Select SUBMIT DECLARATION only after all required information is complete and correct.</li>' +
+          '<li>If validation fails, review the validation message or detailed error list and correct each identified field.</li>' +
+          '<li>After successful submission, verify the confirmation notification and confirm that the declaration appears in the TNP Declaration Management list with the appropriate status.</li>' +
+          '</ol>'
+        },
+        { id:"tnp-c-appendix", label:"Appendix A – UI Reference", html: "" },
+        { id:"tnp-step-1", label:"Step 1: Open TNP Declaration Management", sub:true, html:
+          '<p>From the left navigation menu, expand Declarations and select Transhipment (TNP). The TNP Declaration Management page displays existing transhipment declarations, filters, statuses, row-level actions, and list-level controls. Select + NEW DECLARATION to create a new TNP declaration.</p>' +
+          fig("tnp", 1, "TNP Declaration Management - Add New Declaration")
+        },
+        { id:"tnp-step-2", label:"Step 2: Start a New TNP Declaration", sub:true, html:
+          '<p>The system opens the TNP declaration entry page at Shipment Info (S). Complete the mandatory declaration and shipment fields such as Declaration Type, Cargo Type, Inward Transport ID, Release Location, Receipt Location, and other applicable information.</p>' +
+          '<div class="note-box"><strong>Note:</strong> Shipment Info is the first workflow tab. Use NEXT to continue after completing the required fields.</div>' +
+          fig("tnp", 2, "New TNP Declaration - Shipment Info")
+        },
+        { id:"tnp-step-3", label:"Step 3: Validation Error - Missing Declaration Type", sub:true, html:
+          '<p>If Declaration Type is not selected, the system prevents the related operation and displays a Validation Error indicating that Declaration Type is required.</p>' +
+          '<div class="note-box"><strong>Note:</strong> Correct the Declaration Type before attempting the affected operation again.</div>' +
+          fig("tnp", 3, "Validation Error - Declaration Type Required")
+        },
+        { id:"tnp-step-4", label:"Step 4: Validation Failed - Required Fields Incomplete", sub:true, html:
+          '<p>If required fields are incomplete, the system displays a Validation Failed message and highlights mandatory values that must be completed before submission.</p>' +
+          '<div class="note-box"><strong>Note:</strong> Complete the highlighted mandatory fields before attempting submission.</div>' +
+          fig("tnp", 4, "Validation Failed - Required Fields Incomplete")
+        },
+        { id:"tnp-step-5", label:"Step 5: Review Detailed Validation Errors", sub:true, html:
+          '<p>When validation fails, the system may display a detailed list of missing information grouped by section, including Summary, Transport, Cargo, Item, and other validation errors. Correct each listed field before attempting submission again.</p>' +
+          '<div class="note-box"><strong>Note:</strong> Use the detailed validation list to identify all missing fields and return to the relevant tabs for correction.</div>' +
+          fig("tnp", 5, "Detailed TNP Validation Errors")
+        },
+        { id:"tnp-step-6", label:"Step 6: Complete Shipment Information", sub:true, html:
+          '<p>Enter the required Shipment Info values for the transhipment declaration. The page may include Declaration Type, Cargo Type, Inward Transport ID, Outward Transport ID, Release Location, Receipt Location, Storage Location, Previous Permit Number, BG Indicator, License, Document, and Additional Recipients.</p>' +
+          '<div class="note-box"><strong>Note:</strong> Use NEXT to continue from Shipment Info to Transport Info.</div>' +
+          fig("tnp", 6, "Completed TNP Shipment Information")
+        },
+        { id:"tnp-step-7", label:"Step 7: Complete Transport Information", sub:true, html:
+          '<p>Select Transport Info (T) or use NEXT from Shipment Info. Enter cargo details, inward transport details, outward transport details, departure and arrival information, ports, country of final destination, and container details where applicable.</p>' +
+          '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Shipment Info. NEXT proceeds to Party Info.</div>' +
+          fig("tnp", 7, "TNP Transport Information")
+        },
+        { id:"tnp-step-8", label:"Step 8: Complete Party Information", sub:true, html:
+          '<p>Select Party Info (P) or use NEXT from Transport Info. Enter or verify the parties involved in the transhipment declaration, such as Inward Carrier, Outward Carrier, Handling Agent, Declaring Agent, Consignee, and End User where applicable.</p>' +
+          '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Transport Info. NEXT proceeds to Items.</div>' +
+          fig("tnp", 8, "TNP Party Information")
+        },
+        { id:"tnp-step-9", label:"Step 9: Complete Item Information", sub:true, html:
+          '<p>Select Items (I) or use NEXT from Party Info. Enter the required item information, including inward and outward HAWB/HUCR/HBL references, HS Code, description, brand, country of origin, packing details, quantity, UOM, item value, CASC details, tariff and lot identification, and shipping marks as applicable.</p>' +
+          '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Party Info. NEXT proceeds to CPC.</div>' +
+          fig("tnp", 9, "TNP Item Information")
+        },
+        { id:"tnp-step-10", label:"Step 10: Complete CPC Information", sub:true, html:
+          '<p>Select CPC (C) or use NEXT from Items. Select the applicable CPC-related options such as AEO, CWC, SEASTORE, STS, STS & CWC, or International Permit Exchange.</p>' +
+          '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Items. NEXT proceeds to Summary.</div>' +
+          fig("tnp", 10, "TNP CPC Information")
+        },
+        { id:"tnp-step-11", label:"Step 11: Review the Declaration Summary", sub:true, html:
+          '<p>Select Summary (Y) or use NEXT from CPC. Review the number of items, total CIF/FOB value, total package and package UOM, total gross weight and weight UOM, transport references, remarks, and declaration statement. Confirm that the declaration particulars are true and correct before final submission.</p>' +
+          '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to CPC. Summary is the final tab; review all information before using SAVE DRAFT or SUBMIT DECLARATION.</div>' +
+          fig("tnp", 11, "TNP Declaration Summary")
+        },
+        { id:"tnp-step-12", label:"Step 12: Save and Submit the TNP Declaration", sub:true, html:
+          '<p>Use SAVE DRAFT when the declaration must be saved without final submission. When all required information is complete, select SUBMIT DECLARATION. After successful processing, the system returns to the TNP Declaration Management page and displays confirmation notifications such as Draft Saved and Declaration Submitted.</p>' +
+          '<div class="note-box"><strong>Note:</strong> SAVE DRAFT stores the declaration without final submission. SUBMIT DECLARATION performs final validation and submission.</div>' +
+          fig("tnp", 12, "TNP Draft Saved and Declaration Submitted")
+        }
+      ]
+    },
+
+    "out": {
+      subtitle: "Declarations → Outward (OUT)",
+      sections: [
+        { id:"out-c-1", label:"1. Page Overview", html:
+          '<p>The Outward (OUT) declaration workflow is used by authorized users to create, review, save, validate, and submit outward TradeNet declarations. The declaration is completed across a sequence of tabs: Shipment Info, Transport Info, Party Info, Invoice, Items, CPC, and Summary.</p>'
+        },
+        { id:"out-c-2", label:"2. Navigation", html:
+          '<p><strong>Expected navigation path:</strong></p><p>Declarations → Outward (OUT) → + NEW DECLARATION</p>'
+        },
+        { id:"out-c-3", label:"3. Declaration Workflow Tabs", html:
+          '<table><thead><tr><th>Tab</th><th>Purpose</th><th>Navigation</th></tr></thead><tbody>' +
+          '<tr><td>Shipment Info (S)</td><td>Declaration type, cargo type, transport mode, release/receipt locations, previous permit, certificate of origin, and other shipment-level information.</td><td>First tab / use NEXT to continue.</td></tr>' +
+          '<tr><td>Transport Info (T)</td><td>Cargo details, inward and outward transport means, vessel information, ports, voyage details, and container information.</td><td>PREVIOUS returns to Shipment Info; NEXT opens Party Info.</td></tr>' +
+          '<tr><td>Party Info (P)</td><td>Importer, inward/outward carrier, freight forwarder, declaring agent, exporter, consignee, end user, and manufacturer details where applicable.</td><td>PREVIOUS returns to Transport Info; NEXT opens Invoice.</td></tr>' +
+          '<tr><td>Invoice (V)</td><td>Invoice number/date, supplier or manufacturer party, term type, currencies, charges, CIF, duties, tax, and GST.</td><td>PREVIOUS returns to Party Info; NEXT opens Items.</td></tr>' +
+          '<tr><td>Items (I)</td><td>Item references, HS Code, description, country of origin, quantity/UOM, values, CASC, certificate-of-origin details, shipping marks, tariff and related information.</td><td>PREVIOUS returns to Invoice; NEXT opens CPC.</td></tr>' +
+          '<tr><td>CPC (C)</td><td>CPC-related options such as AEO, CWC, SEASTORE, STS, International Permit Exchange, CNB, and Deferred Printing of CO.</td><td>PREVIOUS returns to Items; NEXT opens Summary.</td></tr>' +
+          '<tr><td>Summary (Y)</td><td>Final totals, CIF/FOB value, remarks, declaration statement, validation, draft save, and submission.</td><td>PREVIOUS returns to CPC; NEXT is not applicable at the final tab.</td></tr>' +
+          '</tbody></table>'
+        },
+        { id:"out-c-4", label:"4. Navigation Button Notes", html:
+          '<table><thead><tr><th>Control</th><th>Action</th><th>Important Note</th></tr></thead><tbody>' +
+          '<tr><td>PREVIOUS</td><td>Moves to the immediately preceding declaration tab.</td><td>Use when earlier information must be reviewed or corrected. It does not submit the declaration.</td></tr>' +
+          '<tr><td>NEXT</td><td>Moves to the immediately following declaration tab.</td><td>Complete the mandatory fields required by the current workflow before proceeding. Entered data should remain available while navigating.</td></tr>' +
+          '<tr><td>SAVE DRAFT</td><td>Stores the current OUT declaration without final submission.</td><td>A successful save is confirmed by the Draft Saved notification. Saving a draft is not the same as submitting the declaration.</td></tr>' +
+          '<tr><td>SUBMIT DECLARATION</td><td>Runs final validation and submits the OUT declaration when validation succeeds.</td><td>Use only after reviewing the Summary and confirming the declaration statement. Validation or submission notifications indicate the result.</td></tr>' +
+          '<tr><td>EXIT DECLARATION</td><td>Leaves the declaration entry/edit page.</td><td>Use only after saving any information that must be retained.</td></tr>' +
+          '</tbody></table>'
+        },
+        { id:"out-c-5", label:"5. Validation Requirements", html:
+          '<ul>' +
+          '<li>All fields marked with * should be treated as mandatory.</li>' +
+          '<li>Declaration Type is mandatory. If it is missing, the application displays a Validation Error instructing the user to select a Declaration Type before saving or processing.</li>' +
+          '<li>Mandatory declaration information should not accept blank or whitespace-only values where text input is required.</li>' +
+          '<li>Invalid, incomplete, or inconsistent declaration data should prevent successful final submission.</li>' +
+          '<li>If required data is missing, the application can display a Validation Failed notification and a detailed validation panel identifying missing or invalid fields.</li>' +
+          '<li>The declaration statement "I/We declare that all the particulars in this Application are true and correct." must be confirmed before final submission when required by the application.</li>' +
+          '<li>SAVE DRAFT stores the current declaration without final submission and displays a Draft Saved confirmation when successful.</li>' +
+          '<li>Saving a draft does not mean the declaration passed final submission validation; unresolved mandatory fields must still be corrected before submission.</li>' +
+          '<li>SUBMIT DECLARATION performs final validation before the declaration is submitted.</li>' +
+          '<li>If validation fails, the declaration remains available for correction and should not be treated as successfully submitted.</li>' +
+          '<li>After successful validation and submission, confirmation notifications are displayed and the declaration appears in the OUT Declaration Management list with the appropriate status.</li>' +
+          '</ul>'
+        },
+        { id:"out-c-6", label:"6. Suggested Outward Declaration Management Flow", html:
+          '<ol>' +
+          '<li>Open Declarations → Outward (OUT).</li>' +
+          '<li>Review the existing OUT declaration list or use the available filters to locate a declaration.</li>' +
+          '<li>Select + NEW DECLARATION to begin a new outward declaration.</li>' +
+          '<li>Complete Shipment Info, including Declaration Type, Cargo Type, transport mode, Release Location, Receipt Location, and applicable Certificate of Origin information.</li>' +
+          '<li>Use NEXT to proceed through Transport Info, Party Info, Invoice, Items, CPC, and Summary. Use PREVIOUS to return to an earlier tab when information must be reviewed or corrected.</li>' +
+          '<li>Complete all transport, party, invoice, item, CPC, and other applicable declaration information.</li>' +
+          '<li>Use SAVE DRAFT when the declaration must be stored without final submission and verify the Draft Saved confirmation.</li>' +
+          '<li>On Summary, review item totals, invoice values, Total CIF/FOB Value, transport summary, remarks, and the declaration statement.</li>' +
+          '<li>Select SUBMIT DECLARATION only after all mandatory information is complete and the declaration statement has been confirmed.</li>' +
+          '<li>If validation fails, review the toast message and detailed validation panel, correct the identified fields, and submit again.</li>' +
+          '<li>After successful validation and submission, verify the success notifications and confirm the declaration appears in OUT Declaration Management with the resulting status.</li>' +
+          '</ol>'
+        },
+        { id:"out-c-appendix", label:"Appendix A – UI Reference", html:
+          '<p>The following screenshots show the outward declaration workflow, including declaration creation, validation failures, completed declaration tabs, draft saving, and successful submission.</p>'
+        },
+        { id:"out-step-1", label:"Step 1: Open OUT Declaration Management", sub:true, html:
+          '<p>From the left navigation menu, expand Declarations and select Outward (OUT). The OUT Declaration Management page displays existing outward declarations, filters, statuses, row actions, and declaration-level controls. Select + NEW DECLARATION to begin a new OUT declaration.</p>' +
+          '<div class="note-box"><strong>Note:</strong> The management page also provides controls such as Refresh, OUTUPD, Custom Column, Status List, Download Template, and Excel Upload.</div>' +
+          fig("out", 1, "OUT Declaration Management - Add New Declaration")
+        },
+        { id:"out-step-2", label:"Step 2: Start a New OUT Declaration", sub:true, html:
+          '<p>The system opens the OUT declaration entry page at Shipment Info (S). Complete the mandatory declaration fields, including Declaration Type, Cargo Type, Outward Transport Mode, Release Location, and Receipt Location, together with other shipment information required for the declaration.</p>' +
+          '<div class="note-box"><strong>Note:</strong> Select NEXT to continue after the required information has been completed. SAVE DRAFT stores the current declaration without final submission.</div>' +
+          fig("out", 2, "New OUT Declaration - Shipment Info")
+        },
+        { id:"out-step-3", label:"Step 3: Review Validation Error for Missing Declaration Type", sub:true, html:
+          '<p>If Declaration Type is not selected, the system displays a Validation Error message stating that Declaration Type is required. The declaration must be corrected before the relevant save or submission action can complete successfully.</p>' +
+          '<div class="note-box"><strong>Note:</strong> The screenshot shows the Summary tab with the red Validation Error notification at the top-right.</div>' +
+          fig("out", 3, "Validation Error - Declaration Type Required")
+        },
+        { id:"out-step-4", label:"Step 4: Review Draft Save and Validation Failed Notifications", sub:true, html:
+          '<p>The application can confirm that the draft was saved while also indicating that required fields are still incomplete. A green Draft Saved notification confirms storage of the draft, while the red Validation Failed notification indicates that the declaration is not ready for final submission.</p>' +
+          '<div class="note-box"><strong>Note:</strong> Saving a draft is independent from successful final submission validation.</div>' +
+          fig("out", 4, "Draft Saved and Validation Failed Notifications")
+        },
+        { id:"out-step-5", label:"Step 5: Review Detailed Validation Failures", sub:true, html:
+          '<p>When final validation fails, review the detailed validation panel displayed below the Summary section. The panel lists missing or invalid information, such as required declaration/cargo fields, transport mode, departure date, discharge port, or final destination country.</p>' +
+          '<div class="note-box"><strong>Note:</strong> Correct every identified error before attempting SUBMIT DECLARATION again.</div>' +
+          fig("out", 5, "Detailed Validation Failure Messages")
+        },
+        { id:"out-step-6", label:"Step 6: Complete Shipment Information", sub:true, html:
+          '<p>Enter or verify the Shipment Info values for the OUT declaration. The completed example includes Declaration Type, Cargo Type, Inward Transport Mode, Outward Transport Mode, Release Location, Receipt Location, and Certificate of Origin details where applicable.</p>' +
+          '<div class="note-box"><strong>Note:</strong> Additional shipment controls such as previous permit number, checks, recipients, license, and document may be completed depending on the declaration scenario.</div>' +
+          fig("out", 6, "Completed Shipment Information")
+        },
+        { id:"out-step-7", label:"Step 7: Complete Transport Information", sub:true, html:
+          '<p>Select Transport Info (T) or use NEXT from Shipment Info. Enter cargo details such as Total Package, package UOM, Gross Weight and UOM. Complete inward and outward transport means, voyage details, loading/discharge ports, country of final destination, additional vessel information, and container details when applicable.</p>' +
+          '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Shipment Info. NEXT proceeds to Party Info.</div>' +
+          fig("out", 7, "Transport Information")
+        },
+        { id:"out-step-8", label:"Step 8: Complete Party Information", sub:true, html:
+          '<p>Select Party Info (P) or use NEXT from Transport Info. Enter or verify the parties involved in the outward declaration, including Importer, Inward Carrier, Freight Forwarder, Outward Carrier, Declaring Agent, Exporter, Consignee, End User, and Manufacturer where applicable. Verify UEN and address information before proceeding.</p>' +
+          '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Transport Info. NEXT proceeds to Invoice.</div>' +
+          fig("out", 8, "Party Information")
+        },
+        { id:"out-step-9", label:"Step 9: Complete Invoice Information", sub:true, html:
+          '<p>Select Invoice (V) or use NEXT from Party Info. Enter the invoice number, invoice date, term type, supplier/manufacturer party, currency, invoice amount, and applicable freight, insurance, duties, tax, and GST information. Review calculated CIF and other totals shown by the system.</p>' +
+          '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Party Info. NEXT proceeds to Items.</div>' +
+          fig("out", 9, "Invoice Information")
+        },
+        { id:"out-step-10", label:"Step 10: Complete Item Information", sub:true, html:
+          '<p>Select Items (I) or use NEXT from Invoice. Add the required item data, including inward/outward HAWB or shipment references where applicable, HS Code, description, brand, country of origin, quantity, UOM, item value, and related CASC, certificate-of-origin, shipping mark, tariff, or GST information.</p>' +
+          '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Invoice. NEXT proceeds to CPC.</div>' +
+          fig("out", 10, "Item Information")
+        },
+        { id:"out-step-11", label:"Step 11: Complete CPC Information", sub:true, html:
+          '<p>Select CPC (C) or use NEXT from Items. Choose the CPC-related options applicable to the declaration, such as AEO, CWC, SEASTORE, STS, STS & CWC, International Permit Exchange, CNB, or Deferred Printing of CO. Where AEO is selected, enter the required process codes.</p>' +
+          '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Items. NEXT proceeds to Summary.</div>' +
+          fig("out", 11, "CPC Information")
+        },
+        { id:"out-step-12", label:"Step 12: Review the Declaration Summary and Save Draft", sub:true, html:
+          '<p>Select Summary (Y) or use NEXT from CPC. Review the number of items, invoice amount, item amount, Total Invoice CIF Value, Total CIF/FOB Value, package and gross weight summary, inward/outward transport, remarks, and declaration statement. Use SAVE DRAFT when the declaration must be stored without final submission.</p>' +
+          '<div class="note-box"><strong>Note:</strong> The green Draft Saved notification confirms that the OUT declaration draft was saved successfully. Confirm the declaration statement before final submission when required.</div>' +
+          fig("out", 12, "Declaration Summary - Draft Saved")
+        },
+        { id:"out-step-13", label:"Step 13: Validate and Submit the OUT Declaration", sub:true, html:
+          '<p>After all mandatory information is complete, select SUBMIT DECLARATION from the Summary page. The system performs final validation. When validation succeeds, the application displays confirmation messages and returns to the OUT Declaration Management list.</p>' +
+          '<div class="note-box"><strong>Note:</strong> The example shows Draft Saved, Validation Passed, and Declaration Submitted notifications. The submitted declaration appears in the list with status SUB.</div>' +
+          fig("out", 13, "Validation Passed and Declaration Submitted")
+        },
+        { id:"out-step-14", label:"Step 14: Verify the Submitted Declaration in Management", sub:true, html:
+          '<p>Confirm that the submitted declaration appears in OUT Declaration Management with the expected Message Ref, Declaration Type, Message Type, sequence information, creator, and resulting status. Use the available row actions according to the user&rsquo;s permissions and the declaration status.</p>' +
+          '<div class="note-box"><strong>Note:</strong> A successfully submitted declaration is shown with status SUB in the example.</div>' +
+          fig("out", 14, "Submitted OUT Declaration in Management List")
+        }
+      ]
+    },
+
+    "coo": {
+      subtitle: "Declarations → Certificate of Origin (COO)",
+      sections: [
+        { id:"coo-c-1", label:"1. Document Overview", html:
+          '<p>The Certificate of Origin (COO) declaration workflow is used by authorized users to create, review, save, validate, and submit Certificate of Origin declarations. The workflow is completed across Header & Certificate, Transport Info, Party Info, Items, and Summary.</p>'
+        },
+        { id:"coo-c-2", label:"2. Navigation", html:
+          '<p><strong>Expected navigation path:</strong></p><p>Declarations → Certificate of Origin (COO) → + NEW DECLARATION</p>'
+        },
+        { id:"coo-c-3", label:"3. Declaration Workflow Tabs", html:
+          '<table><thead><tr><th>Tab</th><th>Purpose</th><th>Navigation</th></tr></thead><tbody>' +
+          '<tr><td>Header & Certificate (H)</td><td>Declaration information, outward transport mode, certificate type/details, copies, currency, and supporting certificate information.</td><td>First tab / use NEXT to continue.</td></tr>' +
+          '<tr><td>Transport Info (T)</td><td>Outward transport means including flight/voyage details, departure date, discharge port, and country of final destination.</td><td>PREVIOUS returns to Header & Certificate; NEXT opens Party Info.</td></tr>' +
+          '<tr><td>Party Info (P)</td><td>Freight Forwarder, Outward Carrier, Declaring Agent, Exporter, Consignee, Manufacturer, UEN, and address details.</td><td>PREVIOUS returns to Transport Info; NEXT opens Items.</td></tr>' +
+          '<tr><td>Items (I)</td><td>HS Code, country of origin, description, quantity, value, invoice data, Certificate of Origin item details, and shipping marks.</td><td>PREVIOUS returns to Party Info; NEXT opens Summary.</td></tr>' +
+          '<tr><td>Summary (S)</td><td>Final review, number of items, shipment ID, declaration statement, draft saving, validation, and final submission.</td><td>PREVIOUS returns to Items; NEXT is not applicable on the final tab.</td></tr>' +
+          '</tbody></table>'
+        },
+        { id:"coo-c-4", label:"4. Navigation Button Notes", html:
+          '<table><thead><tr><th>Control</th><th>Action</th><th>Important Note</th></tr></thead><tbody>' +
+          '<tr><td>PREVIOUS</td><td>Moves to the immediately preceding COO declaration tab.</td><td>Use to review or correct earlier information. It does not submit the declaration.</td></tr>' +
+          '<tr><td>NEXT</td><td>Moves to the immediately following COO declaration tab.</td><td>Complete mandatory fields required by the current stage before proceeding where validation is enforced.</td></tr>' +
+          '<tr><td>SAVE DRAFT</td><td>Saves the current COO declaration without final submission.</td><td>A successful save is confirmed by a Draft Saved notification.</td></tr>' +
+          '<tr><td>SUBMIT DECLARATION</td><td>Performs final validation and submits the COO declaration.</td><td>Use only after reviewing the Summary and confirming the declaration statement.</td></tr>' +
+          '<tr><td>DRAFT COO</td><td>Downloads or generates the available draft COO document for the current declaration.</td><td>Availability depends on the current declaration state and system behavior.</td></tr>' +
+          '<tr><td>COO DETAILS</td><td>Provides COO details when the function is enabled for the current declaration state.</td><td>The control may remain unavailable until applicable processing requirements are met.</td></tr>' +
+          '<tr><td>EXIT DECLARATION</td><td>Leaves the declaration entry screen.</td><td>Save required work before exiting when necessary.</td></tr>' +
+          '</tbody></table>'
+        },
+        { id:"coo-c-5", label:"5. Validation Requirements", html:
+          '<ul>' +
+          '<li>All fields marked with * should be treated as mandatory.</li>' +
+          '<li>Mandatory declaration information should not accept blank or whitespace-only values where text input is required.</li>' +
+          '<li>The Declaration Indicator must be confirmed before final submission.</li>' +
+          '<li>Certificate Type and applicable certificate details must be completed as required by the declaration scenario.</li>' +
+          '<li>Outward Transport Mode and corresponding transport data must be completed.</li>' +
+          '<li>Required exporter and consignee information, including addresses, must be provided.</li>' +
+          '<li>Invalid, incomplete, or inconsistent data must prevent successful final submission.</li>' +
+          '<li>Validation messages should clearly identify the missing or invalid field or section.</li>' +
+          '<li>SAVE DRAFT saves the current declaration without final submission and should display a Draft Saved confirmation.</li>' +
+          '<li>SUBMIT DECLARATION performs final validation before submission.</li>' +
+          '<li>If validation fails, the declaration remains available for correction and is not treated as successfully submitted.</li>' +
+          '<li>After successful submission, the declaration should appear in COO Declaration Management with the appropriate status.</li>' +
+          '</ul>'
+        },
+        { id:"coo-c-6", label:"6. Suggested Certificate of Origin Declaration Flow", html:
+          '<ol>' +
+          '<li>Open Declarations → Certificate of Origin (COO).</li>' +
+          '<li>Review the existing COO declaration list or use the available filters to locate a declaration.</li>' +
+          '<li>Select + NEW DECLARATION to create a new Certificate of Origin declaration.</li>' +
+          '<li>Complete Header & Certificate information, including Outward Transport Mode, CO Type, certificate detail type(s), and other applicable certificate information.</li>' +
+          '<li>Use NEXT to proceed through Transport Info, Party Info, Items, and Summary. Use PREVIOUS whenever earlier information must be reviewed or corrected.</li>' +
+          '<li>Enter and verify outward transport details, parties, exporter/consignee data, item information, and Certificate of Origin item details.</li>' +
+          '<li>Use SAVE DRAFT when the declaration must be stored without final submission and verify the Draft Saved confirmation.</li>' +
+          '<li>On Summary, review the number of items and declaration indicator.</li>' +
+          '<li>Select SUBMIT DECLARATION only after confirming that all required information is complete and correct.</li>' +
+          '<li>If validation fails, correct the fields listed in the validation message and submit again.</li>' +
+          '<li>After successful submission, verify the confirmation notification and confirm that the declaration appears in COO Declaration Management with status SUB or the appropriate resulting status.</li>' +
+          '</ol>'
+        },
+        { id:"coo-c-appendix", label:"Appendix A – UI Reference", html: "" },
+        { id:"coo-step-1", label:"Step 1: Open COO Declaration Management", sub:true, html:
+          '<p>From the left navigation menu, expand Declarations and select Certificate of Origin (COO). The COO Declaration Management page displays existing declarations, filters, status information, certificate numbers, row actions, and declaration-level controls. Select + NEW DECLARATION to begin a new COO declaration.</p>' +
+          fig("coo", 1, "COO Declaration Management - Add New Declaration")
+        },
+        { id:"coo-step-2", label:"Step 2: Start a New COO Declaration", sub:true, html:
+          '<p>The system opens the declaration entry page at Header & Certificate (H). Complete the mandatory declaration information, including Outward Transport Mode, CO Type, Certificate Detail #1 Type, number of copies where applicable, currency, certificate additional information, and transport details required by the selected certificate scenario.</p>' +
+          fig("coo", 2, "New COO Declaration - Header & Certificate")
+        },
+        { id:"coo-step-3", label:"Step 3: Review Validation Failure on Incomplete Declaration", sub:true, html:
+          '<p>If the user attempts final submission while mandatory information is incomplete, the system displays Validation Failed. The Summary also shows the declaration statement, which must be confirmed before successful submission. A draft may still be saved where allowed.</p>' +
+          fig("coo", 3, "Validation Failed - Summary")
+        },
+        { id:"coo-step-4", label:"Step 4: Review Detailed Validation Messages", sub:true, html:
+          '<p>The detailed validation panel lists the missing required information that must be corrected before submission. The example identifies requirements such as Declaration Indicator, Application Product Type, Certificate Type, Outward Transport Mode, Departure Date, Discharge Port, Country of Final Destination, Exporter ID, Exporter Name, Exporter Address, Consignee Name, and Consignee Address.</p>' +
+          fig("coo", 4, "Detailed Validation Failed Message")
+        },
+        { id:"coo-step-5", label:"Step 5: Complete Transport Information", sub:true, html:
+          '<p>Select Transport Info (T) or use NEXT from Header & Certificate. Enter the applicable outward transport information. The example includes Flight Number, Departure Date, Discharge Port, Country of Final Destination, and optional Aircraft Registration Number.</p>' +
+          fig("coo", 5, "COO Transport Information")
+        },
+        { id:"coo-step-6", label:"Step 6: Complete Party Information", sub:true, html:
+          '<p>Select Party Info (P) or use NEXT from Transport Info. Enter or verify Freight Forwarder, Outward Carrier, Declaring Agent, Exporter, Consignee, and Manufacturer information as applicable. Verify UEN and address details before proceeding.</p>' +
+          fig("coo", 6, "COO Party Information")
+        },
+        { id:"coo-step-7", label:"Step 7: Complete Item Information", sub:true, html:
+          '<p>Select Items (I) or use NEXT from Party Info. Add the required item details including HS Code, country of origin, description, currency, quantity, UOM, item value, and Certificate of Origin item details such as certificate quantity, manufacturing cost date, invoice number/date, origin criteria, content percent, and certificate item description.</p>' +
+          fig("coo", 7, "COO Item Information")
+        },
+        { id:"coo-step-8", label:"Step 8: Review the Declaration Summary", sub:true, html:
+          '<p>Select Summary (S) or use NEXT from Items. Review the number of items and the Declaration Indicator section. Confirm the declaration statement stating that the particulars in the application are true and correct before submission.</p>' +
+          fig("coo", 8, "COO Declaration Summary")
+        },
+        { id:"coo-step-9", label:"Step 9: Save the Declaration as Draft", sub:true, html:
+          '<p>Select SAVE DRAFT when the COO declaration must be saved without final submission. After a successful save, the system displays a Draft Saved notification confirming that the COO declaration draft has been saved successfully.</p>' +
+          fig("coo", 9, "COO Draft Saved Confirmation")
+        },
+        { id:"coo-step-10", label:"Step 10: Validate and Submit the COO Declaration", sub:true, html:
+          '<p>When all required information is complete, select SUBMIT DECLARATION from Summary. After successful submission, the system displays a Declaration Submitted confirmation and returns to COO Declaration Management, where the submitted declaration is shown with status SUB.</p>' +
+          fig("coo", 10, "COO Declaration Submitted")
+        }
+      ]
+    }
+  };
+
+  /* ============================================================
+     3. LOOKUP HELPERS
+     ============================================================ */
+  var itemIndex = {};   // id -> { item, section }
+  NAV_SECTIONS.forEach(function(section){
+    section.items.forEach(function(item){
+      itemIndex[item.id] = { item: item, section: section };
+    });
+  });
+
+  function findById(id){ return itemIndex[id] || null; }
+
+  // Flatten TOC_STRUCTURE into a single array (depth included) for
+  // rendering, search indexing, and doc-id lookups.
+  var tocFlat = [];
+  (function flattenToc(nodes, depth){
+    nodes.forEach(function(node){
+      node.depth = depth;
+      tocFlat.push(node);
+      if(node.children) flattenToc(node.children, depth + 1);
+    });
+  })(TOC_STRUCTURE, 0);
+
+  /* ============================================================
+     4. STATE
+     ============================================================ */
+  var state = {
+    activeId: null,
+    view: "landing",  // "landing" | "doc" | "toc"
+    expanded: {}   // sectionId -> bool
+  };
+
+  /* ============================================================
+     5. RENDER SIDEBAR
+     ============================================================ */
+  var sidebarEl = document.getElementById("sidebar");
+
+  function chevronSVG(){
+    return '<svg class="chev" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
+  }
+
+  function renderSidebar(){
+    var html = "";
+    NAV_SECTIONS.forEach(function(section){
+      var expanded = !!state.expanded[section.id];
+      html += '<div class="nav-section' + (expanded ? " expanded" : "") + '" data-section="' + section.id + '">';
+      html += '  <button type="button" class="nav-section-btn" data-toggle="' + section.id + '">';
+      html += chevronSVG();
+      html += '    <span class="label">' + section.title + '</span>';
+      html += '  </button>';
+      html += '  <ul class="nav-items">';
+      section.items.forEach(function(item){
+        var active = item.id === state.activeId;
+        html += '<li class="nav-item' + (active ? " active" : "") + '" data-doc="' + item.id + '">' + item.label + '</li>';
+      });
+      html += '  </ul>';
+      html += '</div>';
+    });
+    sidebarEl.innerHTML = html;
+  }
+
+  sidebarEl.addEventListener("click", function(e){
+    var toggleBtn = e.target.closest("[data-toggle]");
+    if(toggleBtn){
+      var sid = toggleBtn.getAttribute("data-toggle");
+      state.expanded[sid] = !state.expanded[sid];
+      renderSidebar();
+      return;
+    }
+    var docItem = e.target.closest("[data-doc]");
+    if(docItem){
+      navigateTo(docItem.getAttribute("data-doc"));
+      closeMobileSidebar();
+    }
+  });
+
+  /* ============================================================
+     6. RENDER LANDING CARDS
+     ============================================================ */
+  var cardGrid = document.getElementById("moduleCardGrid");
+  (function renderCards(){
+    var html = "";
+    NAV_SECTIONS.forEach(function(section){
+      html += '<div class="module-card" data-open-section="' + section.id + '">';
+      html += '  <div class="module-card-title">' + titleCase(section.crumb) + '</div>';
+      html += '  <div class="module-card-count">' + section.items.length + (section.items.length === 1 ? " document" : " documents") + '</div>';
+      html += '</div>';
+    });
+    cardGrid.innerHTML = html;
+  })();
+
+  function titleCase(s){ return s; }
+
+  cardGrid.addEventListener("click", function(e){
+    var card = e.target.closest("[data-open-section]");
+    if(!card) return;
+    var sid = card.getAttribute("data-open-section");
+    var section = NAV_SECTIONS.filter(function(s){ return s.id === sid; })[0];
+    if(!section) return;
+    state.expanded[sid] = true;
+    if(section.items.length){
+      navigateTo(section.items[0].id);
+    }
+  });
+
+  document.getElementById("brandHome").addEventListener("click", function(){
+    showLanding();
+    if(location.hash) history.pushState(null, "", location.pathname + location.search);
+  });
+
+  /* ============================================================
+     7. DOCUMENT VIEWER / openDocument()
+     ============================================================ */
+  var landingView   = document.getElementById("landingView");
+  var tocView       = document.getElementById("tocView");
+  var docView       = document.getElementById("docView");
+  var breadcrumbEl  = document.getElementById("breadcrumb");
+  var docTitleEl    = document.getElementById("docTitle");
+  var pdfFrame      = document.getElementById("pdfFrame");
+  var pdfMissing    = document.getElementById("pdfMissing");
+  var pdfMissingPath= document.getElementById("pdfMissingPath");
+  var openNewTabBtn = document.getElementById("openNewTabBtn");
+  var contentsPanel = document.getElementById("contentsPanel");
+  var contentsBody  = document.getElementById("contentsBody");
+  var topNav        = document.getElementById("topNav");
+  var pdfFrameContainer = document.getElementById("pdfFrameContainer");
+  var htmlDocContainer  = document.getElementById("htmlDocContainer");
+  var htmlDocContent    = document.getElementById("htmlDocContent");
+
+  function isPlaceholder(path){
+    return !path || /PLACEHOLDER/i.test(path);
+  }
+
+  function renderHtmlDoc(doc){
+    var html = '<div class="doc-html-subtitle">' + escapeHtml(doc.subtitle) + '</div>';
+    doc.sections.forEach(function(s){
+      html += '<section id="' + s.id + '"><h2>' + escapeHtml(s.label) + '</h2>' + s.html + '</section>';
+    });
+    htmlDocContent.innerHTML = html;
+  }
+
+  function openDocument(id){
+    var found = findById(id);
+    if(!found){ return; }
+
+    state.activeId = id;
+    state.view = "doc";
+
+    // Auto-expand the parent section, then render once
+    state.expanded[found.section.id] = true;
+    renderSidebar();
+
+    // Breadcrumb
+    breadcrumbEl.innerHTML =
+      '<span>Documentation</span><span class="sep">&rsaquo;</span>' +
+      '<span>' + found.section.crumb + '</span><span class="sep">&rsaquo;</span>' +
+      '<span class="current">' + found.item.label + '</span>';
+
+    // Title
+    docTitleEl.textContent = found.item.label;
+
+    var htmlDoc = HTML_DOCS[id];
+
+    if(htmlDoc){
+      // Render the extracted PDF content as native HTML — no PDF viewer at all.
+      docView.dataset.mode = "html";
+      pdfFrameContainer.classList.remove("active");
+      pdfFrame.removeAttribute("src");
+      pdfMissing.classList.remove("show");
+      htmlDocContainer.classList.add("active");
+      htmlDocContainer.scrollTop = 0;
+      renderHtmlDoc(htmlDoc);
+      openNewTabBtn.style.display = "none";
+    } else {
+      docView.dataset.mode = "pdf";
+      htmlDocContainer.classList.remove("active");
+      htmlDocContent.innerHTML = "";
+      pdfFrameContainer.classList.add("active");
+      openNewTabBtn.style.display = "";
+
+      // PDF path lookup (centralized map)
+      var path = DOCUMENT_MAP[id];
+
+      if(isPlaceholder(path)){
+        pdfFrame.style.display = "none";
+        pdfFrame.removeAttribute("src");
+        pdfMissing.classList.add("show");
+        pdfMissingPath.textContent = path || "(not mapped)";
+        openNewTabBtn.setAttribute("aria-disabled", "true");
+        openNewTabBtn.href = "#";
+      } else {
+        pdfMissing.classList.remove("show");
+        pdfFrame.style.display = "block";
+        pdfFrame.src = path;
+        openNewTabBtn.href = path;
+        openNewTabBtn.removeAttribute("aria-disabled");
+      }
+    }
+
+    renderContentsPanel(id);
+    showDocView();
+  }
+
+  function setActiveView(view){
+    landingView.style.display = view === "landing" ? "block" : "none";
+    tocView.classList.toggle("active", view === "toc");
+    docView.classList.toggle("active", view === "doc");
+    contentsPanel.classList.toggle("docview-visible", view === "doc");
+    if(view !== "doc") closeContentsDrawer();
+    topNav.querySelectorAll("a[data-nav]").forEach(function(a){
+      a.classList.toggle("current",
+        (view === "landing" && a.dataset.nav === "home") ||
+        ((view === "toc" || view === "doc") && a.dataset.nav === "toc")
+      );
+    });
+  }
+
+  function showDocView(){
+    state.view = "doc";
+    setActiveView("doc");
+  }
+  function showLanding(){
+    state.activeId = null;
+    state.view = "landing";
+    renderSidebar();
+    setActiveView("landing");
+  }
+  function showToc(){
+    state.activeId = null;
+    state.view = "toc";
+    renderSidebar();
+    renderToc();
+    setActiveView("toc");
+  }
+
+  document.getElementById("printBtn").addEventListener("click", function(){
+    if(docView.dataset.mode === "html"){ window.print(); return; }
+    try{ pdfFrame.contentWindow.print(); }
+    catch(err){ window.print(); }
+  });
+
+  /* ============================================================
+     7B. TABLE OF CONTENTS RENDERING
+     ============================================================ */
+  var tocTreeEl = document.getElementById("tocTree");
+
+  function renderTocNodes(nodes){
+    return nodes.map(function(node){
+      var clickable = !!node.docId;
+      var active = clickable && node.docId === state.activeId;
+      var html = '<li class="toc-node" data-depth="' + node.depth + '">';
+      html += '<div class="toc-row' + (clickable ? " clickable" : "") + (active ? " active" : "") + '"' +
+              ' data-number="' + node.number + '"' +
+              (clickable ? ' data-doc="' + node.docId + '"' : "") + '>';
+      html += '<span class="toc-number">' + node.number + '</span>';
+      html += '<span class="toc-label">' + escapeHtml(node.title) + '</span>';
+      if(!clickable) html += '<span class="toc-nodoc-tag">No linked document</span>';
+      html += '</div>';
+      if(node.children && node.children.length){
+        html += '<ol class="toc-children">' + renderTocNodes(node.children) + '</ol>';
+      }
+      html += '</li>';
+      return html;
+    }).join("");
+  }
+
+  function renderToc(){
+    tocTreeEl.innerHTML = renderTocNodes(TOC_STRUCTURE);
+  }
+
+  function focusTocNode(number){
+    var row = tocTreeEl.querySelector('[data-number="' + number + '"]');
+    if(!row) return;
+    row.scrollIntoView({ block:"center", behavior:"smooth" });
+    row.classList.add("active");
+    setTimeout(function(){
+      if(!row.classList.contains("clickable")) row.classList.remove("active");
+    }, 1600);
+  }
+
+  tocTreeEl.addEventListener("click", function(e){
+    var row = e.target.closest(".toc-row.clickable");
+    if(!row) return;
+    navigateTo(row.getAttribute("data-doc"));
+  });
+
+  /* ============================================================
+     7C. CONTENTS PANEL (right-hand section index)
+     ============================================================ */
+  function renderContentsPanel(id){
+    var htmlDoc = HTML_DOCS[id];
+    if(htmlDoc){
+      contentsBody.innerHTML = '<ul class="contents-list">' +
+        htmlDoc.sections.map(function(s){
+          return '<li class="contents-item linkable' + (s.sub ? " contents-sub" : "") + '" data-scroll="' + s.id + '">' +
+                 escapeHtml(s.label) + '</li>';
+        }).join("") +
+        '</ul>';
+      return;
+    }
+    var sections = CONTENTS_MAP[id];
+    if(sections && sections.length){
+      contentsBody.innerHTML = '<ul class="contents-list">' +
+        sections.map(function(s){
+          return '<li class="contents-item">' + escapeHtml(s) + '</li>';
+        }).join("") +
+        '</ul>';
+    } else {
+      contentsBody.innerHTML = '<div class="contents-empty">No section index is available for this document yet.</div>';
+    }
+  }
+
+  contentsBody.addEventListener("click", function(e){
+    var el = e.target.closest("[data-scroll]");
+    if(!el) return;
+    var target = document.getElementById(el.getAttribute("data-scroll"));
+    if(target) target.scrollIntoView({ behavior:"smooth", block:"start" });
+    closeContentsDrawer();
+  });
+
+  /* ============================================================
+     8. HASH ROUTING  (#/documents/<id>, #/toc)
+     ============================================================ */
+  function navigateTo(id){
+    location.hash = "/documents/" + id;
+  }
+
+  function handleHashChange(){
+    var hash = location.hash || "";
+    var match = hash.match(/^#\/documents\/([a-z0-9-]+)$/i);
+    if(match && findById(match[1])){
+      openDocument(match[1]);
+    } else if(/^#\/toc\/?$/i.test(hash)){
+      showToc();
+    } else if(!hash || hash === "#" || hash === "#/"){
+      showLanding();
+    }
+  }
+
+  window.addEventListener("hashchange", handleHashChange);
+
+  /* ============================================================
+     9. SEARCH
+     ============================================================ */
+  var searchInput   = document.getElementById("searchInput");
+  var searchResults = document.getElementById("searchResults");
+
+  // Sidebar/document entries
+  var searchFlat = [];
+  NAV_SECTIONS.forEach(function(section){
+    section.items.forEach(function(item){
+      searchFlat.push({ kind:"doc", docId:item.id, label:item.label, path:section.crumb });
+    });
+  });
+  // Table of Contents entries (numbered) — searchable even when they
+  // have no linked document, per the TOC-search requirement.
+  tocFlat.forEach(function(node){
+    searchFlat.push({
+      kind:"toc",
+      docId:node.docId || null,
+      number:node.number,
+      label:node.number + " " + node.title,
+      path:"Table of Contents"
+    });
+  });
+
+  function runSearch(query){
+    query = query.trim().toLowerCase();
+    if(!query){ closeSearch(); return; }
+    var results = searchFlat.filter(function(entry){
+      return entry.label.toLowerCase().indexOf(query) !== -1 ||
+             entry.path.toLowerCase().indexOf(query) !== -1 ||
+             (entry.docId && entry.docId.toLowerCase().indexOf(query) !== -1);
+    }).slice(0, 20);
+
+    if(!results.length){
+      searchResults.innerHTML = '<div class="search-empty">No matching documents.</div>';
+    } else {
+      searchResults.innerHTML = results.map(function(r, i){
+        return '<div class="search-result-item" data-index="' + i + '">' +
+               '  <div class="search-result-label">' + escapeHtml(r.label) + '</div>' +
+               '  <div class="search-result-path">' + escapeHtml(r.path) + '</div>' +
+               '</div>';
+      }).join("");
+      searchResults.dataset.resultsJson = JSON.stringify(results);
+    }
+    searchResults.classList.add("open");
+  }
+
+  function closeSearch(){
+    searchResults.classList.remove("open");
+    searchResults.innerHTML = "";
+    delete searchResults.dataset.resultsJson;
+  }
+
+  function escapeHtml(s){
+    var d = document.createElement("div");
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  function openSearchResult(entry){
+    if(entry.docId){
+      navigateTo(entry.docId);
+    } else if(entry.kind === "toc"){
+      showToc();
+      history.pushState(null, "", location.pathname + location.search + "#/toc");
+      focusTocNode(entry.number);
+    }
+    searchInput.value = "";
+    closeSearch();
+    closeMobileSidebar();
+  }
+
+  searchInput.addEventListener("input", function(){ runSearch(searchInput.value); });
+  searchInput.addEventListener("focus", function(){ if(searchInput.value.trim()) runSearch(searchInput.value); });
+
+  searchResults.addEventListener("click", function(e){
+    var el = e.target.closest("[data-index]");
+    if(!el || !searchResults.dataset.resultsJson) return;
+    var results = JSON.parse(searchResults.dataset.resultsJson);
+    var entry = results[Number(el.getAttribute("data-index"))];
+    if(entry) openSearchResult(entry);
+  });
+
+  document.addEventListener("click", function(e){
+    if(!e.target.closest(".header-search")) closeSearch();
+  });
+
+  document.addEventListener("keydown", function(e){
+    if(e.key === "/" && document.activeElement !== searchInput){
+      e.preventDefault();
+      searchInput.focus();
+    }
+    if(e.key === "Escape"){
+      closeSearch();
+      searchInput.blur();
+    }
+  });
+
+  /* ============================================================
+     10. THEME TOGGLE
+     ============================================================ */
+  var themeToggle = document.getElementById("themeToggle");
+  var SUN_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>';
+  var MOON_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+
+  function applyTheme(theme){
+    document.documentElement.setAttribute("data-theme", theme);
+    themeToggle.innerHTML = theme === "dark" ? SUN_ICON : MOON_ICON;
+    try{ localStorage.setItem("tradenix-docs-theme", theme); }catch(err){}
+  }
+
+  (function initTheme(){
+    var saved = null;
+    try{ saved = localStorage.getItem("tradenix-docs-theme"); }catch(err){}
+    applyTheme(saved === "light" ? "light" : "dark");
+  })();
+
+  themeToggle.addEventListener("click", function(){
+    var current = document.documentElement.getAttribute("data-theme");
+    applyTheme(current === "dark" ? "light" : "dark");
+  });
+
+  /* ============================================================
+     11. FULLSCREEN
+     ============================================================ */
+  document.getElementById("fullscreenToggle").addEventListener("click", function(){
+    if(!document.fullscreenElement){
+      document.documentElement.requestFullscreen().catch(function(){});
+    } else {
+      document.exitFullscreen().catch(function(){});
+    }
+  });
+
+  /* ============================================================
+     12. MOBILE SIDEBAR DRAWER
+     ============================================================ */
+  var sidebarBackdrop = document.getElementById("sidebarBackdrop");
+  var hamburgerBtn = document.getElementById("hamburgerBtn");
+
+  function openMobileSidebar(){
+    sidebarEl.classList.add("open");
+    sidebarBackdrop.classList.add("open");
+  }
+  function closeMobileSidebar(){
+    sidebarEl.classList.remove("open");
+    sidebarBackdrop.classList.remove("open");
+  }
+  hamburgerBtn.addEventListener("click", function(){
+    sidebarEl.classList.contains("open") ? closeMobileSidebar() : openMobileSidebar();
+  });
+  sidebarBackdrop.addEventListener("click", closeMobileSidebar);
+
+  /* ============================================================
+     12B. MOBILE / TABLET CONTENTS DRAWER
+     ============================================================ */
+  var contentsBackdrop  = document.getElementById("contentsBackdrop");
+  var contentsToggleBtn = document.getElementById("contentsToggleBtn");
+
+  function openContentsDrawer(){
+    contentsPanel.classList.add("drawer-open");
+    contentsBackdrop.classList.add("open");
+  }
+  function closeContentsDrawer(){
+    contentsPanel.classList.remove("drawer-open");
+    contentsBackdrop.classList.remove("open");
+  }
+  contentsToggleBtn.addEventListener("click", function(){
+    contentsPanel.classList.contains("drawer-open") ? closeContentsDrawer() : openContentsDrawer();
+  });
+  contentsBackdrop.addEventListener("click", closeContentsDrawer);
+
+  /* ============================================================
+     13. INIT
+     ============================================================ */
+  renderSidebar();
+  handleHashChange();
+  if(!location.hash || location.hash === "#" || location.hash === "#/"){
+    showLanding();
+  }
+})();
+</script>
+</body>
+</html>
