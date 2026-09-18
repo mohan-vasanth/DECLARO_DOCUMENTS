@@ -1,0 +1,118 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+2 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Length 3394 >>
+stream
+q
+0.12 0.14 0.18 rg
+BT
+/F2 20 Tf 54 730.0 Td (Dashboard PDF - Exact Content and Structure Fix Plan) Tj 0 0 Td
+/F1 10 Tf 54 708.0 Td (Prepared from the requested Dashboard PDF correction requirements. This document defines the) Tj 0 0 Td
+/F1 10 Tf 54 694.0 Td (extraction plan, protected scope, and acceptance criteria.) Tj 0 0 Td
+/F2 15 Tf 54 664.0 Td (OBJECTIVE) Tj 0 0 Td
+/F1 10 Tf 54 645.0 Td (Fix the Dashboard PDF to HTML conversion so the Dashboard documentation reproduces the) Tj 0 0 Td
+/F1 10 Tf 54 631.0 Td (original uploaded PDF accurately and completely.) Tj 0 0 Td
+/F1 10 Tf 54 612.0 Td (The original Dashboard PDF is the sole source of truth. The Declaration documentation is) Tj 0 0 Td
+/F1 10 Tf 54 598.0 Td (only a technical reference for the existing HTML rendering approach.) Tj 0 0 Td
+/F2 15 Tf 54 574.0 Td (ACTION ITEMS) Tj 0 0 Td
+/F1 10 Tf 54 555.0 Td (   1. Compare the current Dashboard HTML output against every page of the original Dashboard) Tj 0 0 Td
+/F1 10 Tf 54 541.0 Td (   PDF.) Tj 0 0 Td
+/F1 10 Tf 54 522.0 Td (   2. Identify every missing or misplaced item, including text, values, tags, headings,) Tj 0 0 Td
+/F1 10 Tf 54 508.0 Td (   labels, field names, tables, screenshots, logo artwork, page structure, and ordering.) Tj 0 0 Td
+/F1 10 Tf 54 489.0 Td (   3. Extract all PDF text and values without inventing, guessing, paraphrasing, or) Tj 0 0 Td
+/F1 10 Tf 54 475.0 Td (   replacing source content.) Tj 0 0 Td
+/F1 10 Tf 54 456.0 Td (   4. Extract every original embedded image and screenshot from the PDF and place it in the) Tj 0 0 Td
+/F1 10 Tf 54 442.0 Td (   matching HTML section and position.) Tj 0 0 Td
+/F1 10 Tf 54 423.0 Td (   5. Extract the original logo asset, preserving its source artwork, proportions, size) Tj 0 0 Td
+/F1 10 Tf 54 409.0 Td (   relationship, placement, and surrounding document structure as closely as the HTML flow) Tj 0 0 Td
+/F1 10 Tf 54 395.0 Td (   allows.) Tj 0 0 Td
+/F1 10 Tf 54 376.0 Td (   6. Restore the exact source-document order and ensure no valid existing Dashboard content) Tj 0 0 Td
+/F1 10 Tf 54 362.0 Td (   is removed.) Tj 0 0 Td
+/F1 10 Tf 54 343.0 Td (   7. Keep the Dashboard on the existing native HTML documentation path. Do not use a PDF) Tj 0 0 Td
+/F1 10 Tf 54 329.0 Td (   iframe, object, preview, or replacement image in place of the HTML content.) Tj 0 0 Td
+/F1 10 Tf 54 310.0 Td (   8. Verify Dashboard Contents-panel links and Dashboard content-search results after the) Tj 0 0 Td
+/F1 10 Tf 54 296.0 Td (   extraction is corrected.) Tj 0 0 Td
+/F2 15 Tf 54 272.0 Td (SOURCE-OF-TRUTH RULES) Tj 0 0 Td
+/F1 10 Tf 54 253.0 Td (Use only the original uploaded Dashboard PDF for Dashboard content decisions.) Tj 0 0 Td
+/F1 10 Tf 54 234.0 Td (Do not manually recreate missing values or labels.) Tj 0 0 Td
+/F1 10 Tf 54 215.0 Td (Do not guess content that is obscured or unreadable in the source PDF.) Tj 0 0 Td
+/F1 10 Tf 54 196.0 Td (Do not create newly designed replacement screenshots or logos.) Tj 0 0 Td
+/F1 10 Tf 54 177.0 Td (Do not remove existing Dashboard content unless the source comparison proves it is incorrect) Tj 0 0 Td
+/F1 10 Tf 54 163.0 Td (or duplicated.) Tj 0 0 Td
+/F2 15 Tf 54 139.0 Td (PROTECTED AREAS) Tj 0 0 Td
+/F1 10 Tf 54 120.0 Td (Do not modify IPT, INP, TNP, OUT, or COO documentation.) Tj 0 0 Td
+/F1 10 Tf 54 101.0 Td (Do not change existing Dashboard functionality.) Tj 0 0 Td
+ET
+Q
+endstream
+endobj
+5 0 obj
+<< /Length 2154 >>
+stream
+q
+0.12 0.14 0.18 rg
+BT
+/F1 10 Tf 54 730.0 Td (Do not change the sidebar, header, Contents navigation, search functionality, UI design,) Tj 0 0 Td
+/F1 10 Tf 54 716.0 Td (styling, portal layout, or other portal modules.) Tj 0 0 Td
+/F1 10 Tf 54 697.0 Td (Only Dashboard PDF content extraction and Dashboard-specific rendering/assets may be) Tj 0 0 Td
+/F1 10 Tf 54 683.0 Td (changed.) Tj 0 0 Td
+/F2 15 Tf 54 659.0 Td (EXPECTED RESULT) Tj 0 0 Td
+/F1 10 Tf 54 640.0 Td (Original Dashboard PDF -> complete and accurate HTML Dashboard documentation.) Tj 0 0 Td
+/F1 10 Tf 54 621.0 Td (The result must preserve all relevant visible PDF content: text, values, tags, headings,) Tj 0 0 Td
+/F1 10 Tf 54 607.0 Td (labels, field names, tables, sections, images, screenshots, logo, document order, structure,) Tj 0 0 Td
+/F1 10 Tf 54 593.0 Td (and placement.) Tj 0 0 Td
+/F1 10 Tf 54 574.0 Td (Nothing from the original Dashboard PDF should be unintentionally missing.) Tj 0 0 Td
+/F2 15 Tf 54 550.0 Td (ACCEPTANCE CHECKLIST) Tj 0 0 Td
+/F1 10 Tf 54 531.0 Td (   [ ] Every PDF page has been compared with the HTML Dashboard output.) Tj 0 0 Td
+/F1 10 Tf 54 512.0 Td (   [ ] All headings and subheadings are present and ordered correctly.) Tj 0 0 Td
+/F1 10 Tf 54 493.0 Td (   [ ] All text, values, tags, labels, and field names are present.) Tj 0 0 Td
+/F1 10 Tf 54 474.0 Td (   [ ] All tables and table values are present.) Tj 0 0 Td
+/F1 10 Tf 54 455.0 Td (   [ ] All original screenshots and embedded images are present in the correct sections.) Tj 0 0 Td
+/F1 10 Tf 54 436.0 Td (   [ ] The original logo is present, correctly positioned, and not replaced with a newly) Tj 0 0 Td
+/F1 10 Tf 54 422.0 Td (   created version.) Tj 0 0 Td
+/F1 10 Tf 54 403.0 Td (   [ ] Dashboard Contents navigation reaches every rendered section.) Tj 0 0 Td
+/F1 10 Tf 54 384.0 Td (   [ ] Dashboard content search finds extracted Dashboard text and section labels.) Tj 0 0 Td
+/F1 10 Tf 54 365.0 Td (   [ ] IPT, INP, TNP, OUT, and COO behavior remains unchanged.) Tj 0 0 Td
+/F1 10 Tf 54 346.0 Td (   [ ] Portal UI, styling, layout, sidebar, header, and other modules remain unchanged.) Tj 0 0 Td
+ET
+Q
+endstream
+endobj
+6 0 obj
+<< /Type /Pages /Count 2 /Kids [7 0 R 8 0 R] >>
+endobj
+7 0 obj
+<< /Type /Page /Parent 6 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 4 0 R >>
+endobj
+8 0 obj
+<< /Type /Page /Parent 6 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 5 0 R >>
+endobj
+9 0 obj
+<< /Type /Catalog /Pages 6 0 R >>
+endobj
+xref
+0 10
+0000000000 65535 f 
+0000000015 00000 n 
+0000000085 00000 n 
+0000000160 00000 n 
+0000000230 00000 n 
+0000003676 00000 n 
+0000005882 00000 n 
+0000005945 00000 n 
+0000006091 00000 n 
+0000006237 00000 n 
+trailer
+<< /Size 10 /Root 9 0 R >>
+startxref
+6286
+%%EOF

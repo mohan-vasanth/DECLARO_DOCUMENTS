@@ -635,6 +635,47 @@
     font-size:13.5px;
     margin:-4px 0 24px;
   }
+  /* Reproduces a source PDF's own page-header letterhead (logo, brand,
+     version/date, rule, title) exactly as it sits on the original page —
+     never as part of a numbered section's body content. */
+  .pdf-masthead{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    margin:-4px 0 0;
+  }
+  .pdf-masthead-logo{
+    height:34px;
+    width:auto;
+    flex-shrink:0;
+    background:#fff;
+    border-radius:2px;
+  }
+  .pdf-masthead-brand{
+    flex:1;
+    text-align:center;
+    color:var(--accent);
+    font-weight:700;
+    font-size:16px;
+  }
+  .pdf-masthead-meta{
+    color:var(--text-faint);
+    font-size:12px;
+    white-space:nowrap;
+    flex-shrink:0;
+  }
+  .pdf-masthead-rule{
+    border:none;
+    border-top:1px solid var(--border);
+    margin:12px 0 22px;
+  }
+  .pdf-doc-title{
+    font-size:22px;
+    font-weight:700;
+    text-align:center;
+    color:var(--text);
+    margin:0 0 28px;
+  }
   .doc-html section{margin-bottom:32px;scroll-margin-top:16px;}
   .doc-html h2{
     font-size:17px;
@@ -805,6 +846,7 @@
       <div class="doc-header">
         <h2 id="docTitle">Document</h2>
         <div class="doc-header-actions">
+          <a class="btn" id="tocBackBtn" href="#/toc" style="display:none">&larr; Back to Table of Contents</a>
           <button class="btn contents-toggle" id="contentsToggleBtn">Contents</button>
           <button class="btn" id="printBtn">Print</button>
           <a class="btn btn-primary" id="openNewTabBtn" href="#" target="_blank" rel="noopener">Open in New Tab</a>
@@ -933,10 +975,10 @@
      ============================================================ */
   var DOCUMENT_MAP = {
     /* DASHBOARD */
-    "dashboard":                 "documents/PLACEHOLDER-dashboard.pdf",
+    "dashboard":                 "documents/Declaro_Dashboard_Page_Documentation.pdf",
 
     /* STATUS LIST */
-    "status-list":                "documents/PLACEHOLDER-status-list.pdf",
+    "status-list":                "documents/Declaro_Status_List_Page_Documentation.pdf",
 
     /* MANAGEMENT */
     "users":                      "documents/PLACEHOLDER-users.pdf",
@@ -1021,9 +1063,9 @@
      rendered as plain, non-clickable text.
      ============================================================ */
   var TOC_STRUCTURE = [
-    { number:"1", title:"Introduction", children:[
-      { number:"1.1", title:"Purpose" },
-      { number:"1.2", title:"Scope" }
+    { number:"1", title:"Introduction", docId:"introduction", children:[
+      { number:"1.1", title:"Purpose", docId:"purpose" },
+      { number:"1.2", title:"Scope", docId:"scope" }
     ]},
     { number:"2", title:"System Overview", children:[
       { number:"2.1", title:"Application Overview" },
@@ -1130,19 +1172,214 @@
      Each section becomes a scrollable, anchorable block and also
      drives the right-hand Contents panel for that document.
      ============================================================ */
-  function fig(docId, num, caption){
+  function fig(docId, num, caption, w, h){
     var n = String(num).length < 2 ? "0" + num : String(num);
     var src = "assets/" + docId + "/figure-" + n + ".png";
     var altText = "Figure " + num + ". " + caption;
+    // width/height are the extracted PNG's real intrinsic pixel size (from
+    // pdfimages). Setting them (with CSS width:100%;height:auto) lets the
+    // browser reserve the correct box before the image loads, so lazy
+    // loading can't shift layout under a scroll already in flight.
     return '<figure class="doc-figure">' +
-      '<img src="' + src + '" alt="' + escapeHtml(altText) + '" loading="lazy">' +
+      '<img src="' + src + '" width="' + w + '" height="' + h + '" alt="' + escapeHtml(altText) + '" loading="lazy">' +
       '<figcaption>' + escapeHtml(altText) + '</figcaption>' +
       '</figure>';
   }
 
+  function dashboardFig(docId, num, caption, w, h){
+    var n = String(num).length < 2 ? "0" + num : String(num);
+    var src = "assets/" + docId + "/figure-" + n + ".jpg";
+    var altText = "Figure " + num + ". " + caption;
+    return '<figure class="doc-figure">' +
+      '<img src="' + src + '" width="' + w + '" height="' + h + '" alt="' + escapeHtml(altText) + '" loading="lazy">' +
+      '<figcaption>' + escapeHtml(altText) + '</figcaption>' +
+      '</figure>';
+  }
+
+  // Reproduces a source PDF's own page-header layout — logo, brand,
+  // version/date on one row, a rule, then the document title — rendered
+  // once at the top of the document (outside/above section 1), exactly
+  // mirroring where this masthead sits on every page of the source PDF.
+  // It must never be nested inside a numbered section's content.
+  // docId selects the extracted logo at assets/<docId>/palminds-logo.jpg.
+  function pdfMasthead(docId, title){
+    return '<div class="pdf-masthead">' +
+        '<img class="pdf-masthead-logo" src="assets/' + docId + '/palminds-logo.jpg" width="460" height="145" alt="Opalminds Ideas Empowered logo">' +
+        '<div class="pdf-masthead-brand">Tradenix</div>' +
+        '<div class="pdf-masthead-meta">Version – 1&nbsp;&nbsp;&nbsp;11-09-2026</div>' +
+      '</div>' +
+      '<hr class="pdf-masthead-rule">' +
+      '<h1 class="pdf-doc-title">' + escapeHtml(title) + '</h1>';
+  }
+
   var HTML_DOCS = {
+    "dashboard": {
+      header: pdfMasthead("dashboard", "Dashboard Page Documentation"),
+      sections: [
+        { id:"dashboard-c-1", label:"1. Page Overview", html:
+          '<p>This document describes the Tradenix Dashboard page shown in the provided application screenshot. It covers the dashboard filters, chart controls, summary panels, table layout, refresh action, and the expected user flow for reviewing declaration status information.</p>'
+        },
+        { id:"dashboard-c-2", label:"2. Page Purpose", html:
+          '<p>The Dashboard provides a consolidated view of declaration activity. It allows an authorized user to filter the displayed information by declaration flow and status, switch the chart presentation between Bar and Pie views, review period-based summaries, and refresh the displayed dashboard data.</p>'
+        },
+        { id:"dashboard-c-3", label:"3. Navigation", html:
+          '<p><strong>Expected navigation path:</strong></p><p>Dashboard</p>'
+        },
+        { id:"dashboard-c-4", label:"4. Dashboard Page Overview", html:
+          '<p>The page contains declaration and status filters at the top, chart-type controls, period-based charts and summary tables, and a REFRESH DB action. The visible declaration flow codes in the tables are IPT, INP, OUT, TNP, and COO.</p>' +
+          dashboardFig("dashboard", 1, "Tradenix Dashboard page", 1550, 815)
+        },
+        { id:"dashboard-c-5", label:"5. Filter and Control Descriptions", html:
+          '<table><thead><tr><th>Control</th><th>Type</th><th>Purpose</th><th>Expected Behavior</th></tr></thead><tbody>' +
+          '<tr><td>Declaration</td><td>Dropdown</td><td>Filter the dashboard by declaration flow.</td><td>The screenshot shows All Flows selected. A different available flow may be selected to narrow the dashboard results.</td></tr>' +
+          '<tr><td>Status</td><td>Dropdown</td><td>Filter dashboard results by status.</td><td>The visible options include Select, Approved, Rejected, Awaiting, and Amendment. The screenshot shows Approved selected.</td></tr>' +
+          '<tr><td>BAR</td><td>Toggle button</td><td>Display dashboard charts in bar-chart format.</td><td>BAR is visibly selected in the screenshot.</td></tr>' +
+          '<tr><td>PIE</td><td>Toggle button</td><td>Display dashboard charts in pie-chart format.</td><td>Switches the chart presentation to pie view when selected.</td></tr>' +
+          '<tr><td>REFRESH DB</td><td>Action button</td><td>Refresh the dashboard data.</td><td>Reloads or refreshes the dashboard data displayed on the page.</td></tr>' +
+          '</tbody></table>'
+        },
+        { id:"dashboard-c-6", label:"6. Dashboard Summary Areas", html:
+          '<p>The screenshot shows three side-by-side summary areas. The left panel is labeled Today and the right panel is labeled This Month. The center panel title is obscured by the open Status dropdown in the supplied screenshot; therefore, this document refers to it as the middle period summary rather than assuming its exact label.</p>' +
+          '<table><thead><tr><th>Area</th><th>Visible Content</th></tr></thead><tbody>' +
+          '<tr><td>Today</td><td>Chart and summary table for the current-day view.</td></tr>' +
+          '<tr><td>Middle period summary</td><td>Chart and summary table. The title is not fully visible in the supplied screenshot.</td></tr>' +
+          '<tr><td>This Month</td><td>Chart and summary table for the monthly view.</td></tr>' +
+          '<tr><td>Summary tables</td><td>Rows include Overall, IPT, INP, OUT, TNP, and COO. Visible columns include Flow, Total, Approved, Rejected, Awaiting, with additional columns extending to the right.</td></tr>' +
+          '</tbody></table>'
+        },
+        { id:"dashboard-c-appendix", label:"Appendix A – UI Reference", html:"" },
+        { id:"dashboard-step-1", label:"Step 1 – Open the Dashboard", sub:true, html:
+          '<p>Select Dashboard from the left navigation menu. The system opens the Dashboard page and displays the declaration summaries, filters, charts, and tables.</p>' +
+          dashboardFig("dashboard", 2, "Dashboard navigation", 1550, 762)
+        },
+        { id:"dashboard-step-2", label:"Step 2 – Select the Dashboard Filters", sub:true, html:
+          '<p>Use the Declaration dropdown to choose the required declaration flow and use the Status dropdown to choose the required status. In the supplied screenshot, Declaration is set to All Flows and Status is set to Approved.</p>' +
+          dashboardFig("dashboard", 3, "Declaration and Status filters", 1550, 824)
+        },
+        { id:"dashboard-step-3", label:"Step 3 – Select the Chart Type", sub:true, html:
+          '<p>Choose BAR to view the summary as bar charts or select PIE to switch the chart presentation. The screenshot shows BAR as the active chart type.</p>' +
+          dashboardFig("dashboard", 4, "Bar/Pie chart selector", 1550, 835)
+        },
+        { id:"dashboard-step-4", label:"Step 4 – Review the Dashboard Summaries", sub:true, html:
+          '<p>Review the charts and the corresponding summary tables for each visible period. Use the tables to compare Total, Approved, Rejected, Awaiting, and other available status counts for the listed declaration flows.</p>' +
+          dashboardFig("dashboard", 5, "Period-based dashboard summaries", 1550, 780)
+        },
+        { id:"dashboard-step-5", label:"Step 5 – Refresh the Dashboard Data", sub:true, html:
+          '<p>Select REFRESH DB when the latest dashboard data is required. After the refresh completes, review the charts and tables again to confirm that the displayed information is current.</p>' +
+          dashboardFig("dashboard", 6, "Refresh DB action", 1550, 824)
+        },
+        { id:"dashboard-c-8", label:"8. Visible Declaration Flow Codes", html:
+          '<table><thead><tr><th>Flow Code</th><th>Documentation Note</th></tr></thead><tbody>' +
+          '<tr><td>IPT</td><td>Visible as a declaration flow row in the dashboard summary tables.</td></tr>' +
+          '<tr><td>INP</td><td>Visible as a declaration flow row in the dashboard summary tables.</td></tr>' +
+          '<tr><td>OUT</td><td>Visible as a declaration flow row in the dashboard summary tables.</td></tr>' +
+          '<tr><td>TNP</td><td>Visible as a declaration flow row in the dashboard summary tables.</td></tr>' +
+          '<tr><td>COO</td><td>Visible as a declaration flow row in the dashboard summary tables.</td></tr>' +
+          '</tbody></table>' +
+          '<p>Note: The supplied screenshot does not define the expanded business meaning of these flow codes; therefore, the document preserves the codes exactly as displayed.</p>'
+        },
+        { id:"dashboard-c-9", label:"9. Validation and Expected System Behavior", html:
+          '<ul>' +
+          '<li>Changing the Declaration or Status selection should update or filter the dashboard information according to the selected value.</li>' +
+          '<li>The chart and table data should remain consistent for the same selected filters and period.</li>' +
+          '<li>Selecting BAR or PIE should change only the chart presentation and should not change the underlying summary values.</li>' +
+          '<li>REFRESH DB should refresh the displayed dashboard data without changing the user&rsquo;s selected filters unless the application is designed to reset them.</li>' +
+          '<li>If no records are available for a selected filter or period, the dashboard should show the application&rsquo;s configured empty/zero-data state.</li>' +
+          '<li>The exact error, loading, timeout, or refresh-success messages are not visible in the supplied screenshot and should be confirmed during QA.</li>' +
+          '</ul>' +
+          '<h3 style="font-size:14.5px;margin:18px 0 8px;color:var(--text);">Note:</h3>' +
+          '<p>Review the charts and the corresponding summary tables for Today, This Week, and This Month. Use the tables to compare Total and the status conditions Approved Permit, Rejected, Amendment, and Awaiting for the listed declaration flows.</p>'
+        }
+      ]
+    },
+
+    "status-list": {
+      header: pdfMasthead("status-list", "Status List Page Documentation"),
+      sections: [
+        { id:"sl-c-1", label:"1. Page Overview", html:
+          '<p>This document describes the Tradenix Status List page, including its purpose, navigation path, visible status codes, search controls, and expected end-user behavior. The documentation is based only on the supplied Status List screenshot.</p>'
+        },
+        { id:"sl-c-2", label:"2. Page Purpose", html:
+          '<p>The Status List page provides a reference list of declaration status codes and their corresponding descriptions. It allows users to quickly identify the meaning of a status code used elsewhere in Tradenix and to filter the list by code or description.</p>'
+        },
+        { id:"sl-c-3", label:"3. Navigation", html:
+          '<p><strong>Expected navigation path:</strong> Dashboard → Status List</p>' +
+          '<p>The Status List option is available in the left-side navigation menu directly below Dashboard in the supplied interface.</p>' +
+          fig("status-list", 1, "Navigate to Status List from the left-side menu.", 1550, 735)
+        },
+        { id:"sl-c-4", label:"4. Page Overview", html:
+          '<p>The page contains a two-column reference table. The first column displays the Status Code and the second column displays its Description. A search field is available under each column header for filtering the visible list.</p>' +
+          '<table><thead><tr><th>Page Element</th><th>Type</th><th>Purpose</th><th>Expected Behavior</th></tr></thead><tbody>' +
+          '<tr><td>Status Code</td><td>Table column</td><td>Displays the declaration status code.</td><td>Shows the short code used by Tradenix for a declaration status.</td></tr>' +
+          '<tr><td>Description</td><td>Table column</td><td>Displays the meaning of the status code.</td><td>Shows the corresponding human-readable status description.</td></tr>' +
+          '<tr><td>Search code</td><td>Text filter</td><td>Filter the list by status code.</td><td>Entering a value should narrow the visible rows to matching status codes.</td></tr>' +
+          '<tr><td>Search description</td><td>Text filter</td><td>Filter the list by description.</td><td>Entering a value should narrow the visible rows to matching descriptions.</td></tr>' +
+          '</tbody></table>' +
+          '<h3 style="font-size:14.5px;margin:18px 0 8px;color:var(--text);">4.1 Search and Filter Controls</h3>' +
+          '<p>Two search inputs are visible at the top of the table. Use Search code when the status code is known, or Search description when searching by the status meaning.</p>'
+        },
+        { id:"sl-c-5", label:"5. Status Code Reference", html:
+          '<p>The following status codes and descriptions are visible in the supplied Status List page screenshot:</p>' +
+          '<table><thead><tr><th>Status Code</th><th>Description</th></tr></thead><tbody>' +
+          '<tr><td>DRF</td><td>Draft</td></tr>' +
+          '<tr><td>FLD</td><td>Failed</td></tr>' +
+          '<tr><td>PII</td><td>Profile Initialization Issue</td></tr>' +
+          '<tr><td>PRC</td><td>Processing</td></tr>' +
+          '<tr><td>RTS</td><td>Ready To Submit</td></tr>' +
+          '<tr><td>SNT</td><td>Sent</td></tr>' +
+          '<tr><td>SUB</td><td>Submitted</td></tr>' +
+          '<tr><td>AWR</td><td>Awaiting Response</td></tr>' +
+          '<tr><td>REJ</td><td>Rejected</td></tr>' +
+          '<tr><td>PMT</td><td>Permit Issued</td></tr>' +
+          '<tr><td>UPD</td><td>Updated</td></tr>' +
+          '<tr><td>AMD</td><td>Amendment Draft</td></tr>' +
+          '<tr><td>AMS</td><td>Amendment Submitted</td></tr>' +
+          '</tbody></table>'
+        },
+        { id:"sl-c-6", label:"6. Step-by-Step Procedure", html:"" },
+        { id:"sl-step-1", label:"Step 1 – Open the Status List page", sub:true, html:
+          '<p>From the Tradenix left navigation menu, select Status List. The system displays the Status List page containing the declaration status codes and descriptions.</p>'
+        },
+        { id:"sl-step-2", label:"Step 2 – Review the status reference", sub:true, html:
+          '<p>Review the Status Code and Description columns to identify the required declaration status and its meaning.</p>'
+        },
+        { id:"sl-step-3", label:"Step 3 – Search by status code", sub:true, html:
+          '<p>If the code is known, enter the required value in the Search code field. Use this field to narrow the list to the matching status code.</p>'
+        },
+        { id:"sl-step-4", label:"Step 4 – Search by description", sub:true, html:
+          '<p>If the status meaning is known instead of the code, enter text in the Search description field to locate the corresponding status.</p>'
+        },
+        { id:"sl-step-5", label:"Step 5 – Clear the search when finished", sub:true, html:
+          '<p>Remove the entered search text to return to the complete list of visible status codes.</p>'
+        },
+        { id:"sl-c-7", label:"7. Expected System Behavior", html:
+          '<table><thead><tr><th>Scenario</th><th>Expected Behavior</th></tr></thead><tbody>' +
+          '<tr><td>Page opened</td><td>The Status List table is displayed with Status Code and Description columns.</td></tr>' +
+          '<tr><td>Status code search entered</td><td>The visible list should be filtered to records matching the entered code.</td></tr>' +
+          '<tr><td>Description search entered</td><td>The visible list should be filtered to records matching the entered description text.</td></tr>' +
+          '<tr><td>No matching result</td><td>The page should show no matching rows or the application&rsquo;s standard empty-result behavior. Exact wording is not visible in the supplied screenshot and should be confirmed during QA.</td></tr>' +
+          '<tr><td>Search field cleared</td><td>The complete available status list should be shown again.</td></tr>' +
+          '</tbody></table>'
+        },
+        { id:"sl-c-8", label:"8. Actions and Permissions", html:
+          '<p>No Create, Edit, Delete, Activate/Deactivate, Save, or Cancel controls are visible on the supplied Status List page. Based on the screenshot, this page should be documented as a reference/list page with search capability only. Any additional administration behavior should be documented only after supporting UI or functional evidence is provided.</p>'
+        },
+        { id:"sl-c-10", label:"10. QA / Validation Notes", html:
+          '<table><thead><tr><th>QA Area</th><th>Validation Check</th></tr></thead><tbody>' +
+          '<tr><td>Navigation</td><td>Verify Dashboard → Status List opens the correct page.</td></tr>' +
+          '<tr><td>Data visibility</td><td>Verify every configured status code appears with the correct description.</td></tr>' +
+          '<tr><td>Code search</td><td>Verify exact and partial status-code searches behave according to the implemented filter logic.</td></tr>' +
+          '<tr><td>Description search</td><td>Verify description filtering returns the expected matching rows.</td></tr>' +
+          '<tr><td>Clear search</td><td>Verify clearing a search restores the full list.</td></tr>' +
+          '<tr><td>Read-only behavior</td><td>Confirm whether the Status List is intentionally read-only; no maintenance actions are visible in the provided screenshot.</td></tr>' +
+          '<tr><td>Empty-result behavior</td><td>Confirm the message or visual state shown when no rows match a search.</td></tr>' +
+          '</tbody></table>'
+        }
+      ]
+    },
+
     "ipt": {
-      subtitle: "Declarations → In-Payment (IPT)",
+      header: pdfMasthead("ipt", "IPT Declaration"),
       sections: [
         { id:"ipt-c-1", label:"1. Page Overview", html:
           '<p>The In-Payment (IPT) declaration workflow is used by authorized users to create, review, save, validate, and submit IPT declarations. The declaration is completed across a sequence of tabs: Shipment Info, Transport Info, Party Info, Invoice Info, Items, CPC, and Summary.</p>'
@@ -1205,67 +1442,67 @@
         },
         { id:"ipt-step-1", label:"Step 1: Open the Dashboard", sub:true, html:
           '<p>Open Tradenix and select Dashboard from the left navigation menu. The Dashboard displays declaration activity for Today, This Week, and This Month. Use the Declaration and Status filters when a filtered operational view is required.</p>' +
-          fig("ipt", 1, "Dashboard")
+          fig("ipt", 1, "Dashboard", 1550, 732)
         },
         { id:"ipt-step-2", label:"Step 2: Open IPT Declaration Management", sub:true, html:
           '<p>From the left navigation menu, expand Declarations and select In-Payment (IPT). The IPT Declaration Management page displays existing IPT declarations, list filters, status information, row actions, and declaration-level controls. Select + NEW DECLARATION to begin a new IPT declaration.</p>' +
-          fig("ipt", 2, "IPT Declaration Management - Add New Declaration")
+          fig("ipt", 2, "IPT Declaration Management - Add New Declaration", 1550, 729)
         },
         { id:"ipt-step-3", label:"Step 3: Start the New IPT Declaration", sub:true, html:
           '<p>The system opens the IPT declaration entry page at Shipment Info (S). Complete the mandatory declaration fields shown on the page, including Declaration Type, Cargo Type, Release Location, and Receipt Location, together with any other information required for the shipment.</p>' +
           '<div class="note-box"><strong>Note:</strong> Select NEXT to proceed from Shipment Info to Transport Info. PREVIOUS is unavailable or not required on the first workflow tab.</div>' +
-          fig("ipt", 3, "New IPT Declaration - Shipment Info")
+          fig("ipt", 3, "New IPT Declaration - Shipment Info", 1550, 727)
         },
         { id:"ipt-step-4", label:"Step 4: Complete Shipment Information", sub:true, html:
           '<p>Enter or select the required Shipment Info values. The page may contain additional controls such as Previous Permit Number, BG Indicator, Blanket Start Date, Supply Indicator, License, Document, and Additional Recipients, depending on the declaration scenario.</p>' +
           '<div class="note-box"><strong>Note:</strong> Use NEXT to continue to Transport Info after reviewing the Shipment Info values. Use PREVIOUS on later tabs to return and correct these details if necessary.</div>' +
-          fig("ipt", 4, "Completed Shipment Information")
+          fig("ipt", 4, "Completed Shipment Information", 1550, 727)
         },
         { id:"ipt-step-5", label:"Step 5: Complete Transport Information", sub:true, html:
           '<p>Select Transport Info (T) or use NEXT from Shipment Info. Enter cargo details such as Total Package, package UOM, Gross Weight, and weight UOM. Complete the applicable inward transport details, including arrival date, loading port, transport reference information, and container details when relevant.</p>' +
           '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Shipment Info. NEXT proceeds to Party Info.</div>' +
-          fig("ipt", 5, "Transport Information")
+          fig("ipt", 5, "Transport Information", 1550, 724)
         },
         { id:"ipt-step-6", label:"Step 6: Complete Party Information", sub:true, html:
           '<p>Select Party Info (P) or use NEXT from Transport Info. Enter or verify the parties involved in the declaration, such as Importer, Inward Carrier, Freight Forwarder, Declaring Agent, and Claimant Party where applicable. Verify the corresponding UEN values before proceeding.</p>' +
           '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Transport Info. NEXT proceeds to Invoice Info.</div>' +
-          fig("ipt", 6, "Party Information")
+          fig("ipt", 6, "Party Information", 1550, 724)
         },
         { id:"ipt-step-7", label:"Step 7: Complete Invoice Information", sub:true, html:
           '<p>Select Invoice Info (V) or use NEXT from Party Info. Enter the invoice number, invoice date, term type, supplier/manufacturer information, currency, invoice amount, and other applicable charges. Review the calculated values such as CIF, duties, tax, and GST where displayed.</p>' +
           '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Party Info. NEXT proceeds to Items.</div>' +
-          fig("ipt", 7, "Invoice Information")
+          fig("ipt", 7, "Invoice Information", 1550, 721)
         },
         { id:"ipt-step-8", label:"Step 8: Complete Item Information", sub:true, html:
           '<p>Select Items (I) or use NEXT from Invoice Info. Add the required item details, including invoice reference, HAWB or shipment reference where applicable, HS Code, description, brand, country of origin, quantity, UOM, item value, and supporting CASC, shipping mark, tariff, or GST details as required.</p>' +
           '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Invoice Info. NEXT proceeds to CPC.</div>' +
-          fig("ipt", 8, "Item Information")
+          fig("ipt", 8, "Item Information", 1550, 724)
         },
         { id:"ipt-step-9", label:"Step 9: Complete CPC Information", sub:true, html:
           '<p>Select CPC (C) or use NEXT from Items. Select the required CPC-related options applicable to the declaration, such as AEO, CWC, SEASTORE, STS, STS & CWC, International Permit Exchange, CNB, or Deferred Printing of CO.</p>' +
           '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Items. NEXT proceeds to Summary.</div>' +
-          fig("ipt", 9, "CPC Information")
+          fig("ipt", 9, "CPC Information", 1550, 733)
         },
         { id:"ipt-step-10", label:"Step 10: Review the Declaration Summary", sub:true, html:
           '<p>Select Summary (Y) or use NEXT from CPC. Review the overall declaration summary, item totals, invoice values, CIF value, customs duty, excise duty, GST, other tax, total amount payable, importer information, package details, gross weight, item quantity totals, and declaration references. Enter remarks when required and confirm the declaration statement before submission.</p>' +
           '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to CPC. Summary is the final workflow tab; review all values before using SAVE DRAFT or SUBMIT DECLARATION.</div>' +
-          fig("ipt", 10, "Declaration Summary")
+          fig("ipt", 10, "Declaration Summary", 1550, 725)
         },
         { id:"ipt-step-11", label:"Step 11: Save the Declaration as Draft", sub:true, html:
           '<p>Select SAVE DRAFT when the declaration must be saved without final submission. After a successful save, the system displays a Draft Saved notification confirming that the IPT declaration draft has been saved successfully.</p>' +
           '<div class="note-box"><strong>Note:</strong> SAVE DRAFT stores the current declaration without final submission. The declaration can be opened again for further review or completion.</div>' +
-          fig("ipt", 11, "Draft Saved Confirmation")
+          fig("ipt", 11, "Draft Saved Confirmation", 1550, 727)
         },
         { id:"ipt-step-12", label:"Step 12: Validate and Submit the Declaration", sub:true, html:
           '<p>When all required information is complete, select SUBMIT DECLARATION from the Summary page. The system validates the declaration before submission. After successful validation and submission, confirmation notifications are displayed and the IPT Declaration Management list shows the resulting declaration status.</p>' +
           '<div class="note-box"><strong>Note:</strong> SUBMIT DECLARATION performs final validation and submission. PREVIOUS can be used before submission to revisit earlier information.</div>' +
-          fig("ipt", 12, "Validation Passed and Declaration Submitted")
+          fig("ipt", 12, "Validation Passed and Declaration Submitted", 1550, 727)
         }
       ]
     },
 
     "inp": {
-      subtitle: "Declarations → In-Non-Payment (INP)",
+      header: pdfMasthead("inp", "INP Declaration"),
       sections: [
         { id:"inp-c-1", label:"1. Page Overview", html:
           '<p>The In-Non-Payment (INP) declaration workflow is used by authorized users to create, review, save, validate, and submit INP declarations. The declaration is completed across a sequence of tabs: Shipment Info, Transport Info, Party Info, Invoice Info, Items, CPC, and Summary.</p>'
@@ -1328,78 +1565,78 @@
         { id:"inp-c-appendix", label:"Appendix A – UI Reference", html: "" },
         { id:"inp-step-1", label:"Step 1: Open INP Declaration Management", sub:true, html:
           '<p>From the left navigation menu, expand Declarations and select In-Non-Payment (INP). The INP Declaration Management page displays existing INP declarations, filters, declaration statuses, row-level actions, and list-level controls. Select + NEW DECLARATION to create a new INP declaration.</p>' +
-          fig("inp", 1, "INP Declaration Management - Add New Declaration")
+          fig("inp", 1, "INP Declaration Management - Add New Declaration", 1550, 732)
         },
         { id:"inp-step-2", label:"Step 2: Start a New INP Declaration", sub:true, html:
           '<p>The system opens the INP declaration entry page at Shipment Info (S). Complete the mandatory declaration and shipment fields shown on the page, including Declaration Type, Cargo Type, Release Location, Receipt Location, and other applicable information.</p>' +
           '<div class="note-box"><strong>Note:</strong> Shipment Info is the first declaration tab. Use NEXT to continue to Transport Info after completing the required fields.</div>' +
-          fig("inp", 2, "New INP Declaration - Shipment Info")
+          fig("inp", 2, "New INP Declaration - Shipment Info", 1550, 724)
         },
         { id:"inp-step-3", label:"Step 3: Complete Shipment Information", sub:true, html:
           '<p>Enter or select the required Shipment Info values. Depending on the declaration type, the form may also require Inward Transport Mode, Storage Location, Previous Permit Number, BG Indicator, Blanket Start Date, Supply Indicator, License, Document, and Additional Recipients.</p>' +
           '<div class="note-box"><strong>Note:</strong> Use NEXT to continue from Shipment Info to Transport Info. On later tabs, PREVIOUS can be used to return and correct Shipment Info values.</div>' +
-          fig("inp", 3, "Completed Shipment Information")
+          fig("inp", 3, "Completed Shipment Information", 1550, 644)
         },
         { id:"inp-step-4", label:"Step 4: Complete Transport Information", sub:true, html:
           '<p>Select Transport Info (T) or use NEXT from Shipment Info. Enter cargo details such as Total Package, package UOM, Gross Weight, and weight UOM. Complete applicable inward transport details including Arrival Date, Loading Port, Port Name, Inward Flight Number, aircraft registration number, Inward Master Air Waybill, and container details where required.</p>' +
           '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Shipment Info. NEXT proceeds to Party Info.</div>' +
-          fig("inp", 4, "Transport Information")
+          fig("inp", 4, "Transport Information", 1550, 727)
         },
         { id:"inp-step-5", label:"Step 5: Complete Party Information", sub:true, html:
           '<p>Select Party Info (P) or use NEXT from Transport Info. Enter or verify the declaration parties, including Importer, Inward Carrier, Freight Forwarder, and Declaring Agent. Verify the corresponding UEN values before proceeding.</p>' +
           '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Transport Info. NEXT proceeds to Invoice Info.</div>' +
-          fig("inp", 5, "Party Information")
+          fig("inp", 5, "Party Information", 1550, 730)
         },
         { id:"inp-step-6", label:"Step 6: Complete Invoice Information", sub:true, html:
           '<p>Select Invoice Info (V) or use NEXT from Party Info. Enter the invoice number, invoice date, term type, supplier/manufacturer details, currency, invoice amount, and other applicable charges. Review the calculated CIF, duty, tax, and GST values displayed by the system.</p>' +
           '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Party Info. NEXT proceeds to Items.</div>' +
-          fig("inp", 6, "Invoice Information")
+          fig("inp", 6, "Invoice Information", 1550, 724)
         },
         { id:"inp-step-7", label:"Step 7: Complete Item Information", sub:true, html:
           '<p>Select Items (I) or use NEXT from Invoice Info. Add the required item details such as invoice reference, HAWB or shipment reference, HS Code, description, brand, country of origin, quantity, UOM, item value, currency, and applicable CASC, shipping mark, tariff, or GST information.</p>' +
           '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Invoice Info. NEXT proceeds to CPC.</div>' +
-          fig("inp", 7, "Item Information")
+          fig("inp", 7, "Item Information", 1550, 716)
         },
         { id:"inp-step-8", label:"Step 8: Complete CPC Information", sub:true, html:
           '<p>Select CPC (C) or use NEXT from Items. Select the applicable CPC-related options, such as AEO, CWC, SEASTORE, STS, STS & CWC, International Permit Exchange, CNB, or Deferred Printing of CO.</p>' +
           '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Items. NEXT proceeds to Summary.</div>' +
-          fig("inp", 8, "CPC Information")
+          fig("inp", 8, "CPC Information", 1550, 723)
         },
         { id:"inp-step-9", label:"Step 9: Review the Declaration Summary", sub:true, html:
           '<p>Select Summary (Y) or use NEXT from CPC. Review the declaration totals, number of invoices and items, invoice and item amounts, CIF/FOB values, GST, customs duty, excise duty, other tax, total amount payable, importer details, package details, gross weight, item quantity totals, HAWB number, and declaration references. Enter remarks where required and confirm the declaration statement before final submission.</p>' +
           '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to CPC. Summary is the final workflow tab; review all values before using SAVE DRAFT or SUBMIT DECLARATION.</div>' +
-          fig("inp", 9, "Declaration Summary")
+          fig("inp", 9, "Declaration Summary", 1550, 725)
         },
         { id:"inp-step-10", label:"Step 10: Save the INP Declaration as Draft", sub:true, html:
           '<p>Select SAVE DRAFT when the declaration must be stored without final submission. After a successful save, the system displays a Draft Saved notification confirming that the INP declaration draft has been saved successfully.</p>' +
           '<div class="note-box"><strong>Note:</strong> SAVE DRAFT stores the current declaration without final submission and confirms the save with a Draft Saved notification.</div>' +
-          fig("inp", 10, "Draft Saved Confirmation")
+          fig("inp", 10, "Draft Saved Confirmation", 1550, 735)
         },
         { id:"inp-step-11", label:"Step 11: Validate and Submit the Declaration", sub:true, html:
           '<p>When all required information is complete, select SUBMIT DECLARATION from the Summary page. The system validates the declaration before submission. After successful validation and submission, the system displays Validation Passed and Declaration Submitted notifications and returns to the INP Declaration Management list with the updated status.</p>' +
           '<div class="note-box"><strong>Note:</strong> SUBMIT DECLARATION performs final validation. When validation passes, the declaration is submitted and confirmation notifications are displayed.</div>' +
-          fig("inp", 11, "Validation Passed and Declaration Submitted")
+          fig("inp", 11, "Validation Passed and Declaration Submitted", 1550, 725)
         },
         { id:"inp-step-12", label:"Step 12: Validation Error - Missing Declaration Type", sub:true, html:
           '<p>If a mandatory field is missing, the system prevents successful submission and displays a validation message. In the example shown, the Declaration Type is missing and the system displays a Validation Error instructing the user to select a Declaration Type before saving.</p>' +
           '<div class="note-box"><strong>Note:</strong> Validation errors must be corrected before the declaration can be successfully processed.</div>' +
-          fig("inp", 12, "Validation Error - Declaration Type Required")
+          fig("inp", 12, "Validation Error - Declaration Type Required", 1550, 733)
         },
         { id:"inp-step-13", label:"Step 13: Validation Failed - Required Fields Incomplete", sub:true, html:
           '<p>If required declaration information is incomplete, the system displays Validation Failed and instructs the user to fill in all required fields before validation can proceed.</p>' +
           '<div class="note-box"><strong>Note:</strong> A Validation Failed message indicates that required information is still incomplete.</div>' +
-          fig("inp", 13, "Validation Failed - Required Fields Incomplete")
+          fig("inp", 13, "Validation Failed - Required Fields Incomplete", 1550, 729)
         },
         { id:"inp-step-14", label:"Step 14: Review Detailed Validation Errors", sub:true, html:
           '<p>When validation fails, the system may display a detailed list of missing or invalid fields. Review each listed validation item, return to the relevant declaration tabs, correct the required information, and repeat validation before final submission.</p>' +
           '<div class="note-box"><strong>Note:</strong> Use the detailed validation list to identify all missing fields, then navigate back using PREVIOUS or the declaration tabs to correct them.</div>' +
-          fig("inp", 14, "Detailed Validation Errors")
+          fig("inp", 14, "Detailed Validation Errors", 1550, 727)
         }
       ]
     },
 
     "tnp": {
-      subtitle: "Declarations → Transhipment (TNP)",
+      header: pdfMasthead("tnp", "TNP Declaration"),
       sections: [
         { id:"tnp-c-1", label:"1. Page Overview", html:
           '<p>The Transhipment (TNP) declaration workflow is used by authorized users to create, review, save, validate, and submit transhipment declarations. The declaration is completed across Shipment Info, Transport Info, Party Info, Items, CPC, and Summary.</p>'
@@ -1463,68 +1700,68 @@
         { id:"tnp-c-appendix", label:"Appendix A – UI Reference", html: "" },
         { id:"tnp-step-1", label:"Step 1: Open TNP Declaration Management", sub:true, html:
           '<p>From the left navigation menu, expand Declarations and select Transhipment (TNP). The TNP Declaration Management page displays existing transhipment declarations, filters, statuses, row-level actions, and list-level controls. Select + NEW DECLARATION to create a new TNP declaration.</p>' +
-          fig("tnp", 1, "TNP Declaration Management - Add New Declaration")
+          fig("tnp", 1, "TNP Declaration Management - Add New Declaration", 1550, 735)
         },
         { id:"tnp-step-2", label:"Step 2: Start a New TNP Declaration", sub:true, html:
           '<p>The system opens the TNP declaration entry page at Shipment Info (S). Complete the mandatory declaration and shipment fields such as Declaration Type, Cargo Type, Inward Transport ID, Release Location, Receipt Location, and other applicable information.</p>' +
           '<div class="note-box"><strong>Note:</strong> Shipment Info is the first workflow tab. Use NEXT to continue after completing the required fields.</div>' +
-          fig("tnp", 2, "New TNP Declaration - Shipment Info")
+          fig("tnp", 2, "New TNP Declaration - Shipment Info", 1550, 743)
         },
         { id:"tnp-step-3", label:"Step 3: Validation Error - Missing Declaration Type", sub:true, html:
           '<p>If Declaration Type is not selected, the system prevents the related operation and displays a Validation Error indicating that Declaration Type is required.</p>' +
           '<div class="note-box"><strong>Note:</strong> Correct the Declaration Type before attempting the affected operation again.</div>' +
-          fig("tnp", 3, "Validation Error - Declaration Type Required")
+          fig("tnp", 3, "Validation Error - Declaration Type Required", 1550, 738)
         },
         { id:"tnp-step-4", label:"Step 4: Validation Failed - Required Fields Incomplete", sub:true, html:
           '<p>If required fields are incomplete, the system displays a Validation Failed message and highlights mandatory values that must be completed before submission.</p>' +
           '<div class="note-box"><strong>Note:</strong> Complete the highlighted mandatory fields before attempting submission.</div>' +
-          fig("tnp", 4, "Validation Failed - Required Fields Incomplete")
+          fig("tnp", 4, "Validation Failed - Required Fields Incomplete", 1550, 738)
         },
         { id:"tnp-step-5", label:"Step 5: Review Detailed Validation Errors", sub:true, html:
           '<p>When validation fails, the system may display a detailed list of missing information grouped by section, including Summary, Transport, Cargo, Item, and other validation errors. Correct each listed field before attempting submission again.</p>' +
           '<div class="note-box"><strong>Note:</strong> Use the detailed validation list to identify all missing fields and return to the relevant tabs for correction.</div>' +
-          fig("tnp", 5, "Detailed TNP Validation Errors")
+          fig("tnp", 5, "Detailed TNP Validation Errors", 1550, 747)
         },
         { id:"tnp-step-6", label:"Step 6: Complete Shipment Information", sub:true, html:
           '<p>Enter the required Shipment Info values for the transhipment declaration. The page may include Declaration Type, Cargo Type, Inward Transport ID, Outward Transport ID, Release Location, Receipt Location, Storage Location, Previous Permit Number, BG Indicator, License, Document, and Additional Recipients.</p>' +
           '<div class="note-box"><strong>Note:</strong> Use NEXT to continue from Shipment Info to Transport Info.</div>' +
-          fig("tnp", 6, "Completed TNP Shipment Information")
+          fig("tnp", 6, "Completed TNP Shipment Information", 1550, 746)
         },
         { id:"tnp-step-7", label:"Step 7: Complete Transport Information", sub:true, html:
           '<p>Select Transport Info (T) or use NEXT from Shipment Info. Enter cargo details, inward transport details, outward transport details, departure and arrival information, ports, country of final destination, and container details where applicable.</p>' +
           '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Shipment Info. NEXT proceeds to Party Info.</div>' +
-          fig("tnp", 7, "TNP Transport Information")
+          fig("tnp", 7, "TNP Transport Information", 1550, 743)
         },
         { id:"tnp-step-8", label:"Step 8: Complete Party Information", sub:true, html:
           '<p>Select Party Info (P) or use NEXT from Transport Info. Enter or verify the parties involved in the transhipment declaration, such as Inward Carrier, Outward Carrier, Handling Agent, Declaring Agent, Consignee, and End User where applicable.</p>' +
           '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Transport Info. NEXT proceeds to Items.</div>' +
-          fig("tnp", 8, "TNP Party Information")
+          fig("tnp", 8, "TNP Party Information", 1550, 735)
         },
         { id:"tnp-step-9", label:"Step 9: Complete Item Information", sub:true, html:
           '<p>Select Items (I) or use NEXT from Party Info. Enter the required item information, including inward and outward HAWB/HUCR/HBL references, HS Code, description, brand, country of origin, packing details, quantity, UOM, item value, CASC details, tariff and lot identification, and shipping marks as applicable.</p>' +
           '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Party Info. NEXT proceeds to CPC.</div>' +
-          fig("tnp", 9, "TNP Item Information")
+          fig("tnp", 9, "TNP Item Information", 1550, 746)
         },
         { id:"tnp-step-10", label:"Step 10: Complete CPC Information", sub:true, html:
           '<p>Select CPC (C) or use NEXT from Items. Select the applicable CPC-related options such as AEO, CWC, SEASTORE, STS, STS & CWC, or International Permit Exchange.</p>' +
           '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Items. NEXT proceeds to Summary.</div>' +
-          fig("tnp", 10, "TNP CPC Information")
+          fig("tnp", 10, "TNP CPC Information", 1550, 743)
         },
         { id:"tnp-step-11", label:"Step 11: Review the Declaration Summary", sub:true, html:
           '<p>Select Summary (Y) or use NEXT from CPC. Review the number of items, total CIF/FOB value, total package and package UOM, total gross weight and weight UOM, transport references, remarks, and declaration statement. Confirm that the declaration particulars are true and correct before final submission.</p>' +
           '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to CPC. Summary is the final tab; review all information before using SAVE DRAFT or SUBMIT DECLARATION.</div>' +
-          fig("tnp", 11, "TNP Declaration Summary")
+          fig("tnp", 11, "TNP Declaration Summary", 1550, 741)
         },
         { id:"tnp-step-12", label:"Step 12: Save and Submit the TNP Declaration", sub:true, html:
           '<p>Use SAVE DRAFT when the declaration must be saved without final submission. When all required information is complete, select SUBMIT DECLARATION. After successful processing, the system returns to the TNP Declaration Management page and displays confirmation notifications such as Draft Saved and Declaration Submitted.</p>' +
           '<div class="note-box"><strong>Note:</strong> SAVE DRAFT stores the declaration without final submission. SUBMIT DECLARATION performs final validation and submission.</div>' +
-          fig("tnp", 12, "TNP Draft Saved and Declaration Submitted")
+          fig("tnp", 12, "TNP Draft Saved and Declaration Submitted", 1550, 738)
         }
       ]
     },
 
     "out": {
-      subtitle: "Declarations → Outward (OUT)",
+      header: pdfMasthead("out", "OUT Declaration"),
       sections: [
         { id:"out-c-1", label:"1. Page Overview", html:
           '<p>The Outward (OUT) declaration workflow is used by authorized users to create, review, save, validate, and submit outward TradeNet declarations. The declaration is completed across a sequence of tabs: Shipment Info, Transport Info, Party Info, Invoice, Items, CPC, and Summary.</p>'
@@ -1588,78 +1825,78 @@
         { id:"out-step-1", label:"Step 1: Open OUT Declaration Management", sub:true, html:
           '<p>From the left navigation menu, expand Declarations and select Outward (OUT). The OUT Declaration Management page displays existing outward declarations, filters, statuses, row actions, and declaration-level controls. Select + NEW DECLARATION to begin a new OUT declaration.</p>' +
           '<div class="note-box"><strong>Note:</strong> The management page also provides controls such as Refresh, OUTUPD, Custom Column, Status List, Download Template, and Excel Upload.</div>' +
-          fig("out", 1, "OUT Declaration Management - Add New Declaration")
+          fig("out", 1, "OUT Declaration Management - Add New Declaration", 1550, 723)
         },
         { id:"out-step-2", label:"Step 2: Start a New OUT Declaration", sub:true, html:
           '<p>The system opens the OUT declaration entry page at Shipment Info (S). Complete the mandatory declaration fields, including Declaration Type, Cargo Type, Outward Transport Mode, Release Location, and Receipt Location, together with other shipment information required for the declaration.</p>' +
           '<div class="note-box"><strong>Note:</strong> Select NEXT to continue after the required information has been completed. SAVE DRAFT stores the current declaration without final submission.</div>' +
-          fig("out", 2, "New OUT Declaration - Shipment Info")
+          fig("out", 2, "New OUT Declaration - Shipment Info", 1550, 724)
         },
         { id:"out-step-3", label:"Step 3: Review Validation Error for Missing Declaration Type", sub:true, html:
           '<p>If Declaration Type is not selected, the system displays a Validation Error message stating that Declaration Type is required. The declaration must be corrected before the relevant save or submission action can complete successfully.</p>' +
           '<div class="note-box"><strong>Note:</strong> The screenshot shows the Summary tab with the red Validation Error notification at the top-right.</div>' +
-          fig("out", 3, "Validation Error - Declaration Type Required")
+          fig("out", 3, "Validation Error - Declaration Type Required", 1550, 724)
         },
         { id:"out-step-4", label:"Step 4: Review Draft Save and Validation Failed Notifications", sub:true, html:
           '<p>The application can confirm that the draft was saved while also indicating that required fields are still incomplete. A green Draft Saved notification confirms storage of the draft, while the red Validation Failed notification indicates that the declaration is not ready for final submission.</p>' +
           '<div class="note-box"><strong>Note:</strong> Saving a draft is independent from successful final submission validation.</div>' +
-          fig("out", 4, "Draft Saved and Validation Failed Notifications")
+          fig("out", 4, "Draft Saved and Validation Failed Notifications", 1550, 733)
         },
         { id:"out-step-5", label:"Step 5: Review Detailed Validation Failures", sub:true, html:
           '<p>When final validation fails, review the detailed validation panel displayed below the Summary section. The panel lists missing or invalid information, such as required declaration/cargo fields, transport mode, departure date, discharge port, or final destination country.</p>' +
           '<div class="note-box"><strong>Note:</strong> Correct every identified error before attempting SUBMIT DECLARATION again.</div>' +
-          fig("out", 5, "Detailed Validation Failure Messages")
+          fig("out", 5, "Detailed Validation Failure Messages", 1550, 727)
         },
         { id:"out-step-6", label:"Step 6: Complete Shipment Information", sub:true, html:
           '<p>Enter or verify the Shipment Info values for the OUT declaration. The completed example includes Declaration Type, Cargo Type, Inward Transport Mode, Outward Transport Mode, Release Location, Receipt Location, and Certificate of Origin details where applicable.</p>' +
           '<div class="note-box"><strong>Note:</strong> Additional shipment controls such as previous permit number, checks, recipients, license, and document may be completed depending on the declaration scenario.</div>' +
-          fig("out", 6, "Completed Shipment Information")
+          fig("out", 6, "Completed Shipment Information", 1550, 715)
         },
         { id:"out-step-7", label:"Step 7: Complete Transport Information", sub:true, html:
           '<p>Select Transport Info (T) or use NEXT from Shipment Info. Enter cargo details such as Total Package, package UOM, Gross Weight and UOM. Complete inward and outward transport means, voyage details, loading/discharge ports, country of final destination, additional vessel information, and container details when applicable.</p>' +
           '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Shipment Info. NEXT proceeds to Party Info.</div>' +
-          fig("out", 7, "Transport Information")
+          fig("out", 7, "Transport Information", 1550, 724)
         },
         { id:"out-step-8", label:"Step 8: Complete Party Information", sub:true, html:
           '<p>Select Party Info (P) or use NEXT from Transport Info. Enter or verify the parties involved in the outward declaration, including Importer, Inward Carrier, Freight Forwarder, Outward Carrier, Declaring Agent, Exporter, Consignee, End User, and Manufacturer where applicable. Verify UEN and address information before proceeding.</p>' +
           '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Transport Info. NEXT proceeds to Invoice.</div>' +
-          fig("out", 8, "Party Information")
+          fig("out", 8, "Party Information", 1550, 633)
         },
         { id:"out-step-9", label:"Step 9: Complete Invoice Information", sub:true, html:
           '<p>Select Invoice (V) or use NEXT from Party Info. Enter the invoice number, invoice date, term type, supplier/manufacturer party, currency, invoice amount, and applicable freight, insurance, duties, tax, and GST information. Review calculated CIF and other totals shown by the system.</p>' +
           '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Party Info. NEXT proceeds to Items.</div>' +
-          fig("out", 9, "Invoice Information")
+          fig("out", 9, "Invoice Information", 1550, 724)
         },
         { id:"out-step-10", label:"Step 10: Complete Item Information", sub:true, html:
           '<p>Select Items (I) or use NEXT from Invoice. Add the required item data, including inward/outward HAWB or shipment references where applicable, HS Code, description, brand, country of origin, quantity, UOM, item value, and related CASC, certificate-of-origin, shipping mark, tariff, or GST information.</p>' +
           '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Invoice. NEXT proceeds to CPC.</div>' +
-          fig("out", 10, "Item Information")
+          fig("out", 10, "Item Information", 1550, 724)
         },
         { id:"out-step-11", label:"Step 11: Complete CPC Information", sub:true, html:
           '<p>Select CPC (C) or use NEXT from Items. Choose the CPC-related options applicable to the declaration, such as AEO, CWC, SEASTORE, STS, STS & CWC, International Permit Exchange, CNB, or Deferred Printing of CO. Where AEO is selected, enter the required process codes.</p>' +
           '<div class="note-box"><strong>Note:</strong> PREVIOUS returns to Items. NEXT proceeds to Summary.</div>' +
-          fig("out", 11, "CPC Information")
+          fig("out", 11, "CPC Information", 1550, 727)
         },
         { id:"out-step-12", label:"Step 12: Review the Declaration Summary and Save Draft", sub:true, html:
           '<p>Select Summary (Y) or use NEXT from CPC. Review the number of items, invoice amount, item amount, Total Invoice CIF Value, Total CIF/FOB Value, package and gross weight summary, inward/outward transport, remarks, and declaration statement. Use SAVE DRAFT when the declaration must be stored without final submission.</p>' +
           '<div class="note-box"><strong>Note:</strong> The green Draft Saved notification confirms that the OUT declaration draft was saved successfully. Confirm the declaration statement before final submission when required.</div>' +
-          fig("out", 12, "Declaration Summary - Draft Saved")
+          fig("out", 12, "Declaration Summary - Draft Saved", 1550, 728)
         },
         { id:"out-step-13", label:"Step 13: Validate and Submit the OUT Declaration", sub:true, html:
           '<p>After all mandatory information is complete, select SUBMIT DECLARATION from the Summary page. The system performs final validation. When validation succeeds, the application displays confirmation messages and returns to the OUT Declaration Management list.</p>' +
           '<div class="note-box"><strong>Note:</strong> The example shows Draft Saved, Validation Passed, and Declaration Submitted notifications. The submitted declaration appears in the list with status SUB.</div>' +
-          fig("out", 13, "Validation Passed and Declaration Submitted")
+          fig("out", 13, "Validation Passed and Declaration Submitted", 1550, 721)
         },
         { id:"out-step-14", label:"Step 14: Verify the Submitted Declaration in Management", sub:true, html:
           '<p>Confirm that the submitted declaration appears in OUT Declaration Management with the expected Message Ref, Declaration Type, Message Type, sequence information, creator, and resulting status. Use the available row actions according to the user&rsquo;s permissions and the declaration status.</p>' +
           '<div class="note-box"><strong>Note:</strong> A successfully submitted declaration is shown with status SUB in the example.</div>' +
-          fig("out", 14, "Submitted OUT Declaration in Management List")
+          fig("out", 14, "Submitted OUT Declaration in Management List", 1550, 719)
         }
       ]
     },
 
     "coo": {
-      subtitle: "Declarations → Certificate of Origin (COO)",
+      header: pdfMasthead("coo", "COO Declaration"),
       sections: [
         { id:"coo-c-1", label:"1. Document Overview", html:
           '<p>The Certificate of Origin (COO) declaration workflow is used by authorized users to create, review, save, validate, and submit Certificate of Origin declarations. The workflow is completed across Header & Certificate, Transport Info, Party Info, Items, and Summary.</p>'
@@ -1721,43 +1958,678 @@
         { id:"coo-c-appendix", label:"Appendix A – UI Reference", html: "" },
         { id:"coo-step-1", label:"Step 1: Open COO Declaration Management", sub:true, html:
           '<p>From the left navigation menu, expand Declarations and select Certificate of Origin (COO). The COO Declaration Management page displays existing declarations, filters, status information, certificate numbers, row actions, and declaration-level controls. Select + NEW DECLARATION to begin a new COO declaration.</p>' +
-          fig("coo", 1, "COO Declaration Management - Add New Declaration")
+          fig("coo", 1, "COO Declaration Management - Add New Declaration", 1550, 730)
         },
         { id:"coo-step-2", label:"Step 2: Start a New COO Declaration", sub:true, html:
           '<p>The system opens the declaration entry page at Header & Certificate (H). Complete the mandatory declaration information, including Outward Transport Mode, CO Type, Certificate Detail #1 Type, number of copies where applicable, currency, certificate additional information, and transport details required by the selected certificate scenario.</p>' +
-          fig("coo", 2, "New COO Declaration - Header & Certificate")
+          fig("coo", 2, "New COO Declaration - Header & Certificate", 1550, 738)
         },
         { id:"coo-step-3", label:"Step 3: Review Validation Failure on Incomplete Declaration", sub:true, html:
           '<p>If the user attempts final submission while mandatory information is incomplete, the system displays Validation Failed. The Summary also shows the declaration statement, which must be confirmed before successful submission. A draft may still be saved where allowed.</p>' +
-          fig("coo", 3, "Validation Failed - Summary")
+          fig("coo", 3, "Validation Failed - Summary", 1550, 786)
         },
         { id:"coo-step-4", label:"Step 4: Review Detailed Validation Messages", sub:true, html:
           '<p>The detailed validation panel lists the missing required information that must be corrected before submission. The example identifies requirements such as Declaration Indicator, Application Product Type, Certificate Type, Outward Transport Mode, Departure Date, Discharge Port, Country of Final Destination, Exporter ID, Exporter Name, Exporter Address, Consignee Name, and Consignee Address.</p>' +
-          fig("coo", 4, "Detailed Validation Failed Message")
+          fig("coo", 4, "Detailed Validation Failed Message", 1550, 744)
         },
         { id:"coo-step-5", label:"Step 5: Complete Transport Information", sub:true, html:
           '<p>Select Transport Info (T) or use NEXT from Header & Certificate. Enter the applicable outward transport information. The example includes Flight Number, Departure Date, Discharge Port, Country of Final Destination, and optional Aircraft Registration Number.</p>' +
-          fig("coo", 5, "COO Transport Information")
+          fig("coo", 5, "COO Transport Information", 1550, 777)
         },
         { id:"coo-step-6", label:"Step 6: Complete Party Information", sub:true, html:
           '<p>Select Party Info (P) or use NEXT from Transport Info. Enter or verify Freight Forwarder, Outward Carrier, Declaring Agent, Exporter, Consignee, and Manufacturer information as applicable. Verify UEN and address details before proceeding.</p>' +
-          fig("coo", 6, "COO Party Information")
+          fig("coo", 6, "COO Party Information", 1550, 766)
         },
         { id:"coo-step-7", label:"Step 7: Complete Item Information", sub:true, html:
           '<p>Select Items (I) or use NEXT from Party Info. Add the required item details including HS Code, country of origin, description, currency, quantity, UOM, item value, and Certificate of Origin item details such as certificate quantity, manufacturing cost date, invoice number/date, origin criteria, content percent, and certificate item description.</p>' +
-          fig("coo", 7, "COO Item Information")
+          fig("coo", 7, "COO Item Information", 1550, 747)
         },
         { id:"coo-step-8", label:"Step 8: Review the Declaration Summary", sub:true, html:
           '<p>Select Summary (S) or use NEXT from Items. Review the number of items and the Declaration Indicator section. Confirm the declaration statement stating that the particulars in the application are true and correct before submission.</p>' +
-          fig("coo", 8, "COO Declaration Summary")
+          fig("coo", 8, "COO Declaration Summary", 1550, 758)
         },
         { id:"coo-step-9", label:"Step 9: Save the Declaration as Draft", sub:true, html:
           '<p>Select SAVE DRAFT when the COO declaration must be saved without final submission. After a successful save, the system displays a Draft Saved notification confirming that the COO declaration draft has been saved successfully.</p>' +
-          fig("coo", 9, "COO Draft Saved Confirmation")
+          fig("coo", 9, "COO Draft Saved Confirmation", 1550, 683)
         },
         { id:"coo-step-10", label:"Step 10: Validate and Submit the COO Declaration", sub:true, html:
           '<p>When all required information is complete, select SUBMIT DECLARATION from Summary. After successful submission, the system displays a Declaration Submitted confirmation and returns to COO Declaration Management, where the submitted declaration is shown with status SUB.</p>' +
-          fig("coo", 10, "COO Declaration Submitted")
+          fig("coo", 10, "COO Declaration Submitted", 1550, 625)
+        }
+      ]
+    },
+
+    "introduction": {
+      header: pdfMasthead("introduction", "Introduction to the Tradenix Application"),
+      sections: [
+        { id:"introduction-c-1", label:"Overview", html:
+          '<p>Tradenix is a centralized customs declaration management application designed to support the end-to-end handling of declaration-related activities within a controlled and structured environment. It provides authorized users with a single platform to review declaration information, manage operational master data, monitor status conditions, and perform declaration actions according to assigned roles and permissions.</p>' +
+          '<p>The application is designed for freight forwarding and customs operations where multiple users, departments, forwarders, and mailboxes need to be managed with clear access control. Tradenix uses role- and permission-based authorization so that each user can access only the functions and operations permitted for their assigned responsibility.</p>' +
+          '<p>Through the Dashboard, users can monitor declaration activity and review status conditions such as Approved Permit, Rejected, Awaiting, and Amendment. The dashboard presents declaration summaries for Today, This Week, and This Month, helping users quickly understand current and recent declaration activity.</p>' +
+          '<p>Tradenix also supports declaration management activities such as creating, viewing, cloning, editing, and deleting declarations where the assigned permission allows the operation. Administrative modules support the management of users, forwarders, departments, mailboxes, roles, permissions, and related configuration data required for declaration processing.</p>' +
+          '<p>The application provides a consistent workflow for operational and administrative users while improving visibility, traceability, data organization, and control over customs declaration activities.</p>'
+        }
+      ]
+    },
+
+    "purpose": {
+      header: pdfMasthead("purpose", "Purpose of the Tradenix Application"),
+      sections: [
+        { id:"purpose-c-1", label:"Overview", html:
+          '<p>Tradenix is designed to streamline and manage customs declaration activities within a centralized platform. The application helps freight forwarding and customs operations teams efficiently create, process, review, and manage import and export declarations.</p>' +
+          '<p>The system provides role-based access control to ensure that users can perform only the actions permitted for their assigned roles and responsibilities. It also supports the management of users, forwarders, departments, mailboxes, declarations, reports, and related operational data.</p>' +
+          '<p>The primary purpose of Tradenix is to:</p>' +
+          '<ul>' +
+          '<li>Simplify the customs declaration process.</li>' +
+          '<li>Reduce manual effort and operational errors.</li>' +
+          '<li>Provide controlled access through roles and permissions.</li>' +
+          '<li>Maintain accurate and organized declaration records.</li>' +
+          '<li>Improve visibility into declaration status and processing activities.</li>' +
+          '<li>Support administrative management of users, forwarders, departments, and mailboxes.</li>' +
+          '<li>Provide a consistent and secure workflow for customs declaration operations.</li>' +
+          '<li>Improve overall efficiency, traceability, and compliance in customs-related activities.</li>' +
+          '</ul>'
+        }
+      ]
+    },
+
+    "scope": {
+      header: pdfMasthead("scope", "Scope of the Tradenix Application"),
+      sections: [
+        { id:"scope-c-1", label:"Overview", html:
+          '<p>The scope of the Tradenix application is to provide a centralized platform for managing customs declaration activities, user access, operational master data, declaration processing, status tracking, and reporting.</p>' +
+          '<ul>' +
+          '<li><strong>Dashboard Monitoring:</strong> Displays declaration activity and status summaries for Today, This Week, and This Month, including statuses such as Approved Permit, Rejected, Awaiting, and Amendment.</li>' +
+          '<li><strong>Declaration Management:</strong> Supports the creation, viewing, cloning, editing, and deletion of declarations based on the permissions assigned to the user.</li>' +
+          '<li><strong>Status Tracking:</strong> Allows users to monitor the current status of declarations and review declaration processing outcomes.</li>' +
+          '<li><strong>User Management:</strong> Enables authorized administrators to onboard users, assign organization roles, and manage user access.</li>' +
+          '<li><strong>Role and Permission Management:</strong> Controls access to application functions based on assigned roles and permissions.</li>' +
+          '<li><strong>Forwarder Management:</strong> Maintains freight forwarder-related master data used within the application.</li>' +
+          '<li><strong>Department Management:</strong> Allows departments to be configured and associated with the relevant forwarders.</li>' +
+          '<li><strong>Mailbox Management:</strong> Supports mailbox configuration and mapping to departments for operational use.</li>' +
+          '<li><strong>Reports and Operational Visibility:</strong> Provides access to declaration-related information and reports based on the user\'s assigned permissions.</li>' +
+          '<li><strong>Controlled Access:</strong> Ensures that protected functions and system operations are available only to authorized users.</li>' +
+          '</ul>' +
+          '<p>The overall scope of Tradenix is to improve the efficiency, accuracy, traceability, and control of customs declaration operations while providing a structured workflow for administrators, declarants, reporting users, and other authorized personnel.</p>'
+        }
+      ]
+    },
+
+    "users": {
+      header: pdfMasthead("users", "Management User Page Documentation"),
+      sections: [
+        { id:"users-c-1", label:"1. Page Overview", html:
+          '<p>The Onboard User page is used by an authorized administrator to create a new Tradenix user and assign the appropriate organization-level and forwarder-specific access permissions.</p>'
+        },
+        { id:"users-c-2", label:"2. Navigation", html:
+          '<p><strong>Expected navigation path:</strong></p><ul><li>Management → Users → Create Onboard User</li></ul>'
+        },
+        { id:"users-c-3-1", label:"3.1 User Details", html:
+          '<table><thead><tr><th>Field</th><th>Required</th><th>Input Type</th><th>Purpose</th><th>Expected Validation</th></tr></thead><tbody>' +
+          '<tr><td>Username</td><td>Yes (*)</td><td>Text</td><td>Unique login/user name for the new user.</td><td>Should not be blank; uniqueness and permitted-character rules should be enforced.</td></tr>' +
+          '<tr><td>Email</td><td>Yes (*)</td><td>Email/Text</td><td>Email address associated with the user account.</td><td>Required and should follow valid email format.</td></tr>' +
+          '<tr><td>Password</td><td>Yes (*)</td><td>Password</td><td>Initial password for the new user.</td><td>Required; password policy such as minimum length/complexity should be enforced.</td></tr>' +
+          '<tr><td>Confirm Password</td><td>Yes (*)</td><td>Password</td><td>Confirms the password entered above.</td><td>Must match the Password field.</td></tr>' +
+          '</tbody></table>' +
+          '<p>Password visibility: The eye icon beside Password and Confirm Password should allow the user to show/hide the entered password without changing its value.</p>'
+        },
+        { id:"users-c-3-2", label:"3.2 Organization Roles", html:
+          '<p>This section allows the administrator to assign organization-level roles to the user. The screenshot shows the following selectable roles:</p>' +
+          '<ul><li>REPORT_ADMIN</li><li>SUPER_ADMIN</li><li>DECLARANT</li></ul>' +
+          '<p>Role behavior should be controlled by the application\'s authorization model. A user may be assigned one or more roles if the business rules permit it.</p>' +
+          '<div class="note-box"><strong>IMPORTANT – Protected System Roles:</strong> ADMIN, SUPER_ADMIN, REPORT_ADMIN, and DECLARANT are core system roles. The role definitions must not be edited or deleted from Roles &amp; Permissions. User-to-role assignments may be changed when authorized, but the underlying system roles must remain intact.</div>'
+        },
+        { id:"users-c-3-3", label:"3.3 Forwarder Management", html:
+          '<p>Forwarder Access is used to map a user to an already configured forwarder. Before a forwarder can be assigned to a user, the master configuration must be completed in this order: 1) create the Forwarder, 2) create the Department under that Forwarder, and 3) create the Mailbox under the Department. Only after these dependencies exist should the administrator use + ADD FORWARDER to map the forwarder/department access to the user.</p>' +
+          '<p>Available action: “+ ADD FORWARDER”</p>' +
+          '<div class="note-box"><strong>IMPORTANT – Forwarder Mapping Dependency:</strong> Forwarder → Department → Mailbox must be created in this exact order before the forwarder can be mapped to a user. If any one of these master records is missing, the forwarder assignment should be blocked or unavailable.</div>' +
+          '<p>A user may be created without Forwarder Access. However, without a mapped Forwarder, Department, and Mailbox, the user will not have the operational context required to perform forwarder-related activities. The account can exist and the user can sign in according to assigned organization-level permissions, but forwarder-dependent operations must remain unavailable until the required mapping is completed.</p>'
+        },
+        { id:"users-c-4", label:"4. Page Controls", html:
+          '<table><thead><tr><th>Control</th><th>Type</th><th>Function</th><th>Expected Behavior</th></tr></thead><tbody>' +
+          '<tr><td>Password eye icon</td><td>Icon button</td><td>Show/hide password</td><td>Toggles password visibility.</td></tr>' +
+          '<tr><td>Confirm Password eye icon</td><td>Icon button</td><td>Show/hide confirmation</td><td>Toggles confirmation password visibility.</td></tr>' +
+          '<tr><td>ADD FORWARDER</td><td>Action button/link</td><td>Add forwarder access</td><td>Opens the forwarder access configuration flow.</td></tr>' +
+          '<tr><td>CANCEL</td><td>Button</td><td>Discard creation</td><td>Leaves the create-user flow without creating the user; unsaved-data handling should follow application rules.</td></tr>' +
+          '<tr><td>CREATE USER</td><td>Primary button</td><td>Create account</td><td>Creates the user after all required fields, roles/access rules, and validations pass.</td></tr>' +
+          '</tbody></table>'
+        },
+        { id:"users-c-5", label:"5. Validation Requirements", html:
+          '<ul>' +
+          '<li>All fields marked with * should be treated as mandatory.</li>' +
+          '<li>Username should not accept blank/whitespace-only input.</li>' +
+          '<li>Username should satisfy the application\'s allowed-character and uniqueness rules.</li>' +
+          '<li>Email should be validated against the application\'s accepted email format.</li>' +
+          '<li>Password should satisfy the configured password policy.</li>' +
+          '<li>Confirm Password should exactly match Password.</li>' +
+          '<li>Invalid or incomplete data should prevent user creation.</li>' +
+          '<li>Validation messages should be displayed close to the relevant field and should be understandable to the administrator.</li>' +
+          '<li>Create User should remain unavailable/disabled when mandatory information is incomplete, where that is the intended UI behavior.</li>' +
+          '<li>Selected organization roles and forwarder permissions should be persisted correctly after successful creation.</li>' +
+          '</ul>' +
+          '<p>Forwarder assignment prerequisite: the selected Forwarder must already exist, the required Department must already exist under that Forwarder, and the required Mailbox must already exist under that Department. The system should prevent incomplete or invalid mappings.</p>' +
+          '<p>User creation without Forwarder Access is permitted. In that state, forwarder-dependent actions must remain unavailable until a valid Forwarder → Department → Mailbox mapping is added to the user.</p>' +
+          '<ul><li><strong>Protected-role safeguard:</strong> ADMIN, SUPER_ADMIN, REPORT_ADMIN, and DECLARANT must not be editable or deletable as role definitions. The UI and API should block these operations even if attempted directly.</li></ul>'
+        },
+        { id:"users-c-7", label:"7. Suggested User Onboarding Flow", html:
+          '<ol>' +
+          '<li>Open Management → Users.</li>' +
+          '<li>Select + ONBOARD USER.</li>' +
+          '<li>Enter Username/Name.</li>' +
+          '<li>Enter Email.</li>' +
+          '<li>Enter Password.</li>' +
+          '<li>Enter Confirm Password.</li>' +
+          '<li>Select the required Role(s) in the Organization.</li>' +
+          '<li>Decide whether Forwarder Access is required.</li>' +
+          '<li>If Forwarder Access is required, ensure the master data is created in the correct order: Forwarder → Department → Mailbox.</li>' +
+          '<li>Select + ADD FORWARDER.</li>' +
+          '<li>Select the required Forwarder.</li>' +
+          '<li>Select the corresponding Department.</li>' +
+          '<li>Verify that the related Mailbox configuration already exists for the selected Department.</li>' +
+          '<li>Assign the applicable forwarder/department role or access.</li>' +
+          '<li>Review the user details, organization role(s), and forwarder mapping.</li>' +
+          '<li>Select CREATE USER.</li>' +
+          '<li>The system validates the mandatory fields, password confirmation, role assignments, and forwarder mapping where applicable.</li>' +
+          '<li>If validation succeeds, the user is created successfully.</li>' +
+          '<li>If validation fails, the system displays the relevant validation messages and the user must correct the required details.</li>' +
+          '<li>Verify the newly created user in the User Management list.</li>' +
+          '<li>If the user is created without Forwarder Access, the user can still be created, but Forwarder → Department → Mailbox mapping must be completed later before forwarder-dependent operations can be performed.</li>' +
+          '<li>Protected system roles such as ADMIN, SUPER_ADMIN, REPORT_ADMIN, and DECLARANT must not be edited or deleted.</li>' +
+          '</ol>'
+        },
+        { id:"users-c-appendix", label:"Appendix A – UI Reference", html: "" },
+        { id:"users-step-1", label:"Step 1: Admin User Login", sub:true, html:
+          '<p>The Admin User logs into the application using valid login credentials.</p>' +
+          fig("users", 1, "Login", 1599, 796)
+        },
+        { id:"users-step-2", label:"Step 2: Dashboard", sub:true, html:
+          '<p>After successful login, the Admin User is redirected to the Dashboard page.</p>' +
+          fig("users", 2, "Dashboard", 1599, 813)
+        },
+        { id:"users-step-3", label:"Step 3: Managements", sub:true, html:
+          '<p>Click on Managements from the dashboard, then select User. The system navigates to the Onboard User page.</p>'
+        },
+        { id:"users-step-4", label:"Step 4: Create Onboard User", sub:true, html:
+          '<p>Click the highlighted + ONBOARD USER button on the User Management page. The system navigates to the Onboard User / Create User page.</p>' +
+          '<p>Fill in all the mandatory fields on the Create User page. The Create button will be enabled only after all mandatory fields have been completed.</p>' +
+          fig("users", 3, "Create Onboard User", 1600, 810)
+        },
+        { id:"users-step-5", label:"Step 5: Complete User Details and Create User", sub:true, html:
+          '<p>Fill in all the mandatory fields on the Create User page, including:</p>' +
+          '<ul><li>Name</li><li>Email</li><li>Password</li><li>Confirm Password</li><li>Role in the Organization</li></ul>' +
+          '<p>Select the required Organization Role(s). Forwarder Management may be left empty when it is not required at creation time. Once all mandatory user fields are completed, click the highlighted CREATE USER button to create the account.</p>' +
+          fig("users", 4, "Onboard User Page", 1600, 810) +
+          fig("users", 5, "Create button enabled", 1600, 802) +
+          fig("users", 6, "Onboard User Create Successfully", 1599, 719)
+        },
+        { id:"users-step-6", label:"Step 6: Configure Forwarder Management", sub:true, html:
+          '<p>Before configuring Forwarder Access, ensure the master data exists in this order: 1) Forwarder, 2) Department, 3) Mailbox. Then click the highlighted + ADD FORWARDER button and map the available Forwarder and Department to the user. A user may exist without this mapping, but forwarder-dependent operational actions will not be available until the mapping is completed.</p>' +
+          fig("users", 7, "Add Forwarder Management", 1586, 786) +
+          fig("users", 8, "Create button enabled", 1600, 808) +
+          fig("users", 9, "Onboard User Create Successfully", 1600, 789) +
+          '<div class="note-box"><strong>IMPORTANT:</strong> If a user is created without Forwarder Management, the account is valid, but the user will not be able to carry out forwarder-specific operations until a valid Forwarder → Department → Mailbox mapping is assigned.</div>'
+        },
+        { id:"users-step-7", label:"Step 7: User List – Actions", sub:true, html:
+          '<p>The User List page displays the available users along with the following action buttons:</p>' +
+          '<ul>' +
+          '<li><strong>View</strong> – To view the user details.</li>' +
+          '<li><strong>Edit</strong> – To modify or update the user details.</li>' +
+          '<li><strong>Activate</strong> – To activate the user account.</li>' +
+          '<li><strong>Delete</strong> – To delete the user account.</li>' +
+          '</ul>' +
+          '<div class="note-box"><strong>Note:</strong> Role protection is a system integrity requirement. If a protected role is removed or altered, users assigned to that role may lose the permissions required to execute Tradenix operations.</div>'
+        }
+      ]
+    },
+
+    "forwarders": {
+      header: pdfMasthead("forwarders", "Forwarder Onboarding Page Documentation"),
+      sections: [
+        { id:"forwarders-c-1", label:"1. Page Overview", html:
+          '<p>The Forwarder Onboarding page is used by an authorized administrator to create a new freight forwarding company and configure its departments and mailboxes.</p>' +
+          '<p>The page allows the administrator to enter the forwarder’s basic details, add departments, and configure mailbox information required for the forwarder.</p>'
+        },
+        { id:"forwarders-c-2", label:"2. Navigation", html:
+          '<p><strong>Expected navigation path:</strong></p><ul><li>Management → Forwarders → Onboard Forwarder</li></ul>'
+        },
+        { id:"forwarders-c-3-1", label:"3.1 Forwarder Details", html:
+          '<table><thead><tr><th>Field</th><th>Required</th><th>Input Type</th><th>Purpose</th><th>Expected Validation</th></tr></thead><tbody>' +
+          '<tr><td>Name</td><td>Yes (*)</td><td>Text</td><td>Name of the forwarding company.</td><td>Should not be blank.</td></tr>' +
+          '<tr><td>Primary Contact Email</td><td>Yes (*)</td><td>Email/Text</td><td>Email address associated with the forwarder.</td><td>Required and should follow a valid email format.</td></tr>' +
+          '<tr><td>UEN Number</td><td>Yes (*)</td><td>Text</td><td>Unique Entity Number of the forwarder.</td><td>Required; format and uniqueness rules should be confirmed with the application specification.</td></tr>' +
+          '</tbody></table>' +
+          '<div class="note-box"><strong>Note:</strong> The exact validation rules for UEN and email should be confirmed against the application\'s functional specification or API behavior.</div>'
+        },
+        { id:"forwarders-c-3-2", label:"3.2 Departments &amp; Mailboxes", html:
+          '<p>This section allows the administrator to configure departments and their associated mailboxes for the forwarder.</p>' +
+          '<p>Available action:</p><ul><li>+ ADD DEPARTMENT</li></ul>' +
+          '<p>When a department is added, the page displays its department details and mailbox configuration.</p>'
+        },
+        { id:"forwarders-c-3-3", label:"3.3 Department Details", html:
+          '<table><thead><tr><th>Field</th><th>Required</th><th>Input Type</th><th>Purpose</th><th>Expected Validation</th></tr></thead><tbody>' +
+          '<tr><td>Department Name</td><td>Yes (*)</td><td>Text</td><td>Name of the department.</td><td>Should not be blank.</td></tr>' +
+          '<tr><td>Department Code</td><td>Yes (*)</td><td>Text</td><td>Code used to identify the department.</td><td>Required; uniqueness and format rules should be confirmed.</td></tr>' +
+          '</tbody></table>' +
+          '<p>Example shown in the screenshot:</p>' +
+          '<ul><li>Department Name: IMPORT</li><li>Department Code: IMP</li></ul>'
+        },
+        { id:"forwarders-c-3-4", label:"3.4 Mailboxes", html:
+          '<p>Each department can contain one or more mailboxes.</p>' +
+          '<p>Available action:</p><ul><li>+ ADD MAILBOX</li></ul>' +
+          '<table><thead><tr><th>Field</th><th>Required</th><th>Input Type</th><th>Purpose</th><th>Expected Validation</th></tr></thead><tbody>' +
+          '<tr><td>TradeNet Account Name</td><td>Yes (*)</td><td>Text</td><td>TradeNet account name associated with the mailbox.</td><td>Should not be blank.</td></tr>' +
+          '<tr><td>TradeNet Mailbox ID</td><td>Yes (*)</td><td>Text</td><td>Identifier of the TradeNet mailbox.</td><td>Required; format and uniqueness rules should be confirmed.</td></tr>' +
+          '<tr><td>Password</td><td>Yes (*)</td><td>Password</td><td>Password associated with the mailbox.</td><td>Required; should be securely handled.</td></tr>' +
+          '<tr><td>Declarant Code</td><td>Yes (*)</td><td>Text</td><td>Code identifying the declarant.</td><td>Required.</td></tr>' +
+          '<tr><td>Declarant Name</td><td>Yes (*)</td><td>Text</td><td>Name of the declarant.</td><td>Required.</td></tr>' +
+          '<tr><td>Declarant Company UEN</td><td>Yes (*)</td><td>Text</td><td>UEN of the declarant company.</td><td>Required; format rules should be confirmed.</td></tr>' +
+          '<tr><td>Declarant Company Name</td><td>Yes (*)</td><td>Text</td><td>Name of the declarant company.</td><td>Required.</td></tr>' +
+          '<tr><td>Declarant Telephone</td><td>Yes (*)</td><td>Text</td><td>Telephone number of the declarant.</td><td>Required; accepted format should be confirmed.</td></tr>' +
+          '</tbody></table>' +
+          '<p>Example values shown in the screenshot:</p>' +
+          '<ul>' +
+          '<li>TradeNet Account Name: XYZ</li>' +
+          '<li>TradeNet Mailbox ID: 12C678987N</li>' +
+          '<li>Declarant Code: XXX</li>' +
+          '<li>Declarant Name: XXXXXXXX</li>' +
+          '<li>Declarant Company UEN: S8945571E</li>' +
+          '<li>Declarant Company Name: YYYYYYYYY</li>' +
+          '<li>Declarant Telephone: 987654321</li>' +
+          '</ul>'
+        },
+        { id:"forwarders-c-3-5", label:"3.5 Department and Mailbox Controls", html:
+          '<table><thead><tr><th>Control</th><th>Type</th><th>Function</th><th>Expected Behavior</th></tr></thead><tbody>' +
+          '<tr><td>Expand / Collapse</td><td>Icon button</td><td>Show or hide department details.</td><td>Toggles the department section.</td></tr>' +
+          '<tr><td>Delete Department</td><td>Icon button</td><td>Remove a department.</td><td>Removes the selected department, subject to confirmation and application rules.</td></tr>' +
+          '<tr><td>Add Department</td><td>Action button</td><td>Add a new department.</td><td>Opens or adds a department configuration section.</td></tr>' +
+          '<tr><td>Add Mailbox</td><td>Action button</td><td>Add a mailbox to a department.</td><td>Adds a new mailbox configuration section.</td></tr>' +
+          '<tr><td>Delete Mailbox</td><td>Icon button</td><td>Remove a mailbox.</td><td>Removes the selected mailbox, subject to confirmation and application rules.</td></tr>' +
+          '</tbody></table>'
+        },
+        { id:"forwarders-c-4", label:"4. Page Controls", html:
+          '<table><thead><tr><th>Control</th><th>Type</th><th>Function</th><th>Expected Behavior</th></tr></thead><tbody>' +
+          '<tr><td>CANCEL</td><td>Button</td><td>Discard creation.</td><td>Leaves the onboarding flow without creating the forwarder.</td></tr>' +
+          '<tr><td>CREATE FORWARDER</td><td>Primary button</td><td>Create the forwarder.</td><td>Creates the forwarder after all required fields and validations pass.</td></tr>' +
+          '</tbody></table>'
+        },
+        { id:"forwarders-c-5", label:"5. Validation Requirements", html:
+          '<ul>' +
+          '<li>All fields marked with * should be treated as mandatory.</li>' +
+          '<li>Forwarder Name should not accept blank or whitespace-only input.</li>' +
+          '<li>Primary Contact Email should be validated against the application\'s accepted email format.</li>' +
+          '<li>UEN Number should satisfy the application\'s format and uniqueness rules.</li>' +
+          '<li>Department Name and Department Code should be validated.</li>' +
+          '<li>Mailbox fields should be validated before submission.</li>' +
+          '<li>Invalid or incomplete data should prevent forwarder creation.</li>' +
+          '<li>Validation messages should be displayed close to the relevant field and should be understandable to the administrator.</li>' +
+          '<li>The Create Forwarder button should remain unavailable or disabled when mandatory information is incomplete, where that is the intended UI behavior.</li>' +
+          '<li>Selected departments and mailboxes should be persisted correctly after successful creation.</li>' +
+          '</ul>'
+        },
+        { id:"forwarders-c-6", label:"6. Suggested Forwarder Creation Flow", html:
+          '<ol>' +
+          '<li>Step 1 – Open Forwarder Management: Navigate to Management → Forwarders and select + ONBOARD FORWARDER.</li>' +
+          '<li>Step 2 – Enter Forwarder Details: Enter the mandatory Name, Primary Contact Email, and UEN Number.</li>' +
+          '<li>Step 3 – Add Department (when required): Select + ADD DEPARTMENT and enter the Department Name and Department Code.</li>' +
+          '<li>Step 4 – Add Mailbox (when required): Within the department, select + ADD MAILBOX and enter the required mailbox and declarant details.</li>' +
+          '<li>Step 5 – Review and Create: Review the complete configuration and select CREATE FORWARDER.</li>' +
+          '<li>Step 6 – Verify Creation: Confirm the “Forwarder Created” success notification and verify the new forwarder details.</li>' +
+          '<li>Step 7 – Edit/Update (when required): Open the forwarder, select Edit, make the required changes, save them, and verify the “Forwarder Updated” success notification.</li>' +
+          '</ol>'
+        },
+        { id:"forwarders-c-appendix", label:"Appendix A – UI Reference", html: "" },
+        { id:"forwarders-step-1", label:"Step 1: Open Forwarder Management", sub:true, html:
+          '<p>Navigate to Management → Forwarders. The Forwarder Management page displays the existing forwarders. Click the highlighted + ONBOARD FORWARDER button to open the Forwarder Onboarding page.</p>' +
+          fig("forwarders", 1, "Forwarder Management Page", 1600, 813)
+        },
+        { id:"forwarders-step-2", label:"Step 2: Enter Forwarder Details and Create the Forwarder", sub:true, html:
+          '<p>Enter the mandatory forwarder details: Name, Primary Contact Email, and UEN Number. If department and mailbox configuration is required, select + ADD DEPARTMENT and complete the related details. Review the information and click CREATE FORWARDER.</p>' +
+          fig("forwarders", 2, "Forwarder Management Page", 1600, 808) +
+          fig("forwarders", 3, "Create Forwarder Management button enabled", 1599, 807)
+        },
+        { id:"forwarders-step-3", label:"Step 3: Verify Forwarder Creation", sub:true, html:
+          '<p>After successful creation, the system opens the Forwarder details page and displays a “Forwarder Created” success notification. Verify the forwarder information shown on the page.</p>' +
+          fig("forwarders", 4, "Forwarder Management Create Successfully", 1600, 809)
+        },
+        { id:"forwarders-step-4", label:"Step 4: Update the Forwarder and Verify the Success Message", sub:true, html:
+          '<p>To modify a forwarder, open the required record and select Edit. Update the required information and save the changes. Confirm that the “Forwarder Updated” success notification is displayed.</p>' +
+          fig("forwarders", 5, "Forwarder Management Updated Successfully", 1591, 813)
+        },
+        { id:"forwarders-step-5", label:"Step 5: Create Department and Mailbox for the Forwarder", sub:true, html:
+          '<p>From this option, you can create a Department and Mailbox for the selected Forwarder.</p>' +
+          fig("forwarders", 6, "Create Department and Mailbox for the Forwarder", 1600, 809)
+        },
+        { id:"forwarders-step-6", label:"Step 6: Verify Forwarder Management Delete", sub:true, html:
+          '<p>Select the Forwarder Management delete action. The Confirm Delete dialog is displayed. Select DELETE to confirm, or CANCEL to leave the mapping unchanged.</p>' +
+          fig("forwarders", 7, "Create Forwarder Deleted", 1600, 812) +
+          fig("forwarders", 8, "Create Forwarder Deleted Successfully", 1600, 814)
+        }
+      ]
+    },
+
+    "departments": {
+      header: pdfMasthead("departments", "Department Management Page Documentation"),
+      sections: [
+        { id:"departments-c-1", label:"1. Page Overview", html:
+          '<p>The Department Management page is used by an authorized administrator to view, search, manage, and create departments associated with freight forwarders.</p>' +
+          '<p>The Add Department page allows the administrator to create a new department by entering the department code, department name, and selecting the associated forwarder.</p>'
+        },
+        { id:"departments-c-2", label:"2. Navigation", html:
+          '<p><strong>Expected navigation paths:</strong></p>' +
+          '<ul><li>Management → Departments</li><li>Management → Departments → Add Department</li></ul>'
+        },
+        { id:"departments-c-3-1", label:"3.1 Page Header and Actions", html:
+          '<table><thead><tr><th>Control</th><th>Type</th><th>Function</th><th>Expected Behavior</th></tr></thead><tbody>' +
+          '<tr><td>REFRESH</td><td>Action button</td><td>Reload the department list.</td><td>Refreshes the displayed department records.</td></tr>' +
+          '<tr><td>CUSTOM COLUMN</td><td>Action button</td><td>Customize visible table columns.</td><td>Opens the column-selection configuration.</td></tr>' +
+          '<tr><td>+ ADD DEPARTMENT</td><td>Primary action button</td><td>Create a new department.</td><td>Navigates to the Add Department page.</td></tr>' +
+          '</tbody></table>'
+        },
+        { id:"departments-c-3-2", label:"3.2 Department List", html:
+          '<p>The Department Management page displays departments in a tabular list. The table contains department information, status, and available actions.</p>' +
+          '<table><thead><tr><th>Column</th><th>Purpose</th><th>Expected Behavior</th></tr></thead><tbody>' +
+          '<tr><td>Selection Checkbox</td><td>Select one or more departments.</td><td>Allows records to be selected for supported bulk actions.</td></tr>' +
+          '<tr><td>Name</td><td>Displays the department name.</td><td>Supports filtering through the Name filter field.</td></tr>' +
+          '<tr><td>Code</td><td>Displays the department code.</td><td>Supports filtering through the Code filter field.</td></tr>' +
+          '<tr><td>Forwarder</td><td>Displays the associated forwarder.</td><td>Supports filtering through the Forwarder dropdown.</td></tr>' +
+          '<tr><td>Status</td><td>Displays the department status.</td><td>Supports filtering by status, such as All or Active.</td></tr>' +
+          '<tr><td>Actions</td><td>Provides record-level operations.</td><td>Displays View, Edit, Activate/Deactivate, and Delete actions as applicable.</td></tr>' +
+          '</tbody></table>'
+        },
+        { id:"departments-c-3-3", label:"3.3 Search and Filter Controls", html:
+          '<table><thead><tr><th>Control</th><th>Input Type</th><th>Purpose</th><th>Expected Behavior</th></tr></thead><tbody>' +
+          '<tr><td>Name</td><td>Text</td><td>Search departments by name.</td><td>Filters the list using the entered department name.</td></tr>' +
+          '<tr><td>Code</td><td>Text</td><td>Search departments by code.</td><td>Filters the list using the entered department code.</td></tr>' +
+          '<tr><td>Forwarder</td><td>Dropdown</td><td>Filter departments by associated forwarder.</td><td>Displays departments belonging to the selected forwarder.</td></tr>' +
+          '<tr><td>Status</td><td>Dropdown</td><td>Filter departments by status.</td><td>Displays departments matching the selected status.</td></tr>' +
+          '</tbody></table>'
+        },
+        { id:"departments-c-3-4", label:"3.4 Department List Actions", html:
+          '<table><thead><tr><th>Action</th><th>Type</th><th>Function</th><th>Expected Behavior</th></tr></thead><tbody>' +
+          '<tr><td>View</td><td>Icon button</td><td>View department details.</td><td>Opens the selected department details.</td></tr>' +
+          '<tr><td>Edit</td><td>Icon button</td><td>Modify department details.</td><td>Opens the department for editing.</td></tr>' +
+          '<tr><td>Activate / Deactivate</td><td>Icon button</td><td>Change department status.</td><td>Updates the department status after applicable confirmation and validation.</td></tr>' +
+          '<tr><td>Delete</td><td>Icon button</td><td>Delete a department.</td><td>Deletes the selected department subject to confirmation and business rules.</td></tr>' +
+          '</tbody></table>'
+        },
+        { id:"departments-c-3-5", label:"3.5 Pagination", html:
+          '<p>The department list supports pagination and allows the administrator to control the number of departments displayed per page.</p>' +
+          '<ul>' +
+          '<li>Departments per page selector.</li>' +
+          '<li>Current page indicator.</li>' +
+          '<li>Total department count.</li>' +
+          '<li>Previous page and next page controls.</li>' +
+          '<li>First page and last page controls, where available.</li>' +
+          '</ul>'
+        },
+        { id:"departments-c-4-1", label:"4.1 Page Overview (Add Department)", html:
+          '<p>The Add Department page is used to create a new department and associate it with an existing forwarder.</p>'
+        },
+        { id:"departments-c-4-2", label:"4.2 Department Details", html:
+          '<table><thead><tr><th>Field</th><th>Required</th><th>Input Type</th><th>Purpose</th><th>Expected Validation</th></tr></thead><tbody>' +
+          '<tr><td>Code</td><td>Yes (*)</td><td>Text</td><td>Unique code used to identify the department.</td><td>Should not be blank; format and uniqueness rules should be enforced.</td></tr>' +
+          '<tr><td>Name</td><td>Yes (*)</td><td>Text</td><td>Name of the department.</td><td>Should not be blank.</td></tr>' +
+          '<tr><td>Forwarder</td><td>Yes (*)</td><td>Dropdown</td><td>Selects the forwarder to which the department belongs.</td><td>A valid forwarder must be selected.</td></tr>' +
+          '</tbody></table>' +
+          '<p>Example values shown in the screenshot:</p>' +
+          '<ul><li>Code: EXP</li><li>Name: EXPORT</li><li>Forwarder: FORWDWER 1</li></ul>'
+        },
+        { id:"departments-c-4-3", label:"4.3 Forwarder Dropdown", html:
+          '<p>The Forwarder field provides a dropdown list of available forwarders. The administrator must select the appropriate forwarder before creating the department.</p>' +
+          '<p>Examples of forwarders visible in the dropdown include:</p>' +
+          '<ul><li>FORWDWER 1</li><li>FORWDWER 2</li></ul>'
+        },
+        { id:"departments-c-5", label:"5. Page Controls", html:
+          '<table><thead><tr><th>Control</th><th>Type</th><th>Function</th><th>Expected Behavior</th></tr></thead><tbody>' +
+          '<tr><td>CANCEL</td><td>Button</td><td>Discard department creation.</td><td>Returns to the Department Management page without creating the department.</td></tr>' +
+          '<tr><td>CREATE DEPARTMENT</td><td>Primary button</td><td>Create the department.</td><td>Creates the department after all required fields and validations pass.</td></tr>' +
+          '</tbody></table>'
+        },
+        { id:"departments-c-6", label:"6. Validation Requirements", html:
+          '<ul>' +
+          '<li>All fields marked with * should be treated as mandatory.</li>' +
+          '<li>Department Code should not accept blank or whitespace-only input.</li>' +
+          '<li>Department Code should satisfy the application\'s allowed-character and uniqueness rules.</li>' +
+          '<li>Department Name should not accept blank or whitespace-only input.</li>' +
+          '<li>A valid forwarder must be selected.</li>' +
+          '<li>The selected forwarder must exist and be active where required by the application\'s business rules.</li>' +
+          '<li>Invalid or incomplete data should prevent department creation.</li>' +
+          '<li>Validation messages should be displayed close to the relevant field and should be understandable to the administrator.</li>' +
+          '<li>The Create Department button should remain unavailable or disabled when mandatory information is incomplete, where that is the intended UI behavior.</li>' +
+          '<li>The newly created department should be associated with the selected forwarder and should appear in the Department Management list after successful creation.</li>' +
+          '</ul>'
+        },
+        { id:"departments-c-7", label:"7. Suggested Department Creation Flow", html:
+          '<ol>' +
+          '<li>Open Management → Departments.</li>' +
+          '<li>Select Add Department.</li>' +
+          '<li>Enter the Department Code.</li>' +
+          '<li>Enter the Department Name.</li>' +
+          '<li>Open the Forwarder dropdown.</li>' +
+          '<li>Select the appropriate forwarder.</li>' +
+          '<li>Review the entered information.</li>' +
+          '<li>Select Create Department.</li>' +
+          '<li>System validates the department information and forwarder selection.</li>' +
+          '<li>If validation succeeds, the department is created and associated with the selected forwarder.</li>' +
+          '<li>If validation fails, the system should display the relevant error messages and keep the entered data where appropriate.</li>' +
+          '</ol>'
+        },
+        { id:"departments-c-appendix", label:"Appendix A – UI Reference", html: "" },
+        { id:"departments-step-1", label:"Step 1: Open Department Management", sub:true, html:
+          '<p>From the Tradenix dashboard, navigate to Management → Departments. The Department Management page displays the existing departments. Click the highlighted + ADD DEPARTMENT button to start creating a new department.</p>' +
+          fig("departments", 1, "Department Management", 1600, 814)
+        },
+        { id:"departments-step-2", label:"Step 2: Enter Department Details", sub:true, html:
+          '<p>On the Add Department page, enter the mandatory Department Code and Department Name, then select the appropriate Forwarder from the Forwarder dropdown. The department will be associated with the selected forwarder.</p>' +
+          fig("departments", 2, "Add Department", 1600, 807)
+        },
+        { id:"departments-step-3", label:"Step 3: Create the Department", sub:true, html:
+          '<p>After completing all mandatory fields and confirming the selected forwarder, review the entered information and click the highlighted CREATE DEPARTMENT button. The system validates the details before creating the department.</p>' +
+          fig("departments", 3, "Create Department", 1600, 814)
+        },
+        { id:"departments-step-4", label:"Step 4: Verify Successful Creation", sub:true, html:
+          '<p>After successful creation, the system opens the View Department page and displays the Department Created success notification. Verify that the department Code, Name, and Forwarder are correct. The Mailboxes section can then be used for mailbox-related configuration where applicable.</p>' +
+          fig("departments", 4, "Department Created Successfully", 1600, 809)
+        },
+        { id:"departments-step-5", label:"Step 5: Verify Department Update", sub:true, html:
+          '<p>When an existing department is edited and the changes are saved successfully, the system returns to the View Department page and displays the Department Updated success notification. Verify the updated department details before continuing.</p>' +
+          fig("departments", 5, "Department Updated Successfully", 1600, 801)
+        },
+        { id:"departments-step-6", label:"Step 6: Verify Department Delete", sub:true, html:
+          '<p>Select the Department Management delete action. The Confirm Delete dialog is displayed. Select DELETE to confirm, or CANCEL to leave the mapping unchanged.</p>' +
+          fig("departments", 6, "Department delete", 1600, 810) +
+          fig("departments", 7, "Department deleted Successfully", 1600, 810)
+        }
+      ]
+    },
+
+    "mailboxes": {
+      header: pdfMasthead("mailboxes", "Mailbox Management Page Documentation"),
+      sections: [
+        { id:"mailboxes-c-1", label:"1. Page Overview", html:
+          '<p>The Mailbox Management page is used by an authorized administrator to view, search, manage, and create mailboxes associated with freight forwarders.</p>' +
+          '<p>The Add Mailbox page allows the administrator to create a new mailbox by entering TradeNet account details, selecting a forwarder, and entering declarant and company information.</p>'
+        },
+        { id:"mailboxes-c-2", label:"2. Navigation", html:
+          '<p><strong>Expected navigation paths:</strong></p>' +
+          '<ul>' +
+          '<li>Management → Mailboxes</li>' +
+          '<li>Management → Mailboxes → + ADD MAILBOX</li>' +
+          '<li>Management → Mailboxes → View Mailbox → + ADD SEQUENCE POOL</li>' +
+          '</ul>'
+        },
+        { id:"mailboxes-c-3-1", label:"3.1 Mailbox Management List", html:
+          '<p>The Mailbox Management page displays mailbox records in a tabular list. The table should contain mailbox information, associated forwarder details, status, and available actions. (Refer Figure 1 below)</p>' +
+          '<table><thead><tr><th>Control / Column</th><th>Purpose</th><th>Observed / Expected Behavior</th></tr></thead><tbody>' +
+          '<tr><td>IMPORT</td><td>Import mailbox data.</td><td>Visible on the list page. Detailed import behavior is not shown in the supplied screenshots and should be confirmed before documenting the import flow.</td></tr>' +
+          '<tr><td>REFRESH</td><td>Reload the displayed mailbox list.</td><td>Refreshes current mailbox records.</td></tr>' +
+          '<tr><td>CUSTOM COLUMN</td><td>Customize visible table columns.</td><td>Opens the column selection/configuration where supported.</td></tr>' +
+          '<tr><td>+ ADD MAILBOX</td><td>Start mailbox creation.</td><td>Navigates to the Add Mailbox page.</td></tr>' +
+          '<tr><td>TradeNet Account</td><td>Shows the TradeNet account name.</td><td>Supports a text filter in the list header.</td></tr>' +
+          '<tr><td>Forwarder</td><td>Shows the associated forwarder.</td><td>Displays the forwarder mapped to the mailbox.</td></tr>' +
+          '<tr><td>Mailbox ID</td><td>Shows the TradeNet Mailbox ID.</td><td>Supports a text filter in the list header.</td></tr>' +
+          '<tr><td>Declarant Code / Declarant Name</td><td>Shows declarant details.</td><td>Used to identify the declarant associated with the mailbox.</td></tr>' +
+          '<tr><td>Status</td><td>Shows mailbox status.</td><td>The screenshot shows ACTIVE and a status filter.</td></tr>' +
+          '<tr><td>Actions</td><td>Mailbox-level actions.</td><td>The list shows action icons; View, Edit, status action and Delete are documented only to the extent visible/supported.</td></tr>' +
+          '</tbody></table>'
+        },
+        { id:"mailboxes-c-3-2", label:"3.2 Mailbox List", html:
+          '<p>The Mailbox Management page displays mailbox records in a tabular list. The table should contain mailbox information, associated forwarder details, status, and available actions. (Refer Figure 1 below)</p>' +
+          '<table><thead><tr><th>Column</th><th>Purpose</th><th>Expected Behavior</th></tr></thead><tbody>' +
+          '<tr><td>Selection Checkbox</td><td>Select one or more mailboxes.</td><td>Allows records to be selected for supported bulk actions.</td></tr>' +
+          '<tr><td>TradeNet Account Name</td><td>Displays the TradeNet account name.</td><td>Supports filtering where the field is available.</td></tr>' +
+          '<tr><td>TradeNet Mailbox ID</td><td>Displays the mailbox identifier.</td><td>Supports filtering where the field is available.</td></tr>' +
+          '<tr><td>Forwarder</td><td>Displays the associated forwarder.</td><td>Supports filtering by forwarder.</td></tr>' +
+          '<tr><td>Declarant Name</td><td>Displays the declarant name.</td><td>Supports filtering where the field is available.</td></tr>' +
+          '<tr><td>Company Name</td><td>Displays the associated company.</td><td>Supports filtering where the field is available.</td></tr>' +
+          '<tr><td>Status</td><td>Displays the mailbox status.</td><td>Supports filtering by status, such as All or Active.</td></tr>' +
+          '<tr><td>Actions</td><td>Provides record-level operations.</td><td>Displays View, Edit, Activate/Deactivate, and Delete actions as applicable.</td></tr>' +
+          '</tbody></table>'
+        },
+        { id:"mailboxes-c-3-3", label:"3.3 Search and Filter Controls", html:
+          '<p>The mailbox list may provide search and filter controls for locating mailbox records. The exact list columns and filter fields should be confirmed from the Mailbox Management list screen. (Refer Figure 1)</p>' +
+          '<table><thead><tr><th>Control</th><th>Input Type</th><th>Purpose</th><th>Expected Behavior</th></tr></thead><tbody>' +
+          '<tr><td>Account Name</td><td>Text</td><td>Search by TradeNet account name.</td><td>Filters the list using the entered account name.</td></tr>' +
+          '<tr><td>Mailbox ID</td><td>Text</td><td>Search by TradeNet mailbox ID.</td><td>Filters the list using the entered mailbox ID.</td></tr>' +
+          '<tr><td>Forwarder</td><td>Dropdown</td><td>Filter by associated forwarder.</td><td>Displays mailboxes belonging to the selected forwarder.</td></tr>' +
+          '<tr><td>Status</td><td>Dropdown</td><td>Filter by mailbox status.</td><td>Displays mailboxes matching the selected status.</td></tr>' +
+          '</tbody></table>'
+        },
+        { id:"mailboxes-c-3-4", label:"3.4 Mailbox List Actions", html:
+          '<p>The mailbox list may provide action controls for locating mailbox landing page. (Refer Figure 1 below)</p>' +
+          '<table><thead><tr><th>Action</th><th>Type</th><th>Function</th><th>Expected Behavior</th></tr></thead><tbody>' +
+          '<tr><td>View</td><td>Icon button</td><td>View mailbox details.</td><td>Opens the selected mailbox details.</td></tr>' +
+          '<tr><td>Edit</td><td>Icon button</td><td>Modify mailbox details.</td><td>Opens the mailbox for editing.</td></tr>' +
+          '<tr><td>Activate / Deactivate</td><td>Icon button</td><td>Change mailbox status.</td><td>Updates the mailbox status after applicable confirmation and validation.</td></tr>' +
+          '<tr><td>Delete</td><td>Icon button</td><td>Delete a mailbox.</td><td>Deletes the selected mailbox subject to confirmation and business rules.</td></tr>' +
+          '</tbody></table>'
+        },
+        { id:"mailboxes-c-3-5", label:"3.5 Pagination", html:
+          '<p>The mailbox list should support pagination and allow the administrator to control the number of mailboxes displayed per page, where applicable.</p>' +
+          '<ul>' +
+          '<li>Mailboxes per page selector.</li>' +
+          '<li>Current page indicator.</li>' +
+          '<li>Total mailbox count.</li>' +
+          '<li>Previous page and next page controls.</li>' +
+          '<li>First page and last page controls, where available.</li>' +
+          '</ul>'
+        },
+        { id:"mailboxes-c-4-1", label:"4.1 Page Overview (Add Mailbox)", html:
+          '<p>The Add Mailbox page is used to create a new mailbox and associate it with an existing forwarder. (Refer Figure 2 below)</p>'
+        },
+        { id:"mailboxes-c-4-2", label:"4.2 TradeNet and Forwarder Details", html:
+          '<table><thead><tr><th>Field</th><th>Required</th><th>Input Type</th><th>Purpose</th><th>Expected Validation</th></tr></thead><tbody>' +
+          '<tr><td>TradeNet Account Name</td><td>Yes (*)</td><td>Text</td><td>Account name used for the TradeNet mailbox.</td><td>Should not be blank.</td></tr>' +
+          '<tr><td>TradeNet Mailbox ID</td><td>Yes (*)</td><td>Text</td><td>Unique identifier of the TradeNet mailbox.</td><td>Required; format and uniqueness rules should be enforced.</td></tr>' +
+          '<tr><td>Password</td><td>Yes (*)</td><td>Password</td><td>Password associated with the TradeNet mailbox.</td><td>Required; should be securely handled.</td></tr>' +
+          '<tr><td>Forwarder</td><td>Yes (*)</td><td>Dropdown</td><td>Selects the forwarder associated with the mailbox.</td><td>A valid forwarder must be selected.</td></tr>' +
+          '</tbody></table>'
+        },
+        { id:"mailboxes-c-4-3", label:"4.3 Declarant and Company Details", html:
+          '<table><thead><tr><th>Field</th><th>Required</th><th>Input Type</th><th>Purpose</th><th>Expected Validation</th></tr></thead><tbody>' +
+          '<tr><td>Declarant Code</td><td>Yes (*)</td><td>Text</td><td>Code identifying the declarant.</td><td>Should not be blank.</td></tr>' +
+          '<tr><td>Declarant Name</td><td>Yes (*)</td><td>Text</td><td>Name of the declarant.</td><td>Should not be blank.</td></tr>' +
+          '<tr><td>Declarant Telephone</td><td>Yes (*)</td><td>Text/Telephone</td><td>Telephone number of the declarant.</td><td>Required; accepted format should be confirmed.</td></tr>' +
+          '<tr><td>Company UEN</td><td>Yes (*)</td><td>Text</td><td>UEN of the associated company.</td><td>Required; format and uniqueness rules should be confirmed.</td></tr>' +
+          '<tr><td>Company Name</td><td>Yes (*)</td><td>Lookup/Text</td><td>Name of the associated company.</td><td>Required; a valid company should be selected or entered.</td></tr>' +
+          '</tbody></table>' +
+          '<p>Example values shown in the screenshot:</p>' +
+          '<ul>' +
+          '<li>TradeNet Account Name: YYYYY</li>' +
+          '<li>TradeNet Mailbox ID: X123456789</li>' +
+          '<li>Forwarder: Forwarder 1</li>' +
+          '<li>Declarant Code: XXX</li>' +
+          '<li>Declarant Name: XXXXXXXX</li>' +
+          '<li>Declarant Telephone: 987654321</li>' +
+          '<li>Company UEN: XY98765432</li>' +
+          '<li>Company Name: xxxxxx</li>' +
+          '</ul>'
+        },
+        { id:"mailboxes-c-4-4", label:"4.4 Field Controls", html:
+          '<table><thead><tr><th>Control</th><th>Type</th><th>Function</th><th>Expected Behavior</th></tr></thead><tbody>' +
+          '<tr><td>Password Visibility</td><td>Eye icon</td><td>Show or hide the password.</td><td>Toggles password visibility without changing its value.</td></tr>' +
+          '<tr><td>Forwarder Dropdown</td><td>Dropdown</td><td>Select an existing forwarder.</td><td>Displays available forwarders and allows one valid forwarder to be selected.</td></tr>' +
+          '<tr><td>Company Search</td><td>Search/Lookup icon</td><td>Search for a company.</td><td>Opens or activates company lookup functionality.</td></tr>' +
+          '<tr><td>Company Selection Clear</td><td>Clear icon</td><td>Remove the selected company.</td><td>Clears the selected company value.</td></tr>' +
+          '</tbody></table>'
+        },
+        { id:"mailboxes-c-5", label:"5. Page Controls", html:
+          '<table><thead><tr><th>Control</th><th>Type</th><th>Function</th><th>Expected Behavior</th></tr></thead><tbody>' +
+          '<tr><td>CANCEL</td><td>Button</td><td>Discard mailbox creation.</td><td>Returns to the Mailbox Management page without creating the mailbox.</td></tr>' +
+          '<tr><td>CREATE MAILBOX</td><td>Primary button</td><td>Create the mailbox.</td><td>Creates the mailbox after all required fields and validations pass.</td></tr>' +
+          '</tbody></table>'
+        },
+        { id:"mailboxes-c-6", label:"6. Validation Requirements", html:
+          '<ul>' +
+          '<li>All fields marked with * should be treated as mandatory.</li>' +
+          '<li>TradeNet Account Name should not accept blank or whitespace-only input.</li>' +
+          '<li>TradeNet Mailbox ID should satisfy the application\'s format and uniqueness rules.</li>' +
+          '<li>Password should be required and securely handled.</li>' +
+          '<li>A valid forwarder must be selected.</li>' +
+          '<li>Declarant Code and Declarant Name should not be blank.</li>' +
+          '<li>Declarant Telephone should be validated against the accepted telephone format.</li>' +
+          '<li>Company UEN should satisfy the application\'s format and uniqueness rules.</li>' +
+          '<li>A valid company should be selected or entered in the Company Name field.</li>' +
+          '<li>Invalid or incomplete data should prevent mailbox creation.</li>' +
+          '<li>Validation messages should be displayed close to the relevant field and should be understandable to the administrator.</li>' +
+          '<li>The Create Mailbox button should remain unavailable or disabled when mandatory information is incomplete, where that is the intended UI behavior.</li>' +
+          '<li>The newly created mailbox should be associated with the selected forwarder and should appear in the Mailbox Management list after successful creation.</li>' +
+          '</ul>'
+        },
+        { id:"mailboxes-c-7", label:"7. Suggested Mailbox Creation Flow", html:
+          '<ol>' +
+          '<li>Open Management → Mailboxes.</li>' +
+          '<li>Select Add Mailbox.</li>' +
+          '<li>Enter the TradeNet Account Name.</li>' +
+          '<li>Enter the TradeNet Mailbox ID.</li>' +
+          '<li>Enter the Password.</li>' +
+          '<li>Select the appropriate Forwarder from the dropdown.</li>' +
+          '<li>Enter the Declarant Code.</li>' +
+          '<li>Enter the Declarant Name.</li>' +
+          '<li>Enter the Declarant Telephone.</li>' +
+          '<li>Enter or select the Company UEN.</li>' +
+          '<li>Search for and select the Company Name.</li>' +
+          '<li>Review all entered information.</li>' +
+          '<li>Select Create Mailbox.</li>' +
+          '<li>System validates the mailbox information and forwarder/company selections.</li>' +
+          '<li>If validation succeeds, the mailbox is created and associated with the selected forwarder.</li>' +
+          '<li>If validation fails, the system should display the relevant error messages and keep the entered data where appropriate.</li>' +
+          '<li>A Sequence Pool Range is mandatory for each Mailbox ID before jobs can be created. The configured Sequence Start and Sequence End values define the range of sequence numbers that the system can assign to jobs created under that mailbox.</li>' +
+          '</ol>'
+        },
+        { id:"mailboxes-c-appendix", label:"Appendix A – UI Reference and Step-by-Step Procedure", html: "" },
+        { id:"mailboxes-step-1", label:"Step 1: Open Mailbox Management", sub:true, html:
+          '<p>Navigate to Management → Mailboxes. The Mailbox Management list displays existing mailbox records, filters, status, row actions, and the + ADD MAILBOX action.</p>' +
+          fig("mailboxes", 1, "Mailbox Selection in sidemenu and Add Mailbox", 1597, 814)
+        },
+        { id:"mailboxes-step-2", label:"Step 2: Open Add Mailbox and complete mandatory fields", sub:true, html:
+          '<p>Select + ADD MAILBOX. Enter all required TradeNet, Forwarder, Declarant and Company values. Fields marked with * are mandatory. CREATE MAILBOX button remains unavailable until required information is complete/valid.</p>' +
+          fig("mailboxes", 2, "Create Mailbox Details", 1599, 809)
+        },
+        { id:"mailboxes-step-3", label:"Step 3: Select the company and create the mailbox", sub:true, html:
+          '<p>Use the Company Name lookup/selection control to select the correct company. Review the details, then select CREATE MAILBOX when the action becomes available.</p>' +
+          fig("mailboxes", 3, "Create mailbox button enabled", 1600, 814)
+        },
+        { id:"mailboxes-step-4", label:"Step 4: Verify successful mailbox creation", sub:true, html:
+          '<p>After successful creation, verify the success notification and confirm that the mailbox can be opened from Mailbox Management. The screenshot shows a mailbox-created success notification.</p>' +
+          fig("mailboxes", 4, "Mailbox Created Successfully", 1600, 809)
+        },
+        { id:"mailboxes-step-5", label:"Step 5: Add a Sequence Pool to the mailbox", sub:true, html:
+          '<p>Open the mailbox in View Mailbox and select + ADD SEQUENCE POOL. Enter Pool ID, Description where applicable, Sequence Start and Sequence End. The pool is mapped to the mailbox currently being viewed.</p>' +
+          fig("mailboxes", 5, "Add Sequence Range for mailbox ID", 1601, 807)
+        },
+        { id:"mailboxes-step-6", label:"Step 6: Create the Sequence Pool", sub:true, html:
+          '<p>Confirm that Sequence Start and Sequence End form the intended mapped range, then select CREATE. Only Sequence IDs within a valid mapped range can be used for jobs for this mailbox.</p>' +
+          fig("mailboxes", 6, "Mailbox Sequence create button enabled", 1599, 810)
+        },
+        { id:"mailboxes-step-7", label:"Step 7: Verify the Sequence Pool mapping", sub:true, html:
+          '<p>Verify that the Sequence Pool appears in the Sequence Pools grid with Pool ID, Description, Sequence Start and Sequence End. The row also exposes the supported edit/delete action icons.</p>' +
+          fig("mailboxes", 7, "Mailbox View Page", 1600, 813)
+        },
+        { id:"mailboxes-step-8", label:"Step 8: Delete a Sequence Pool when required", sub:true, html:
+          '<p>Select the Sequence Pool delete action. The Confirm Delete dialog is displayed. Select DELETE to confirm, or CANCEL to leave the mapping unchanged.</p>' +
+          fig("mailboxes", 8, "Mailbox Delete button", 1596, 812) +
+          '<div class="note-box"><strong>Note:</strong> For each mapped Mailbox ID, a specific job sequence number range is configured. Jobs can be created only using sequence numbers within the assigned Sequence Pool ID range.</div>'
         }
       ]
     }
@@ -1785,6 +2657,42 @@
       if(node.children) flattenToc(node.children, depth + 1);
     });
   })(TOC_STRUCTURE, 0);
+
+  // TOC nodes that carry a docId but are not app-module sidebar items
+  // (front-matter sections such as Introduction/Purpose/Scope) still need
+  // to resolve through findById/openDocument. Register them here without
+  // adding anything to NAV_SECTIONS, so the sidebar is left untouched.
+  tocFlat.forEach(function(node){
+    if(node.docId && !itemIndex[node.docId]){
+      itemIndex[node.docId] = {
+        item: { id: node.docId, label: node.title },
+        section: { id: "toc-front-matter", crumb: "Table of Contents" }
+      };
+    }
+  });
+
+  function stripHtml(html){
+    var d = document.createElement("div");
+    d.innerHTML = html;
+    return (d.textContent || d.innerText || "").replace(/\s+/g, " ").trim();
+  }
+
+  // Flatten HTML_DOCS into a single array of plain-text section
+  // entries, used only to extend search into documentation content.
+  var contentFlat = [];
+  Object.keys(HTML_DOCS).forEach(function(docId){
+    var doc = HTML_DOCS[docId];
+    var docLabel = (itemIndex[docId] && itemIndex[docId].item.label) || docId;
+    doc.sections.forEach(function(s){
+      contentFlat.push({
+        docId: docId,
+        sectionId: s.id,
+        label: s.label,
+        docLabel: docLabel,
+        text: stripHtml(s.html)
+      });
+    });
+  });
 
   /* ============================================================
      4. STATE
@@ -1885,19 +2793,26 @@
   var pdfMissing    = document.getElementById("pdfMissing");
   var pdfMissingPath= document.getElementById("pdfMissingPath");
   var openNewTabBtn = document.getElementById("openNewTabBtn");
+  var tocBackBtn    = document.getElementById("tocBackBtn");
   var contentsPanel = document.getElementById("contentsPanel");
   var contentsBody  = document.getElementById("contentsBody");
   var topNav        = document.getElementById("topNav");
   var pdfFrameContainer = document.getElementById("pdfFrameContainer");
   var htmlDocContainer  = document.getElementById("htmlDocContainer");
   var htmlDocContent    = document.getElementById("htmlDocContent");
+  var pendingScrollSectionId = null;
 
   function isPlaceholder(path){
     return !path || /PLACEHOLDER/i.test(path);
   }
 
   function renderHtmlDoc(doc){
-    var html = '<div class="doc-html-subtitle">' + escapeHtml(doc.subtitle) + '</div>';
+    // A raw masthead (logo/brand/title, reproducing the source PDF's own
+    // header) takes priority and renders above everything else, never
+    // nested inside a section. Falls back to the plain italic subtitle
+    // line used by documents that don't have a letterhead in the PDF.
+    var html = doc.header ? doc.header :
+      (doc.subtitle ? '<div class="doc-html-subtitle">' + escapeHtml(doc.subtitle) + '</div>' : '');
     doc.sections.forEach(function(s){
       html += '<section id="' + s.id + '"><h2>' + escapeHtml(s.label) + '</h2>' + s.html + '</section>';
     });
@@ -1914,6 +2829,13 @@
     // Auto-expand the parent section, then render once
     state.expanded[found.section.id] = true;
     renderSidebar();
+
+    // Front-matter TOC entries (Introduction/Purpose/Scope) and the
+    // Management module docs (Users/Forwarders/Departments/Mailboxes) get
+    // an explicit way back to the TOC page they were opened from. Left
+    // hidden for every other document (Dashboard, Status List, IPT/INP/
+    // TNP/OUT/COO, etc.).
+    tocBackBtn.style.display = (found.section.id === "toc-front-matter" || found.section.id === "management") ? "" : "none";
 
     // Breadcrumb
     breadcrumbEl.innerHTML =
@@ -1936,6 +2858,15 @@
       htmlDocContainer.scrollTop = 0;
       renderHtmlDoc(htmlDoc);
       openNewTabBtn.style.display = "none";
+
+      if(pendingScrollSectionId){
+        var scrollTarget = pendingScrollSectionId;
+        pendingScrollSectionId = null;
+        setTimeout(function(){
+          var el = document.getElementById(scrollTarget);
+          if(el) el.scrollIntoView({ behavior:"smooth", block:"start" });
+        }, 30);
+      }
     } else {
       docView.dataset.mode = "pdf";
       htmlDocContainer.classList.remove("active");
@@ -2128,6 +3059,19 @@
       path:"Table of Contents"
     });
   });
+  // Documentation content entries — lets search match text inside the
+  // rendered HTML documentation (headings, tables, lists, steps), not
+  // just sidebar/TOC titles. Result click scrolls to that section.
+  contentFlat.forEach(function(c){
+    searchFlat.push({
+      kind:"content",
+      docId:c.docId,
+      sectionId:c.sectionId,
+      label:c.label,
+      path:c.docLabel,
+      text:c.text
+    });
+  });
 
   function runSearch(query){
     query = query.trim().toLowerCase();
@@ -2135,7 +3079,8 @@
     var results = searchFlat.filter(function(entry){
       return entry.label.toLowerCase().indexOf(query) !== -1 ||
              entry.path.toLowerCase().indexOf(query) !== -1 ||
-             (entry.docId && entry.docId.toLowerCase().indexOf(query) !== -1);
+             (entry.docId && entry.docId.toLowerCase().indexOf(query) !== -1) ||
+             (entry.text && entry.text.toLowerCase().indexOf(query) !== -1);
     }).slice(0, 20);
 
     if(!results.length){
@@ -2165,7 +3110,15 @@
   }
 
   function openSearchResult(entry){
-    if(entry.docId){
+    if(entry.kind === "content"){
+      if(state.activeId === entry.docId){
+        var el = document.getElementById(entry.sectionId);
+        if(el) el.scrollIntoView({ behavior:"smooth", block:"start" });
+      } else {
+        pendingScrollSectionId = entry.sectionId;
+        navigateTo(entry.docId);
+      }
+    } else if(entry.docId){
       navigateTo(entry.docId);
     } else if(entry.kind === "toc"){
       showToc();
